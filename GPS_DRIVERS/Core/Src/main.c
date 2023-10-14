@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
+#include "M8N.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -118,7 +119,7 @@ int main(void)
 	  GPS_BUFFER[0] = GPS_I2C_REGISTER;
 
 	  // let receiver know that I wants me sum data
-	  ret = HAL_I2C_Master_Transmit(&hi2c1, GPS_I2C_ADDRESS, &GPS_BUFFER, 36, HAL_MAX_DELAY);
+	  ret = HAL_I2C_Master_Transmit(&hi2c1, GPS_I2C_ADDRESS, &GPS_BUFFER, 36, HAL_MAX_DELAY);  
 	  if ( ret != HAL_OK ) {
 		  Error_Handler();
 	  } else {
@@ -128,7 +129,7 @@ int main(void)
 			  Error_Handler();
 		  }
 		  else {
-			  if (GPS_BUFFER[0] == 0xff) {
+			  if (GPS_BUFFER[0] == 0xff) {  // buffer[0] == 0xff when there is no data
 				  // do nothing
 			  } else {
 			  HAL_UART_Transmit(&huart2, &GPS_BUFFER, 36, HAL_MAX_DELAY);
