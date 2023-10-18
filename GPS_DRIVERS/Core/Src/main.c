@@ -129,10 +129,16 @@ int main(void)
 			  Error_Handler();
 		  }
 		  else {
-			  if (GPS_BUFFER[0] == 0xff) {  // buffer[0] == 0xff when there is no data
-				  // do nothing
+			  if (GPS_BUFFER[0] != 0xff) {  // buffer[0] == 0xff when there is no data
+				  if (UBX_M8N_CHECKSUM_Check(&GPS_BUFFER, sizeof(GPS_BUFFER)/sizeof(GPS_BUFFER[0])) == 1) { // validates data through checksum
+					  UBX_M8N_NAV_POSLLH_Parsing(&GPS_BUFFER, &data);										// parses data
+
+					  HAL_UART_Transmit(&huart2, &GPS_BUFFER, 36, HAL_MAX_DELAY);
+				  } else {
+					  printf("The checksum is invalid!\r\n");
+				  }
 			  } else {
-			  HAL_UART_Transmit(&huart2, &GPS_BUFFER, 36, HAL_MAX_DELAY);
+				  printf("There is no data!\r\n");
 			  }
 			  HAL_Delay(500);
 		  }

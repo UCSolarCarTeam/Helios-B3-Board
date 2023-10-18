@@ -6,8 +6,9 @@
  */
 #include "M8N.h"
 
-/*
- *	This function validates the data retrieved from the GPS receiver using a checksum.
+NAV_POSLLH_Data data;
+
+/*	This function validates the data retrieved from the GPS receiver using a checksum.
  * 	Checksum is calculated over the message, starting and including CLASS field byte up
  * 	until but not including the Checksum field bytes.
  *
@@ -39,3 +40,16 @@ uint8_t UBX_M8N_CHECKSUM_Check(uint8_t* buffer, uint8_t buflen) {
 }
 
 
+/* This function parses the payload from a NAV_POSLLH message
+ * The payload is in little endian format, so left shift the bytes
+ * Follow reference from driver and protocol description
+ */
+void UBX_M8N_NAV_POSLLH_Parsing(uint8_t *buffer, NAV_POSLLH_Data* data) {
+	data->iTOW = buffer[9]<<24 | buffer[8]<<16 | buffer[7]<<8 | buffer[6];
+	data->lon = buffer[13]<<24 | buffer[12]<<16 | buffer[11]<<8 | buffer[10];
+	data.lan = buffer[17]<<24 | buffer[16]<<16 | buffer[15]<<8 | buffer[14];
+	data->height = buffer[21]<<24 | buffer[20]<<16 | buffer[19]<<8 | buffer[18];
+	data->hMSL = buffer[25]<<24 | buffer[24]<<16 | buffer[23]<<8 | buffer[22];
+	data->hAcc = buffer[29]<<24 | buffer[28]<<16 | buffer[27]<<8 | buffer[26];
+	data->vAcc = buffer[33]<<24 | buffer[32]<<16 | buffer[31]<<8 | buffer[30];
+}
