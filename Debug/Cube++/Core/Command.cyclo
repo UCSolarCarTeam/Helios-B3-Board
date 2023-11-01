@@ -1,0 +1,15 @@
+C:\ST\STM32CubeIDE_1.7.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.win32_1.1.1.202309131626\tools\bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/include/c++/11.3.1/bits/atomic_base.h:104:3:constexpr std::memory_order std::operator&(std::memory_order, std::__memory_order_modifier)	1
+C:/Users/Chris/iCloudDrive/Desktop/SC/Helios-B3-Board/Cube++/CubeDefines.hpp:65:17:uint8_t* cube_malloc(uint32_t)	2
+C:/Users/Chris/iCloudDrive/Desktop/SC/Helios-B3-Board/Cube++/CubeDefines.hpp:79:13:void cube_free(void*)	1
+../Cube++/Core/Command.cpp:28:1:Command::Command()	1
+../Cube++/Core/Command.cpp:41:1:Command::Command(GLOBAL_COMMANDS)	1
+../Cube++/Core/Command.cpp:54:1:Command::Command(uint16_t)	1
+../Cube++/Core/Command.cpp:68:1:Command::Command(GLOBAL_COMMANDS, uint16_t)	1
+../Cube++/Core/Command.cpp:90:10:uint8_t* Command::AllocateData(uint16_t)	4
+../Cube++/Core/Command.cpp:115:6:bool Command::SetCommandToStaticExternalBuffer(uint8_t*, uint16_t)	2
+../Cube++/Core/Command.cpp:130:6:bool Command::CopyDataToCommand(uint8_t*, uint16_t)	4
+../Cube++/Core/Command.cpp:145:6:void Command::Reset()	3
+../Cube++/Core/Command.cpp:159:10:uint16_t Command::GetDataSize() const	2
+C:\ST\STM32CubeIDE_1.7.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.win32_1.1.1.202309131626\tools\bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/include/c++/11.3.1/bits/atomic_base.h:400:7:std::__atomic_base<_IntTp>::__int_type std::__atomic_base<_IntTp>::operator+=(std::__atomic_base<_IntTp>::__int_type) [with _ITp = short unsigned int]	1
+C:\ST\STM32CubeIDE_1.7.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.win32_1.1.1.202309131626\tools\bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/include/c++/11.3.1/bits/atomic_base.h:347:7:std::__atomic_base<_IntTp>::operator std::__atomic_base<_IntTp>::__int_type() const [with _ITp = short unsigned int]	1
+C:\ST\STM32CubeIDE_1.7.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.win32_1.1.1.202309131626\tools\bin/../lib/gcc/arm-none-eabi/11.3.1/../../../../arm-none-eabi/include/c++/11.3.1/bits/atomic_base.h:408:7:std::__atomic_base<_IntTp>::__int_type std::__atomic_base<_IntTp>::operator-=(std::__atomic_base<_IntTp>::__int_type) [with _ITp = short unsigned int]	1

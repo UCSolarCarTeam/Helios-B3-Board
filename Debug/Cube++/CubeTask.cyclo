@@ -1,0 +1,9 @@
+C:/Users/Chris/iCloudDrive/Desktop/SC/Helios-B3-Board/Cube++/Core/Inc/Command.hpp:47:14:uint8_t* Command::GetDataPointer() const	1
+C:/Users/Chris/iCloudDrive/Desktop/SC/Helios-B3-Board/Cube++/Core/Inc/Command.hpp:48:21:GLOBAL_COMMANDS Command::GetCommand() const	1
+C:/Users/Chris/iCloudDrive/Desktop/SC/Helios-B3-Board/Cube++/Core/Inc/Command.hpp:49:14:uint16_t Command::GetTaskCommand() const	1
+../Cube++/CubeTask.hpp:32:22:static CubeTask& CubeTask::Inst()	3
+../Cube++/CubeTask.hpp:40:17:static void CubeTask::RunTask(void*)	1
+../Cube++/CubeTask.hpp:47:5:CubeTask::CubeTask()	1
+../Cube++/CubeTask.cpp:14:6:void CubeTask::InitTask()	3
+../Cube++/CubeTask.cpp:36:6:void CubeTask::Run(void*)	1
+../Cube++/CubeTask.cpp:55:6:void CubeTask::HandleCommand(Command&)	3

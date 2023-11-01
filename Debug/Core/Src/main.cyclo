@@ -1,0 +1,15 @@
+../Drivers/CMSIS/Include/core_cm3.h:1499:26:__NVIC_GetPriorityGrouping	1
+../Drivers/CMSIS/Include/core_cm3.h:1511:22:__NVIC_EnableIRQ	2
+../Drivers/CMSIS/Include/core_cm3.h:1639:22:__NVIC_SetPriority	2
+../Drivers/CMSIS/Include/core_cm3.h:1686:26:NVIC_EncodePriority	2
+../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_ll_usart.h:410:22:LL_USART_Enable	1
+../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_ll_usart.h:1479:22:LL_USART_ConfigAsyncMode	1
+../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_ll_bus.h:214:22:LL_AHB1_GRP1_EnableClock	1
+../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_ll_bus.h:529:22:LL_APB1_GRP1_EnableClock	1
+../Core/Src/main.c:71:5:main	1
+../Core/Src/main.c:147:6:SystemClock_Config	3
+../Core/Src/main.c:189:13:MX_CRC_Init	2
+../Core/Src/main.c:215:13:MX_UART5_Init	1
+../Core/Src/main.c:279:13:MX_GPIO_Init	1
+../Core/Src/main.c:303:6:StartDefaultTask	1
+../Core/Src/main.c:318:6:Error_Handler	1
