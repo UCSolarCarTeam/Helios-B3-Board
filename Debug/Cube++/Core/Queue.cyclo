@@ -1,7 +1,0 @@
-../Cube++/Core/Queue.cpp:17:1:Queue::Queue()	1
-../Cube++/Core/Queue.cpp:28:1:Queue::Queue(uint16_t)	1
-../Cube++/Core/Queue.cpp:40:6:bool Queue::SendFromISR(Command&)	2
-../Cube++/Core/Queue.cpp:56:6:bool Queue::SendToFront(Command&)	2
-../Cube++/Core/Queue.cpp:73:6:bool Queue::Send(Command&)	2
-../Cube++/Core/Queue.cpp:92:6:bool Queue::Receive(Command&, uint32_t)	2
-../Cube++/Core/Queue.cpp:105:6:bool Queue::ReceiveWait(Command&)	2

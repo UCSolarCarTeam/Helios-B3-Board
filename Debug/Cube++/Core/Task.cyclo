@@ -1,4 +1,0 @@
-/Users/cjchan/Desktop/SC/Helios-B3-Board/Cube++/CubeDefines.hpp:65:17:uint8_t* cube_malloc(uint32_t)	2
-/Users/cjchan/Desktop/SC/Helios-B3-Board/Cube++/CubeDefines.hpp:89:14:void* operator new(size_t)	1
-../Cube++/Core/Task.cpp:12:1:Task::Task()	1
-../Cube++/Core/Task.cpp:22:1:Task::Task(uint16_t)	2

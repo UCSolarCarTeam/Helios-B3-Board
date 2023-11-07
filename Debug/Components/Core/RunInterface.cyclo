@@ -1,2 +1,0 @@
-../Components/Core/RunInterface.cpp:12:10:void run_interface()	1
-../Components/Core/RunInterface.cpp:17:10:void cpp_USART2_IRQHandler()	1

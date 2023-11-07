@@ -1,8 +1,0 @@
-/Users/cjchan/Desktop/SC/Helios-B3-Board/Cube++/Core/Inc/Task.hpp:29:10:void Task::SendCommandReference(Command&)	1
-../Cube++/CubeTask.hpp:32:22:static CubeTask& CubeTask::Inst()	3
-../Cube++/CubeTask.hpp:47:5:CubeTask::CubeTask()	1
-../Cube++/CubeDefines.cpp:26:6:)	3
-../Cube++/CubeDefines.cpp:69:6:)	8
-../Cube++/CubeDefines.cpp:126:1:void __static_initialization_and_destruction_0(int, int)	5
-../Cube++/CubeDefines.cpp:126:1:cpp)	1
-../Cube++/CubeDefines.cpp:126:1:cpp)	1
