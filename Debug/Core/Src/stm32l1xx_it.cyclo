@@ -5,3 +5,4 @@
 ../Core/Src/stm32l1xx_it.c:131:6:UsageFault_Handler	1
 ../Core/Src/stm32l1xx_it.c:146:6:DebugMon_Handler	1
 ../Core/Src/stm32l1xx_it.c:166:6:TIM2_IRQHandler	1
+../Core/Src/stm32l1xx_it.c:180:6:USART2_IRQHandler	1

@@ -14,7 +14,7 @@
 
 /* Drivers ------------------------------------------------------------------*/
 namespace Driver {
-    UARTDriver uart5(UART5);
+    UARTDriver uart2(USART2);
 }
 
 /* Interface Functions ------------------------------------------------------------*/
