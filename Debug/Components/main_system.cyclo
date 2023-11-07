@@ -1,6 +1,6 @@
-C:/Users/Chris/iCloudDrive/Desktop/SC/Helios-B3-Board/Cube++/Drivers/Inc/UARTDriver.hpp:59:2:UARTDriver::UARTDriver(USART_TypeDef*)	1
-C:/Users/Chris/iCloudDrive/Desktop/SC/Helios-B3-Board/Cube++/CubeTask.hpp:32:22:static CubeTask& CubeTask::Inst()	3
-C:/Users/Chris/iCloudDrive/Desktop/SC/Helios-B3-Board/Cube++/CubeTask.hpp:47:5:CubeTask::CubeTask()	1
+/Users/cjchan/Desktop/SC/Helios-B3-Board/Cube++/Drivers/Inc/UARTDriver.hpp:59:2:UARTDriver::UARTDriver(USART_TypeDef*)	1
+/Users/cjchan/Desktop/SC/Helios-B3-Board/Cube++/CubeTask.hpp:32:22:static CubeTask& CubeTask::Inst()	3
+/Users/cjchan/Desktop/SC/Helios-B3-Board/Cube++/CubeTask.hpp:47:5:CubeTask::CubeTask()	1
 ../Components/main_system.cpp:24:6:void run_main()	1
 ../Components/main_system.cpp:47:1:void __static_initialization_and_destruction_0(int, int)	3
 ../Components/main_system.cpp:47:1:cpp)	1

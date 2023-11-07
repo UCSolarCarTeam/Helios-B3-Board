@@ -84,8 +84,8 @@ all: main-build
 main-build: BCubed.elf secondary-outputs
 
 # Tool invocations
-BCubed.elf BCubed.map: $(OBJS) $(USER_OBJS) C:\Users\Chris\iCloudDrive\Desktop\SC\Helios-B3-Board\STM32L152RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "BCubed.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\Chris\iCloudDrive\Desktop\SC\Helios-B3-Board\STM32L152RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BCubed.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+BCubed.elf BCubed.map: $(OBJS) $(USER_OBJS) /Users/cjchan/Desktop/SC/Helios-B3-Board/STM32L152RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "BCubed.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"/Users/cjchan/Desktop/SC/Helios-B3-Board/STM32L152RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BCubed.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
