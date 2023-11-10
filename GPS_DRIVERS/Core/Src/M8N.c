@@ -5,8 +5,67 @@
  *      Author: Nathan Ante
  */
 #include "M8N.h"
+#include "main.h"
+#include <stdint.h>
 
-NAV_POSLLH_Data data;
+extern I2C_HandleTypeDef hi2c1;
+extern UART_HandleTypeDef huart2;
+
+/*------------------------------- GPS Functions -------------------------------*/
+uint8_t UBX_CFG_PRT[] = {
+	0xB5, 0x62, 0x06, 0x00, 0x14, 0x00,		// header and class/id bytes and length
+	// payload
+	0x00, 0x00,								// Port Identifier & reserved
+	0x00, 0x00,								// txReady settings
+	0x42<<1, 0x00, 0x00, 0x00,  			// I2C mode flags
+	0x00,  0x00, 0x00, 0x00,				// reserved
+	0x01, 0x00,								// inProtoMask
+	0x01, 0x00, 							// outProtoMask
+	0x00, 0x00,								// extended TX timeout
+	0x00, 0x00,								// reserved
+	// Checksum bytes (to-be-added)
+	0xA0, 0x96
+};
+
+uint8_t UBX_CFG_MSG[] = {
+	0xB5, 0x62, 0x06, 0x01,	0x08, 0x00,	// header and class/id bytes and length
+	// payload
+	0x01, 0x02, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+	// Checksum bytes (to-be-added)
+	0x13, 0xBE
+};
+
+uint8_t UBX_CFG_RATE[] = {
+	0xB5, 0x62, 0x06, 0x08,	0x06, 0x00,	// header and class/id bytes and length
+	// payload
+	0xE8, 0x03, 						// measRate(ms)
+	0x01, 0x00, 						// navRate(cycles
+	0x01, 0x00,							// timeRef - 1:GPS time
+	// Checksum bytes (to-be-added)
+	0x01, 0x39
+};
+
+// might be used...
+uint8_t UBX_CFG_CFG[] = {
+	0xB5, 0x62, 0x06, 0x09,	0x0D, 0x00,	// header and class/id bytes and length
+	// payload
+	0x0D, 0x00, 0x00, 0x00, 			// clearMask
+	0x00, 0x00, 0x00, 0x00,				// saveMask
+	0x00, 0x00, 0x00, 0x00,				// loadMask
+	0x00,								// deviceMask
+	// Checksum bytes (to-be-added)
+	0x00, 0x00							
+};
+
+uint8_t UBX_ACK_ACK[] = {
+	0xB5, 0x62, 0x05, 0x01, 0x02, 0x00,	// header and class/id bytes and length
+	0x00,								// classID of the acknowledged message	(to-be-added)
+	0x00,								// messageID of the acknowledged message (to-be-added)
+	// Checksum bytes (to-be-added)
+	0x00, 0x00	
+};
+
+/*------------------------------- GPS Functions -------------------------------*/
 
 /*	This function validates the data retrieved from the GPS receiver using a checksum.
  * 	Checksum is calculated over the message, starting and including CLASS field byte up
@@ -14,13 +73,12 @@ NAV_POSLLH_Data data;
  *
  * 	Essentially, don't include the first and last 2 bytes of the buffer.
  *
- *	After calculating the checksum values CK_A and CK_B, compare with the buffer/message's
- *	checksum bytes, compare CK_A with buffer's second last byte, and compare CK_B with last byte.
- *	If both are equal to each of their pairs, then data retrieved from GPS receiver is valid.
+ *	After calculating the checksum values CK_A and CK_B, return it as a 16 bit unsigned integer
+ *  Where CK_A is the high byte, and CK_B is the low byte
  *
  *	Check documentation if you need more info, details in header file
  */
-uint8_t UBX_M8N_CHECKSUM_Check(uint8_t* buffer, uint8_t buflen) {
+uint16_t UBX_M8N_CHECKSUM(uint8_t* buffer, uint8_t buflen) {
 
 	// These values will be used to compare with the buffer's
 	uint8_t CK_A = 0, CK_B = 0;
@@ -35,8 +93,10 @@ uint8_t UBX_M8N_CHECKSUM_Check(uint8_t* buffer, uint8_t buflen) {
 
 	// After calculating checksum, compare with checksum bytes from buffer
 	// Return 1 if both are equal to buffer checksum, return 0 if not
-	return ((CK_A == buffer[buflen - 2]) && (CK_B == buffer[buflen - 1]));
+	// return ((CK_A == buffer[buflen - 2]) && (CK_B == buffer[buflen - 1]));
 
+	// return 2 byte checksum
+	return ((CK_A<<8) | CK_B);
 }
 
 
@@ -44,12 +104,64 @@ uint8_t UBX_M8N_CHECKSUM_Check(uint8_t* buffer, uint8_t buflen) {
  * The payload is in little endian format, so left shift the bytes
  * Follow reference from driver and protocol description
  */
-void UBX_M8N_NAV_POSLLH_Parsing(uint8_t *buffer, NAV_POSLLH_Data* data) {
+void UBX_M8N_NAV_POSLLH_Parsing(uint8_t *buffer, NavData* data) {
 	data->iTOW = buffer[9]<<24 | buffer[8]<<16 | buffer[7]<<8 | buffer[6];
 	data->lon = buffer[13]<<24 | buffer[12]<<16 | buffer[11]<<8 | buffer[10];
-	data.lan = buffer[17]<<24 | buffer[16]<<16 | buffer[15]<<8 | buffer[14];
+	data->lat = buffer[17]<<24 | buffer[16]<<16 | buffer[15]<<8 | buffer[14];
 	data->height = buffer[21]<<24 | buffer[20]<<16 | buffer[19]<<8 | buffer[18];
 	data->hMSL = buffer[25]<<24 | buffer[24]<<16 | buffer[23]<<8 | buffer[22];
 	data->hAcc = buffer[29]<<24 | buffer[28]<<16 | buffer[27]<<8 | buffer[26];
 	data->vAcc = buffer[33]<<24 | buffer[32]<<16 | buffer[31]<<8 | buffer[30];
 }
+
+/* This function sets a desired configuration in the GPS receiver
+ * It takes in a pointer to the configuration message buffer, as well as its size
+ * Calls Error_Handler() if something goes wrong
+*/
+void CONFIG_Transmit(uint8_t* buffer, uint8_t buflen) {
+	HAL_StatusTypeDef hal;    				// HAL return status
+	uint8_t ACK_BUFFER[10];   				// temporary buffer for acknowledge message
+	ACK_BUFFER[0] = GPS_DATA_REGISTER;	  	// set first element of buffer as register of data stream
+
+	// set global ACK message with expected values
+	UBX_ACK_ACK[6] = buffer[2];
+	UBX_ACK_ACK[7] = buffer[3];
+
+	// set the checksum bytes of the expected ACK message
+	uint16_t expectedCheckSum = UBX_M8N_CHECKSUM(UBX_ACK_ACK, 10);
+	UBX_ACK_ACK[8] = (expectedCheckSum >> 8) & 0xFF;		// CK_A is the high byte
+	UBX_ACK_ACK[9] = expectedCheckSum & 0xFF;				// CK_B is the low byte
+	
+	// transmit desired CONFIG to GPS receiver
+	hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, buffer, buflen, HAL_MAX_DELAY);
+	if (hal != HAL_OK) {
+		// something went wrong with transmit (exit)
+		Error_Handler();
+	}
+
+	hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, UBX_ACK_ACK, 10, HAL_MAX_DELAY);
+	if (hal != HAL_OK) {
+		// something went wrong with receive (exit)
+		Error_Handler();
+	}
+	
+	for(int i = 0; i < 10; i++) {
+		if (buffer[i] != UBX_ACK_ACK[i]) {
+			// not acknowledged
+			Error_Handler();
+		}
+	}
+}
+
+void GPS_Initialization(void) {
+	CONFIG_Transmit(UBX_CFG_PRT, sizeof(UBX_CFG_PRT)/sizeof(UBX_CFG_PRT[0]));
+	HAL_Delay(500);
+
+	CONFIG_Transmit(UBX_CFG_MSG, sizeof(UBX_CFG_MSG)/sizeof(UBX_CFG_MSG[0]));
+	HAL_Delay(500);
+
+	CONFIG_Transmit(UBX_CFG_RATE, sizeof(UBX_CFG_RATE)/sizeof(UBX_CFG_RATE[0]));
+	HAL_Delay(500);
+}
+
+/*------------------------------- Extra Functions for testing purposes -------------------------------*/

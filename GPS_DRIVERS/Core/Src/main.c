@@ -38,29 +38,16 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define BUFFER_SIZE 36
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
-
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-HAL_StatusTypeDef ret;
-
-uint8_t GPS_I2C_FLAG = 0;	// flag for i2c connection
-uint8_t GPS_I2C_DATA = 0;	// temporary variable for GPS data byte received
-
-uint8_t GPS_BUFFER[36];		// buffer for full UBX(GPS) message
-uint8_t GPS_DATA_COMPLETE_FLAG = 0;		// flag for complete UBX message received
-
-uint8_t GPS_I2C_ADDRESS = 0x42 << 1;	// GPS device address is 0x42, left-shifted for STM32 uses 7-bit address
-uint8_t GPS_I2C_REGISTER  = 0xFF;		// register address for GPS data stream
-
-// In case for "random access" read from i2c (refer to page 38 of data sheet)
-uint8_t	GPS_DATA_LENGTH_HIGH = 0xFD;	// register address for GPS data length (high byte)
-uint8_t GPS_DATA_LENGTH_LOW = 0xFE;		// register address for GPS data length (low byte)
+static uint8_t GPS_I2C_FLAG = 0;	// flag for successful i2c connection
+static uint8_t GPS_I2C_DATA = 0;	// flag for complete UBX message received
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -84,7 +71,9 @@ static void MX_USART2_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  HAL_StatusTypeDef hal;    // HAL status return
+  uint8_t GPS_BUFFER[36];		// buffer for full UBX(GPS) message
+  NavData data;             // Struct for parsed data received from gps
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -109,40 +98,56 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  // Setup GPS receiver with desired configurations
+  GPS_Initialization();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  // GPS receiver returns 0xff if no data is available
-	  GPS_BUFFER[0] = GPS_I2C_REGISTER;
+    // set first element of buffer as the address of data stream register
+	  // If GPS_BUFFER == 0xFF, then it means that there is no data for the GPS to send
+	  GPS_BUFFER[0] = GPS_DATA_REGISTER;
 
-	  // let receiver know that I wants me sum data
-	  ret = HAL_I2C_Master_Transmit(&hi2c1, GPS_I2C_ADDRESS, &GPS_BUFFER, 36, HAL_MAX_DELAY);  
-	  if ( ret != HAL_OK ) {
+	  // Transmit to GPS, let it know I want data
+	  hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);  
+	  if ( hal != HAL_OK ) {
 		  Error_Handler();
-	  } else {
-		  // if HAL_OK then retrieve
-		  ret = HAL_I2C_Master_Receive(&hi2c1, GPS_I2C_ADDRESS | 0x01, &GPS_BUFFER, 36, HAL_MAX_DELAY);
-		  if ( ret != HAL_OK ) {
-			  Error_Handler();
-		  }
-		  else {
-			  if (GPS_BUFFER[0] != 0xff) {  // buffer[0] == 0xff when there is no data
-				  if (UBX_M8N_CHECKSUM_Check(&GPS_BUFFER, sizeof(GPS_BUFFER)/sizeof(GPS_BUFFER[0])) == 1) { // validates data through checksum
-					  UBX_M8N_NAV_POSLLH_Parsing(&GPS_BUFFER, &data);										// parses data
-
-					  HAL_UART_Transmit(&huart2, &GPS_BUFFER, 36, HAL_MAX_DELAY);
-				  } else {
-					  printf("The checksum is invalid!\r\n");
-				  }
-			  } else {
-				  printf("There is no data!\r\n");
-			  }
-			  HAL_Delay(500);
-		  }
 	  }
+		
+    // if HAL_OK then receive data
+    // set bit zero on device address for read access
+    hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
+    if ( hal != HAL_OK ) {
+      Error_Handler();
+    }
+
+    // buffer[0] == 0xff when there is no data
+    if (GPS_BUFFER[0] != 0xff) {
+      
+      // call Checksum function to retrieve computed checksum of the buffer's payload
+      uint16_t computedChecksum = UBX_M8N_CHECKSUM(GPS_BUFFER, BUFFER_SIZE);
+
+      // expected checksum value is the last 2 bytes of the buffer
+      uint16_t expectedChecksum = (GPS_BUFFER[BUFFER_SIZE - 2]<<8) | GPS_BUFFER[BUFFER_SIZE - 1];
+
+      // if computed checksum = expected checksum, then data is valid
+      if (computedChecksum == expectedChecksum) {
+        UBX_M8N_NAV_POSLLH_Parsing(GPS_BUFFER, &data);					      // parses data
+        HAL_UART_Transmit(&huart2, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);    // transmit data to pc through UART (for testing)
+      } else {  
+        // The data received from GPS is invalid
+        printf("The checksum is invalid!\r\n");
+      }
+    } else {
+      // The GPS does not have data to send over  
+      printf("There is no data!\r\n");
+    }
+
+    HAL_Delay(500);
+    
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

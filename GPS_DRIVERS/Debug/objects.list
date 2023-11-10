@@ -1,3 +1,4 @@
+"./Core/Src/M8N.o"
 "./Core/Src/main.o"
 "./Core/Src/stm32l1xx_hal_msp.o"
 "./Core/Src/stm32l1xx_it.o"
@@ -18,4 +19,6 @@
 "./Drivers/STM32L1xx_HAL_Driver/Src/stm32l1xx_hal_pwr_ex.o"
 "./Drivers/STM32L1xx_HAL_Driver/Src/stm32l1xx_hal_rcc.o"
 "./Drivers/STM32L1xx_HAL_Driver/Src/stm32l1xx_hal_rcc_ex.o"
+"./Drivers/STM32L1xx_HAL_Driver/Src/stm32l1xx_hal_tim.o"
+"./Drivers/STM32L1xx_HAL_Driver/Src/stm32l1xx_hal_tim_ex.o"
 "./Drivers/STM32L1xx_HAL_Driver/Src/stm32l1xx_hal_uart.o"
