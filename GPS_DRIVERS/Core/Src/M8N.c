@@ -10,14 +10,14 @@
 
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
-
+extern UART_HandleTypeDef huart1;
 /*------------------------------- GPS Functions -------------------------------*/
 uint8_t UBX_CFG_PRT[] = {
 	0xB5, 0x62, 0x06, 0x00, 0x14, 0x00,		// header and class/id bytes and length
 	// payload
 	0x00, 0x00,								// Port Identifier & reserved
 	0x00, 0x00,								// txReady settings
-	0x42<<1, 0x00, 0x00, 0x00,  			// I2C mode flags
+	0x42, 0x00, 0x00, 0x00,  				// I2C mode flags
 	0x00,  0x00, 0x00, 0x00,				// reserved
 	0x01, 0x00,								// inProtoMask
 	0x01, 0x00, 							// outProtoMask
@@ -28,11 +28,11 @@ uint8_t UBX_CFG_PRT[] = {
 };
 
 uint8_t UBX_CFG_MSG[] = {
-	0xB5, 0x62, 0x06, 0x01,	0x08, 0x00,	// header and class/id bytes and length
+	0xB5, 0x62, 0x06, 0x01,	0x03, 0x00,	// header and class/id bytes and length
 	// payload
-	0x01, 0x02, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+	0x01, 0x02, 0x01,
 	// Checksum bytes (to-be-added)
-	0x13, 0xBE
+	0x0E, 0x47
 };
 
 uint8_t UBX_CFG_RATE[] = {
@@ -45,11 +45,19 @@ uint8_t UBX_CFG_RATE[] = {
 	0x01, 0x39
 };
 
+uint8_t UBX_CFG_RESET[] = {
+	0xB5, 0x62, 0x06, 0x04, 0x04, 0x00,	// header and class/id bytes and length
+	0xFF, 0xFF,							// navBbrMask
+	0x00, 0x00,							// resetMode
+	// checksum
+	0x0C, 0x5D
+};
+
 // might be used...
 uint8_t UBX_CFG_CFG[] = {
 	0xB5, 0x62, 0x06, 0x09,	0x0D, 0x00,	// header and class/id bytes and length
 	// payload
-	0x0D, 0x00, 0x00, 0x00, 			// clearMask
+	0x00, 0x00, 0x00, 0x00, 			// clearMask
 	0x00, 0x00, 0x00, 0x00,				// saveMask
 	0x00, 0x00, 0x00, 0x00,				// loadMask
 	0x00,								// deviceMask
@@ -136,32 +144,47 @@ void CONFIG_Transmit(uint8_t* buffer, uint8_t buflen) {
 	hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, buffer, buflen, HAL_MAX_DELAY);
 	if (hal != HAL_OK) {
 		// something went wrong with transmit (exit)
-		Error_Handler();
+		uint8_t test[] = "CONFIG transmit went wrong\r\n";
+		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
 	}
 
-	hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, UBX_ACK_ACK, 10, HAL_MAX_DELAY);
+	// wait for a sec
+	HAL_Delay(1000);
+
+	hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, ACK_BUFFER, sizeof(ACK_BUFFER)/sizeof(ACK_BUFFER[0]), HAL_MAX_DELAY);
 	if (hal != HAL_OK) {
 		// something went wrong with receive (exit)
-		Error_Handler();
+		uint8_t test[] = "CONFIG receive went wrong\r\n";
+		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
 	}
-	
-	for(int i = 0; i < 10; i++) {
-		if (buffer[i] != UBX_ACK_ACK[i]) {
-			// not acknowledged
-			Error_Handler();
-		}
+
+	HAL_UART_Transmit(&huart2, ACK_BUFFER, sizeof(ACK_BUFFER)/sizeof(ACK_BUFFER[0]), HAL_MAX_DELAY);
+
+	uint8_t test[] = "\n";
+	HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
+
+	if (ACK_BUFFER[2] != 0x05 && ACK_BUFFER[3] != 0x01) {
+		uint8_t test[] = "config ACK went wrong\r\n";
+		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
 	}
 }
 
 void GPS_Initialization(void) {
+
+	uint8_t test[] = "PRT CONFIG STARTS here\r\n";
+	HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
 	CONFIG_Transmit(UBX_CFG_PRT, sizeof(UBX_CFG_PRT)/sizeof(UBX_CFG_PRT[0]));
-	HAL_Delay(500);
+	HAL_Delay(1000);
 
+	uint8_t test2[] = "msg CONFIG STARTS here\r\n";
+	HAL_UART_Transmit(&huart1, test2, sizeof(test2), HAL_MAX_DELAY);
 	CONFIG_Transmit(UBX_CFG_MSG, sizeof(UBX_CFG_MSG)/sizeof(UBX_CFG_MSG[0]));
-	HAL_Delay(500);
+	HAL_Delay(1000);
 
+	uint8_t test3[] = "rate CONFIG STARTS here\r\n";
+	HAL_UART_Transmit(&huart1, test3, sizeof(test3), HAL_MAX_DELAY);
 	CONFIG_Transmit(UBX_CFG_RATE, sizeof(UBX_CFG_RATE)/sizeof(UBX_CFG_RATE[0]));
-	HAL_Delay(500);
+	HAL_Delay(1000);
 }
 
 /*------------------------------- Extra Functions for testing purposes -------------------------------*/

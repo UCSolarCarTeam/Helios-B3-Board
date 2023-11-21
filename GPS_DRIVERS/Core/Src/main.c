@@ -43,11 +43,13 @@
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
+
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-static uint8_t GPS_I2C_FLAG = 0;	// flag for successful i2c connection
-static uint8_t GPS_I2C_DATA = 0;	// flag for complete UBX message received
+uint8_t GPS_FLAG = 0;	// flag for successful i2c connection
+//static uint8_t GPS_DATA = 0;	// flag for complete UBX message received
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -55,6 +57,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -96,58 +99,65 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART2_UART_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   // Setup GPS receiver with desired configurations
   GPS_Initialization();
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // set first element of buffer as the address of data stream register
-	  // If GPS_BUFFER == 0xFF, then it means that there is no data for the GPS to send
-	  GPS_BUFFER[0] = GPS_DATA_REGISTER;
+//	  if (GPS_FLAG == 1) {
+//		  GPS_FLAG = 0;
+		// set first element of buffer as the address of data stream register
+		// If GPS_BUFFER == 0xFF, then it means that there is no data for the GPS to send
+	GPS_BUFFER[0] = GPS_DATA_REGISTER;
 
-	  // Transmit to GPS, let it know I want data
-	  hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);  
-	  if ( hal != HAL_OK ) {
-		  Error_Handler();
+	// Transmit to GPS, let it know I want data
+	hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
+	if ( hal != HAL_OK ) {
+		uint8_t test[] = "data transmit went wrong\r\n";
+		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
+	}
+
+	// if HAL_OK then receive data
+	// set bit zero on device address for read access
+	hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
+	if ( hal != HAL_OK ) {
+		uint8_t test[] = "data receive went wrong\r\n";
+		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
+	}
+
+	// buffer[0] == 0xff when there is no data
+	if (GPS_BUFFER[0] != 0xff) {
+
+	  // call Checksum function to retrieve computed checksum of the buffer's payload
+	  uint16_t computedChecksum = UBX_M8N_CHECKSUM(GPS_BUFFER, BUFFER_SIZE);
+
+	  // expected checksum value is the last 2 bytes of the buffer
+	  uint16_t expectedChecksum = (GPS_BUFFER[BUFFER_SIZE - 2]<<8) | GPS_BUFFER[BUFFER_SIZE - 1];
+
+	  // if computed checksum = expected checksum, then data is valid
+	  if (computedChecksum == expectedChecksum) {
+		UBX_M8N_NAV_POSLLH_Parsing(GPS_BUFFER, &data);					      // parses data
+		HAL_UART_Transmit(&huart2, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);    // transmit data to pc through UART (for testing)
+	  } else {
+		// The data received from GPS is invalid
+		// printf("The checksum is invalid!\r\n");
+		uint8_t test[] = "The checksum is invalid!\r\n";
+		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
 	  }
-		
-    // if HAL_OK then receive data
-    // set bit zero on device address for read access
-    hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
-    if ( hal != HAL_OK ) {
-      Error_Handler();
-    }
+	} else {
+	  // The GPS does not have data to send over
+	  uint8_t test[] = "There is no data!\r\n";
+	  HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
+	}
 
-    // buffer[0] == 0xff when there is no data
-    if (GPS_BUFFER[0] != 0xff) {
-      
-      // call Checksum function to retrieve computed checksum of the buffer's payload
-      uint16_t computedChecksum = UBX_M8N_CHECKSUM(GPS_BUFFER, BUFFER_SIZE);
-
-      // expected checksum value is the last 2 bytes of the buffer
-      uint16_t expectedChecksum = (GPS_BUFFER[BUFFER_SIZE - 2]<<8) | GPS_BUFFER[BUFFER_SIZE - 1];
-
-      // if computed checksum = expected checksum, then data is valid
-      if (computedChecksum == expectedChecksum) {
-        UBX_M8N_NAV_POSLLH_Parsing(GPS_BUFFER, &data);					      // parses data
-        HAL_UART_Transmit(&huart2, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);    // transmit data to pc through UART (for testing)
-      } else {  
-        // The data received from GPS is invalid
-        printf("The checksum is invalid!\r\n");
-      }
-    } else {
-      // The GPS does not have data to send over  
-      printf("There is no data!\r\n");
-    }
-
-    HAL_Delay(500);
-    
+	HAL_Delay(500);
+//	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -231,6 +241,39 @@ static void MX_I2C1_Init(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 9600;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -270,19 +313,38 @@ static void MX_USART2_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin : B1_Pin */
+  GPIO_InitStruct.Pin = B1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin == B1_Pin) {
+	  GPS_FLAG = 1;
+  } else {
+      __NOP();
+  }
+}
 /* USER CODE END 4 */
 
 /**
