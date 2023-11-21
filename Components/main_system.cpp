@@ -43,5 +43,6 @@ void run_main() {
     while (1)
     {
         osDelay(100);
+        HAL_NVIC_SystemReset();
     }
 }
