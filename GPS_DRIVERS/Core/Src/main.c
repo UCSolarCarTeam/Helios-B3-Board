@@ -59,7 +59,17 @@ static void MX_I2C1_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
+#ifdef __GNUC__
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif
 
+PUTCHAR_PROTOTYPE
+{
+  HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+  return ch;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -110,25 +120,21 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	  if (GPS_FLAG == 1) {
-//		  GPS_FLAG = 0;
-		// set first element of buffer as the address of data stream register
-		// If GPS_BUFFER == 0xFF, then it means that there is no data for the GPS to send
+    // set first element of buffer as the address of data stream register
+	// If GPS_BUFFER == 0xFF, then it means that there is no data for the GPS to send
 	GPS_BUFFER[0] = GPS_DATA_REGISTER;
 
 	// Transmit to GPS, let it know I want data
 	hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
 	if ( hal != HAL_OK ) {
-		uint8_t test[] = "data transmit went wrong\r\n";
-		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
+		printf("data transmit went wrong\r\n");
 	}
 
 	// if HAL_OK then receive data
 	// set bit zero on device address for read access
 	hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
 	if ( hal != HAL_OK ) {
-		uint8_t test[] = "data receive went wrong\r\n";
-		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
+		printf("data receive went wrong\r\n");
 	}
 
 	// buffer[0] == 0xff when there is no data
@@ -146,14 +152,13 @@ int main(void)
 		HAL_UART_Transmit(&huart2, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);    // transmit data to pc through UART (for testing)
 	  } else {
 		// The data received from GPS is invalid
-		// printf("The checksum is invalid!\r\n");
-		uint8_t test[] = "The checksum is invalid!\r\n";
-		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
+		printf("The checksum is invalid!\r\n");
+		// uint8_t test[] = "The checksum is invalid!\r\n";
+		// HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
 	  }
 	} else {
 	  // The GPS does not have data to send over
-	  uint8_t test[] = "There is no data!\r\n";
-	  HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
+	  printf("There is no data!\r\n");
 	}
 
 	HAL_Delay(500);
