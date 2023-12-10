@@ -80,11 +80,24 @@ uint16_t UBX_M8N_CHECKSUM(uint8_t *buffer, uint8_t buflen);
  * 
  *  Refer to U-Blox 8 / U-Blox M8 Receiver desciption and protocol specification
 */
-void CONFIG_Transmit(uint8_t *buffer, uint8_t buflen);
+void CONFIG_Transmit(uint8_t *buffer, uint16_t buflen);
 
 /*  Initialize GPS with our desired configs
  *  i.e. i2c communication with UBX message protocol
 */
 void GPS_Initialization(void);
+
+/* After writing to the GPS Data Stream Register (i.e. configs and such),
+ * the receiver should store its response in the same register. It also stores
+ * the length of the response on registers 0xFD (high-byte) abd 0xFE (low-byte).
+ *
+ * This function retrieves the length from registers 0xFD and 0xFE and returns it as a uint16_t
+ */
+uint16_t UBX_GET_LENGTH(void);
+
+
+void UBX_Transmit(uint8_t *buffer, uint16_t buflen);
+
+void UBX_Receive(uint8_t *buffer, uint16_t buflen);
 
 #endif /* INC_M8N_H_ */

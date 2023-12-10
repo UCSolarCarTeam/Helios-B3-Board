@@ -6,11 +6,14 @@
  */
 #include "M8N.h"
 #include "main.h"
+#include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart1;
+
 /*------------------------------- GPS Functions -------------------------------*/
 uint8_t UBX_CFG_PRT[] = {
 	0xB5, 0x62, 0x06, 0x00, 0x14, 0x00,		// header and class/id bytes and length
@@ -75,6 +78,22 @@ uint8_t UBX_ACK_ACK[] = {
 
 /*------------------------------- GPS Functions -------------------------------*/
 
+void UBX_Transmit(uint8_t *buffer, uint16_t buflen) {
+	HAL_StatusTypeDef hal = HAL_I2C_Mem_Write(&hi2c1, GPS_DEVICE_ADDRESS, GPS_DATA_REGISTER, 1, buffer, buflen, 100);
+	if (hal != HAL_OK) {
+		printf("HAL Status: %d | I2C Error: %d | Class and ID: %#X %#X\r\n", hal, hi2c1.ErrorCode, buffer[2], buffer[3]);
+	}
+}
+
+void UBX_Receive(uint8_t *buffer, uint16_t buflen) {
+	HAL_StatusTypeDef hal = HAL_I2C_Mem_Read(&hi2c1, GPS_DEVICE_ADDRESS, GPS_DATA_REGISTER, 1, buffer, buflen, 100);
+		if (hal != HAL_OK) {
+			printf("HAL Status: %d | I2C Error: %d\r\n", hal, hi2c1.ErrorCode);
+	}
+}
+
+
+
 /*	This function validates the data retrieved from the GPS receiver using a checksum.
  * 	Checksum is calculated over the message, starting and including CLASS field byte up
  * 	until but not including the Checksum field bytes.
@@ -107,7 +126,6 @@ uint16_t UBX_M8N_CHECKSUM(uint8_t* buffer, uint8_t buflen) {
 	return ((CK_A<<8) | CK_B);
 }
 
-
 /* This function parses the payload from a NAV_POSLLH message
  * The payload is in little endian format, so left shift the bytes
  * Follow reference from driver and protocol description
@@ -126,85 +144,71 @@ void UBX_M8N_NAV_POSLLH_Parsing(uint8_t *buffer, NavData* data) {
  * It takes in a pointer to the configuration message buffer, as well as its size
  * Calls Error_Handler() if something goes wrong
 */
-void CONFIG_Transmit(uint8_t* buffer, uint8_t buflen) {
+void CONFIG_Transmit(uint8_t* buffer, uint16_t buflen) {
 	HAL_StatusTypeDef hal;    				// HAL return status
-	uint8_t ACK_BUFFER[10];   				// temporary buffer for acknowledge message
-	ACK_BUFFER[0] = GPS_DATA_REGISTER;	  	// set first element of buffer as register of data stream
+	printf("Size of config: %d\r\n", buflen);
 
-	// set global ACK message with expected values
-	UBX_ACK_ACK[6] = buffer[2];
-	UBX_ACK_ACK[7] = buffer[3];
-
-	// set the checksum bytes of the expected ACK message
-	uint16_t expectedCheckSum = UBX_M8N_CHECKSUM(UBX_ACK_ACK, 10);
-	UBX_ACK_ACK[8] = (expectedCheckSum >> 8) & 0xFF;		// CK_A is the high byte
-	UBX_ACK_ACK[9] = expectedCheckSum & 0xFF;				// CK_B is the low byte
-	
 	// transmit desired CONFIG to GPS receiver
-	hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, buffer, buflen, HAL_MAX_DELAY);
+	hal = HAL_I2C_Mem_Write(&hi2c1, GPS_DEVICE_ADDRESS, GPS_DATA_LENGTH_HIGH, 1, buffer, buflen, HAL_MAX_DELAY);
 	if (hal != HAL_OK) {
-		// something went wrong with transmit (exit)
 		printf("CONFIG transmit went wrong\r\n");
-		// uint8_t test[] = "CONFIG transmit went wrong\r\n";
-		// HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
 	}
+	// get the length of the CONFIG message response
+	uint16_t message_length = UBX_GET_LENGTH();
+	printf("Message Length: %d\r\n", message_length);
 
-	// wait for a sec
-	HAL_Delay(1000);
-	for (int i = 0; i < 5; i++) {
-		hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, ACK_BUFFER, sizeof(ACK_BUFFER)/sizeof(ACK_BUFFER[0]), HAL_MAX_DELAY);
+	if (message_length != 0) {
+		// create a buffer of
+		uint8_t config_response[message_length];
+		config_response[0] = GPS_DATA_REGISTER;
+
+		// Recieve the CONFIG response
+		hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, config_response, message_length, HAL_MAX_DELAY);
 		if (hal != HAL_OK) {
-			// something went wrong with receive (exit)
-			printf("CONFIG receive went wrong\r\n");
-			// uint8_t test[] = "CONFIG receive went wrong\r\n";
-			// HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
-		}
-
-		HAL_UART_Transmit(&huart2, ACK_BUFFER, sizeof(ACK_BUFFER)/sizeof(ACK_BUFFER[0]), HAL_MAX_DELAY);
-		// uint8_t test[] = "\n";
-		// HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
-
-		if (ACK_BUFFER[2] != 0x05 && ACK_BUFFER[3] != 0x01) {
-			break;
+			printf("CONFIG response went wrong!\r\n");
+			printf("Error code: %08lX\r\n", hi2c1.ErrorCode);
+		} else {
+			printf("Length: %d | Headers: %X %X |Class: %X | ID: %X | rest: %X %X %X %X %X %X\r\n", message_length, config_response[0], config_response[1], config_response[2], config_response[3], config_response[4], config_response[5], config_response[6], config_response[7], config_response[8], config_response[9]);
+			// see if response was a ACK message
 		}
 	}
+}
 
-//	HAL_UART_Transmit(&huart2, ACK_BUFFER, sizeof(ACK_BUFFER)/sizeof(ACK_BUFFER[0]), HAL_MAX_DELAY);
-//
-//	uint8_t test[] = "\n";
-//	HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
-//
-//	if (ACK_BUFFER[2] != 0x05 && ACK_BUFFER[3] != 0x01) {
-//		uint8_t test[] = "config ACK went wrong\r\n";
-//		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
-//	}
+uint16_t UBX_GET_LENGTH() {
+	uint8_t ubx_length[2];
+	HAL_StatusTypeDef hal = HAL_I2C_Mem_Read(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, GPS_DATA_LENGTH_HIGH, 1, ubx_length, sizeof(ubx_length), 100);
+	if (hal != HAL_OK) {
+		printf("Read for length went wrong");
+	}
+
+	printf("High: %X | Low: %X\r\n",ubx_length[0], ubx_length[1]);
+	// return length as uint16_t
+	return ((ubx_length[0] << 8) | (ubx_length[1]));
 }
 
 void GPS_Initialization(void) {
-//	HAL_StatusTypeDef hal;
-//
-//	uint8_t test0[] = "reset the config\r\n";
-//	HAL_UART_Transmit(&huart1, test0, sizeof(test0), HAL_MAX_DELAY);
-//	hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, UBX_CFG_CFG, sizeof(UBX_CFG_CFG), HAL_MAX_DELAY);
-//	if (hal != HAL_OK) {
-//		// something went wrong with transmit (exit)
-//		uint8_t test[] = "CONFIG reset transmit went wrong\r\n";
-//		HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
-//	}
-//	HAL_Delay(5000);
+	HAL_StatusTypeDef hal;
+	hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, UBX_CFG_CFG, sizeof(UBX_CFG_CFG), HAL_MAX_DELAY);
+	if (hal != HAL_OK) {
+		// something went wrong with transmit (exit)
+		printf("UBX-CFG-CFG went wrong!\r\n");
+	}
+	HAL_Delay(2000);
 
-//	uint8_t test[] = "PRT CONFIG STARTS here\r\n";
-//	HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
+	printf("Starting MSG\r\n");
+	CONFIG_Transmit(UBX_CFG_MSG, sizeof(UBX_CFG_MSG)/sizeof(UBX_CFG_MSG[0]));
+	HAL_Delay(1000);
+
+	printf("Starting PRT\r\n");
 	CONFIG_Transmit(UBX_CFG_PRT, sizeof(UBX_CFG_PRT)/sizeof(UBX_CFG_PRT[0]));
 	HAL_Delay(1000);
 
 //	uint8_t test2[] = "msg CONFIG STARTS here\r\n";
 //	HAL_UART_Transmit(&huart1, test2, sizeof(test2), HAL_MAX_DELAY);
-	CONFIG_Transmit(UBX_CFG_MSG, sizeof(UBX_CFG_MSG)/sizeof(UBX_CFG_MSG[0]));
-	HAL_Delay(1000);
 
 //	uint8_t test3[] = "rate CONFIG STARTS here\r\n";
 //	HAL_UART_Transmit(&huart1, test3, sizeof(test3), HAL_MAX_DELAY);
+	printf("Starting RATE\r\n");
 	CONFIG_Transmit(UBX_CFG_RATE, sizeof(UBX_CFG_RATE)/sizeof(UBX_CFG_RATE[0]));
 	HAL_Delay(1000);
 }

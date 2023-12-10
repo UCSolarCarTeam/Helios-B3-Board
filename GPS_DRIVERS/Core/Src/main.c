@@ -113,7 +113,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // Setup GPS receiver with desired configurations
+  printf("Starting configurations\r\n");
   GPS_Initialization();
+  printf("Configurations complete\r\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
