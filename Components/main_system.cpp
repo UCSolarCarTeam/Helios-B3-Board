@@ -28,8 +28,8 @@ void run_main() {
     // Print System Boot Info : Warning, don't queue more than 10 prints before scheduler starts
     CUBE_PRINT("\n-- CUBE SYSTEM --\n");
     CUBE_PRINT("System Reset Reason: [TODO]\n"); //TODO: System reset reason can be implemented via. Flash storage
-    CUBE_PRINT("Current System Heap Use: %d Bytes\n", xPortGetFreeHeapSize());
-    CUBE_PRINT("Lowest Ever Heap Size: %d Bytes\n\n", xPortGetMinimumEverFreeHeapSize());
+    CUBE_PRINT("Current System Free Heap: %d Bytes\n", xPortGetFreeHeapSize());
+    CUBE_PRINT("Lowest Ever Free Heap: %d Bytes\n\n", xPortGetMinimumEverFreeHeapSize());
 
     // Start the Scheduler
     // Guidelines:
