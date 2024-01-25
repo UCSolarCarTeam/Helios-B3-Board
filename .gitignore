@@ -50,3 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# OS Specific
+**/.DS_Store
+
+# Compiled Files
+Debug/
+Release/

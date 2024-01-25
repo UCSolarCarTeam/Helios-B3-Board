@@ -1,0 +1,3 @@
+[submodule "Cube++"]
+	path = Cube++
+	url = git@github.com:cjchanx/CubePlusPlus.git
