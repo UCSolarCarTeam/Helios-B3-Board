@@ -1,5 +1,11 @@
 {
     "files.associations": {
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "xmemory": "c",
+        "atomic": "c",
+        "bit": "c",
+        "charconv": "c",
+        "cstdint": "c",
+        "xutility": "c"
     }
 }

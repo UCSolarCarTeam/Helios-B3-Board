@@ -116,6 +116,8 @@ int main(void)
   MX_USB_PCD_Init();
   MX_USART2_UART_Init();
   MX_CRC_Init();
+
+  
   /* USER CODE BEGIN 2 */
   run_interface();
   #if 0
