@@ -1,6 +1,9 @@
 #include "PQueue.hpp"
-#include <cassert>
 #include "CubeDefines.hpp"
+
+//NOTES FOR MYSELF: Use these functions
+//  void cube_print(const char* format, ...);
+//  void cube_assert_debug(bool condition, const char* file, uint16_t line, const char* str = nullptr, ...);
 
 void test_pqueue_send_receive() {
     PQueue<int, 5> pQueue;
