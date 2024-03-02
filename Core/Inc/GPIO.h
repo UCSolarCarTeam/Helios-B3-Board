@@ -11,7 +11,7 @@
 
 #define PCA8575_ADDR 0x20 << 1;
 
-uint16_t pins = 0;
+uint16_t pins = 0xFFFF;
 
 void I2C_init();
 void I2C_write_pin(uint8_t device_addr, uint8_t pin, uint8_t bit_state);
