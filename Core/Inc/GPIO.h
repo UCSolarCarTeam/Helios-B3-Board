@@ -14,8 +14,9 @@
 uint16_t pins = 0xFFFF;
 
 void I2C_init();
-void I2C_write_pin(uint8_t device_addr, uint8_t pin, uint8_t bit_state);
-void I2C_write(uint8_t device_addr, uint16_t data);
-uint16_t I2C_read(uint8_t device_addr);
+void PCA8575_Write(uint8_t device_addr, uint8_t pin, uint8_t bit_state);
+void PCA8575_WritePin(uint8_t device_addr, uint16_t data);
+uint16_t PCA8575_Read(uint8_t device_addr);
+uint8_t PCA8575_ReadPin(uint8_t device_addr);
 
 #endif /* INC_I2C_DRIVERS_H_ */
