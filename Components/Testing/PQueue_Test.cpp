@@ -236,8 +236,7 @@ void test_pqueue_concurrent_access() {
     CUBE_ASSERT(pQueue.IsEmpty(), "PQueue is not empty after concurrent access");
 }
 
-
-int main() {
+int main_test() {
     test_pqueue_send_receive();
     test_pqueue_full();
     test_pqueue_empty();

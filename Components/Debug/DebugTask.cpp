@@ -68,10 +68,10 @@ void DebugTask::Run(void * pvParams)
     while (1) {
         Command cm;
 
-        //Wait forever for a command
+        // Wait forever for a command
         qEvtQueue->ReceiveWait(cm);
 
-        //Process the command
+        // Process the command
         if(cm.GetCommand() == DATA_COMMAND && cm.GetTaskCommand() == EVENT_DEBUG_RX_COMPLETE) {
             HandleDebugMessage((const char*)debugBuffer);
         }
