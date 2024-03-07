@@ -10,65 +10,60 @@ void test_pqueue_send_receive() {
     
     CUBE_PRINT("Testing PQueue Send and Receive\n");
 
-    // Send items to the queue
+    //Send items to the queue
     for (int i = 0; i < 5; ++i) {
         bool sent = pQueue.Send(i, Priority::NORMAL);
         // Assert that sending was successful
         CUBE_ASSERT(sent, "Sending to PQueue failed");
     }
 
-    // Receive items from the queue
+    //Receive items from the queue and checks if data is correct
     for (int i = 0; i < 5; ++i) {
         int received;
         bool receivedSuccessfully = pQueue.Receive(received);
         CUBE_ASSERT(receivedSuccessfully, "Receiving from PQueue failed");
-        // Check if Recieved item is correct
-        CUBE_ASSERT(received == i, "Received incorrect item from PQueue");
+        CUBE_ASSERT(received == i, "Received incorrect item from PQueue"); 
     }
 }
 
+//Tests if the PQueue adds another item if its full
 void test_pqueue_full() {
     PQueue<int, 2> pQueue;
 
     CUBE_PRINT("Testing PQueue Full\n");
 
-    // Fill up the queue
+    //Fill up the queue
     pQueue.Send(1, Priority::NORMAL);
     pQueue.Send(2, Priority::NORMAL);
 
-    // Attempt to send another item
     bool sent = pQueue.Send(3, Priority::NORMAL);
-    // Check if enqueuing failed
     CUBE_ASSERT(!sent, "Sending to full PQueue succeeded");
 }
 
+//Test to receive an item from a empty Queue
 void test_pqueue_empty() {
     PQueue<int, 5> pQueue;
 
     CUBE_PRINT("Testing PQueue Empty\n");
 
-    // Attempt to receive an item from an empty queue
     int received;
     bool receivedSuccessfully = pQueue.Receive(received);
-    // Assert that receiving fails because the queue is empty
     CUBE_ASSERT(!receivedSuccessfully, "Receiving from empty PQueue succeeded");
 }
 
+//Test if first item recieved from queue is highest priority  
 void test_pqueue_priority() {
     PQueue<int, 5> pQueue;
 
     CUBE_PRINT("Testing PQueue Priority\n");
 
-    // Send items to the queue with different priorities
     pQueue.Send(1, Priority::LOW);
     pQueue.Send(2, Priority::HIGH);
     pQueue.Send(3, Priority::NORMAL);
 
-    // Receive items from the queue
     int received;
     bool receivedSuccessfully = pQueue.Receive(received);
     CUBE_ASSERT(receivedSuccessfully, "Receiving from PQueue failed");
-    // Check if received item is the one with the highest priority
     CUBE_ASSERT(received == 2, "Received incorrect item from PQueue");
 }
 
@@ -257,6 +252,6 @@ int main() {
     test_pqueue_priority_ordering();
     test_pqueue_max_depth_exceeded();
     test_pqueue_concurrent_access();
-    
+
     return 0;
 }
