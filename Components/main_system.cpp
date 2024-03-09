@@ -11,6 +11,7 @@
 
 // Tasks
 #include "CubeTask.hpp"
+#include "I2C_Drivers.h"
 
 /* Drivers ------------------------------------------------------------------*/
 namespace Driver {
