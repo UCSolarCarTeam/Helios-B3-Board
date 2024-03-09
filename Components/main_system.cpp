@@ -35,14 +35,32 @@ void run_main() {
     // Guidelines:
     // - Be CAREFUL with race conditions after osKernelStart
     // - All uses of new and delete should be closely monitored after this point
-    osKernelStart();
+    //osKernelStart();
 
     // Should never reach here
-    CUBE_ASSERT(false, "osKernelStart() failed");
+    //CUBE_ASSERT(false, "osKernelStart() failed");
 
     while (1)
     {
-        osDelay(100);
-        HAL_NVIC_SystemReset();
+        uint8_t device_addr = 0x20; // Device address
+        uint16_t data_to_write = 0xABCD; // Example data to write
+
+        // Write data to PCA8575
+        PCA8575_Write(device_addr, data_to_write);
+
+        // Example of setting a pin state
+        uint8_t pin_to_write = 2; // Example pin number
+        uint8_t bit_state = 1; // Example bit state (0 or 1)
+        PCA8575_WritePin(device_addr, pin_to_write, bit_state);
+
+        // Example of reading data from PCA8575
+        uint16_t data_read = PCA8575_Read(device_addr);
+
+        // Example of reading a pin state
+        uint8_t pin_to_read = 3; // Example pin number
+        uint8_t pin_state = PCA8575_ReadPin(device_addr, pin_to_read);
+
+        osDelay(1000);
+        //HAL_NVIC_SystemReset();
     }
 }

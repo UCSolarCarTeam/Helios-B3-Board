@@ -4,7 +4,7 @@
  *  Created on: Feb 7, 2024
  *      Author: dominic
  */
-#include <GPIO.h>
+#include <GPIO_Moduke_Drivers.h>
 #include "cmsis_os.h"
 
 osMutexId_t i2cMutexHandle;
