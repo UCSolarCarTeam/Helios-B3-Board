@@ -3,6 +3,7 @@
  */
 
 #include "DefaultTask.hpp"
+#include "./Testing/PQueue_Test.hpp"
 
 /**
  * @brief Initializes Default task with the RTOS scheduler
@@ -34,7 +35,9 @@ void DefaultTask::Run(void * pvParams)
     //UART Task loop
     int i = 0;
     while(1) {
+
         CUBE_PRINT("Hello, world [%d]\n", i);
+        test_pqueue_send_receive();
         osDelay(1000);
         ++i;
     }
