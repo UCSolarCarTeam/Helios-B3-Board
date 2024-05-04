@@ -410,7 +410,6 @@ void test_pqueue_max_depth_exceeded() {
 
 void test_send_to_queue() {
     PQueue<int, 5> pQueue;
-    
 }
 
 int main_test() {
