@@ -35,8 +35,6 @@ void DefaultTask::Run(void * pvParams)
     //UART Task loop
     int i = 0;
     while(1) {
-
-        CUBE_PRINT("Hello, world [%d]\n", i);
         main_test();
         osDelay(1000);
         ++i;

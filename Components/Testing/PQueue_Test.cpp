@@ -212,31 +212,69 @@ void test_pqueue_max_depth() {
     CUBE_PRINT("\n-----End of Test 8 -----\n\n");
 }
 
-/*
+// Test if receive works with 0 timeout
+void test_pqueue_receive_zero_timeout() {
+    // Setup the PQueue
+    PQueue<int, 5> pQueue;
+    pQueue.Send(1, Priority::NORMAL);
+
+    CUBE_PRINT("-Testing PQueue Receive with 0 Timeout-\n");
+
+    // Receive an item from the queue using ReceiveWait
+    int received;
+    bool receivedSuccessfully = pQueue.Receive(received, 0);   
+
+    if (receivedSuccessfully) {
+        CUBE_PRINT("|Receiving from PQueue succeeded\n");
+    } else {
+        CUBE_PRINT("!Receiving from PQueue failed\n");
+    } 
+
+    if( received == 1){
+        CUBE_PRINT("|Received correct item from PQueue: %d\n", received);
+    }else{
+        CUBE_PRINT("!Received incorrect item from PQueue: %d\n", received);
+    }
+    CUBE_PRINT("\n-----End of Test 9 -----\n\n");
+}
+
+// Test if the queue sends high priority items
 void test_pqueue_send_high_priority() {
     PQueue<int, 5> pQueue;
 
-    CUBE_PRINT("Testing PQueue Send with High Priority\n");
+    CUBE_PRINT("-Testing PQueue Send with High Priority-\n");
 
     // Send an item to the queue with high priority
     bool sent = pQueue.Send(1, Priority::HIGH);
-    CUBE_PRINT(sent, "Sending to PQueue with high priority failed");
+    if(sent){
+        CUBE_PRINT("|Sending to PQueue with high priority succeeded\n");
+    }else{
+        CUBE_PRINT("!Sending to PQueue with high priority failed\n");
+    }
+    CUBE_PRINT("\n-----End of Test 10 -----\n\n");
 }
 
+// Test if the queue sends low priority items
 void test_pqueue_send_low_priority() {
     PQueue<int, 5> pQueue;
 
-    CUBE_PRINT("Testing PQueue Send with Low Priority\n");
+    CUBE_PRINT("-Testing PQueue Send with Low Priority-\n");
 
     // Send an item to the queue with low priority
     bool sent = pQueue.Send(1, Priority::LOW);
-    CUBE_PRINT(sent, "Sending to PQueue with low priority failed");
+    if(sent){
+        CUBE_PRINT("|Sending to PQueue with low priority succeeded\n");
+    }else{
+        CUBE_PRINT("!Sending to PQueue with low priority failed\n");
+    }
+    CUBE_PRINT("\n-----End of Test 11 -----\n\n");
 }
 
+// Test if the queue receives high priority items
 void test_pqueue_receive_high_priority() {
     PQueue<int, 5> pQueue;
 
-    CUBE_PRINT("Testing PQueue Receive with High Priority\n");
+    CUBE_PRINT("-Testing PQueue Receive with High Priority-\n");
 
     // Send an item to the queue with high priority
     pQueue.Send(1, Priority::HIGH);
@@ -244,15 +282,26 @@ void test_pqueue_receive_high_priority() {
     // Receive an item from the queue
     int received;
     bool receivedSuccessfully = pQueue.Receive(received);
-    CUBE_PRINT(receivedSuccessfully, "Receiving from PQueue failed");
+    if(receivedSuccessfully){
+        CUBE_PRINT("|Receiving from PQueue succeeded\n");
+    }else{
+        CUBE_PRINT("!Receiving from PQueue failed\n");
+    }
+
     // Check if received item is correct
-    CUBE_PRINT(received == 1, "Received incorrect item from PQueue");
+    if(received == 1){
+        CUBE_PRINT("|Received correct item from PQueue: %d\n", received);
+    }else{
+        CUBE_PRINT("!Received incorrect item from PQueue: %d\n", received);
+    }
+    CUBE_PRINT("\n-----End of Test 12 -----\n\n");
 }
 
+// Test if the queue receives low priority items
 void test_pqueue_receive_low_priority() {
     PQueue<int, 5> pQueue;
 
-    CUBE_PRINT("Testing PQueue Receive with Low Priority\n");
+    CUBE_PRINT("-Testing PQueue Receive with Low Priority-\n");
 
     // Send an item to the queue with low priority
     pQueue.Send(1, Priority::LOW);
@@ -260,45 +309,81 @@ void test_pqueue_receive_low_priority() {
     // Receive an item from the queue
     int received;
     bool receivedSuccessfully = pQueue.Receive(received);
-    CUBE_PRINT(receivedSuccessfully, "Receiving from PQueue failed");
+    if(receivedSuccessfully){
+        CUBE_PRINT("|Receiving from PQueue succeeded\n");
+    }else{
+        CUBE_PRINT("!Receiving from PQueue failed\n");
+    }
+
     // Check if received item is correct
-    CUBE_PRINT(received == 1, "Received incorrect item from PQueue");
+    if(received == 1){
+        CUBE_PRINT("|Received correct item from PQueue: %d\n", received);
+    }else{
+        CUBE_PRINT("!Received incorrect item from PQueue: %d\n", received);
+    }
+    CUBE_PRINT("\n-----End of Test 13 -----\n\n");
 }
 
+// Test if the queue receives items in priority order
 void test_pqueue_priority_ordering() {
     PQueue<int, 5> pQueue;
 
-    CUBE_PRINT("Testing PQueue Priority Ordering\n");
+    CUBE_PRINT("-Testing PQueue Priority Ordering-\n");
 
     // Send items to the queue with different priorities
     pQueue.Send(1, Priority::LOW);
     pQueue.Send(2, Priority::HIGH);
     pQueue.Send(3, Priority::NORMAL);
 
-    // Receive items from the queue and ensure they are received in priority order
     int received;
     bool receivedSuccessfully;
 
     // Receive high priority item first
     receivedSuccessfully = pQueue.Receive(received);
-    CUBE_PRINT(receivedSuccessfully, "Receiving from PQueue failed");
-    CUBE_PRINT(received == 2, "Received incorrect item from PQueue");
+    if(receivedSuccessfully){
+        CUBE_PRINT("|Receiving from PQueue succeeded\n");
+    }else{
+        CUBE_PRINT("!Receiving from PQueue failed\n");
+    }
+    if(received == 2){
+        CUBE_PRINT("|Received correct item from PQueue: %d\n", received);
+    }else{
+        CUBE_PRINT("!Received incorrect item from PQueue: %d\n", received);
+    }
+    
 
     // Receive normal priority item next
     receivedSuccessfully = pQueue.Receive(received);
-    CUBE_PRINT(receivedSuccessfully, "Receiving from PQueue failed");
-    CUBE_PRINT(received == 3, "Received incorrect item from PQueue");
+    if(receivedSuccessfully){
+        CUBE_PRINT("|Receiving from PQueue succeeded\n");
+    }else{
+        CUBE_PRINT("!Receiving from PQueue failed\n");
+    }
+    if(received == 3){
+        CUBE_PRINT("|Received correct item from PQueue: %d\n", received);
+    }else{
+        CUBE_PRINT("!Received incorrect item from PQueue: %d\n", received);
+    }
 
     // Receive low priority item last
     receivedSuccessfully = pQueue.Receive(received);
-    CUBE_PRINT(receivedSuccessfully, "Receiving from PQueue failed");
-    CUBE_PRINT(received == 1, "Received incorrect item from PQueue");
+    if(receivedSuccessfully){
+        CUBE_PRINT("|Receiving from PQueue succeeded\n");
+    }else{
+        CUBE_PRINT("!Receiving from PQueue failed\n");
+    }
+    if(received == 1){
+        CUBE_PRINT("|Received correct item from PQueue: %d\n", received);
+    }else{
+        CUBE_PRINT("!Received incorrect item from PQueue: %d\n", received);
+    }
 }
 
+// Test if the queue rejects items when the maximum depth is exceeded
 void test_pqueue_max_depth_exceeded() {
     PQueue<int, 3> pQueue;
 
-    CUBE_PRINT("Testing PQueue Maximum Depth Exceeded\n");
+    CUBE_PRINT("-Testing PQueue Maximum Depth Exceeded-\n");
 
     // Fill up the queue to its maximum depth
     for (int i = 0; i < 3; ++i) {
@@ -308,39 +393,26 @@ void test_pqueue_max_depth_exceeded() {
 
     // Attempt to send another item, which should fail
     bool sent = pQueue.Send(4, Priority::NORMAL);
-    CUBE_PRINT(!sent, "Sending to full PQueue succeeded");
-
-    // Ensure that the queue is still full
-    CUBE_PRINT(pQueue.IsFull(), "PQueue is not full when it should be");
-}
-
-void test_pqueue_concurrent_access() {
-    constexpr int NumIterations = 1000; // Number of iterations per thread
-
-    // Create a PQueue instance
-    PQueue<int, 10> pQueue;
-
-    // Simulate concurrent access using alternating send and receive operations
-    for (int i = 0; i < NumIterations; ++i) {
-        // Alternate between sending and receiving items
-        if (i % 2 == 0) {
-            // Send item with iteration number as data
-            pQueue.Send(i, Priority::NORMAL);
-        } else {
-            // Receive item
-            int received;
-            bool receivedSuccessfully = pQueue.Receive(received);
-            // Assert that receiving was successful
-            CUBE_PRINT(receivedSuccessfully, "Receiving from PQueue failed");
-            // Assert that the received item matches the iteration number
-            CUBE_PRINT(received == i, "Received incorrect item from PQueue");
-        }
+    if (!sent) {
+        CUBE_PRINT("|Queue rejected item when full\n");
+    }else{
+        CUBE_PRINT("!Queue Failed and accepted an item\n");
     }
 
-    // Ensure the queue is empty after all iterations
-    CUBE_PRINT(pQueue.IsEmpty(), "PQueue is not empty after concurrent access");
+    // Ensure that the queue is still full
+    if(pQueue.IsFull()){
+        CUBE_PRINT("|PQueue is full\n");
+    }else{
+        CUBE_PRINT("!PQueue is not full\n");
+    }
+    CUBE_PRINT("\n-----End of Test 15 -----\n\n");
 }
-*/
+
+void test_send_to_queue() {
+    PQueue<int, 5> pQueue;
+    
+}
+
 int main_test() {
     test_pqueue_send_receive();
     test_pqueue_full();
@@ -350,13 +422,13 @@ int main_test() {
     test_pqueue_receive_with_timeout();
     test_pqueue_current_count();
     test_pqueue_max_depth();
-    //test_pqueue_send_high_priority();
-    //test_pqueue_send_low_priority();
-    //test_pqueue_receive_high_priority();
-    //test_pqueue_receive_low_priority();
-    //test_pqueue_priority_ordering();
-    //test_pqueue_max_depth_exceeded();
-    //test_pqueue_concurrent_access();
-
+    test_pqueue_receive_zero_timeout();
+    test_pqueue_send_high_priority();
+    test_pqueue_send_low_priority();
+    test_pqueue_receive_high_priority();
+    test_pqueue_receive_low_priority();
+    test_pqueue_priority_ordering();
+    test_pqueue_max_depth_exceeded();
+    
     return 0;
 }
