@@ -37,7 +37,7 @@ void DefaultTask::Run(void * pvParams)
     while(1) {
 
         CUBE_PRINT("Hello, world [%d]\n", i);
-        test_pqueue_send_receive();
+        main_test();
         osDelay(1000);
         ++i;
     }

@@ -4,6 +4,6 @@
 #include "PQueue.hpp"
 #include "CubeDefines.hpp"
 
-void test_pqueue_send_receive();
+int main_test();
 
 #endif // PQUEUE_TEST_HPP
