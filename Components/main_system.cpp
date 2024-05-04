@@ -40,26 +40,16 @@ void run_main() {
 
     // Should never reach here
     //CUBE_ASSERT(false, "osKernelStart() failed");
-
+    
     while (1)
     {
-        uint8_t device_addr = 0x20; // Device address
-        uint16_t data_to_write = 0xABCD; // Example data to write
+        uint8_t device_addr = 0x20; // Device address, 0x20 for the PCA85
 
-        // Write data to PCA8575
-        PCA8575_Write(device_addr, data_to_write);
+        // Test Data Read/Write
+        PCA8575_DataTest(device_addr);
 
-        // Example of setting a pin state
-        uint8_t pin_to_write = 2; // Example pin number
-        uint8_t bit_state = 1; // Example bit state (0 or 1)
-        PCA8575_WritePin(device_addr, pin_to_write, bit_state);
-
-        // Example of reading data from PCA8575
-        uint16_t data_read = PCA8575_Read(device_addr);
-
-        // Example of reading a pin state
-        uint8_t pin_to_read = 3; // Example pin number
-        uint8_t pin_state = PCA8575_ReadPin(device_addr, pin_to_read);
+        // Test Pin Read/Write
+        PCA8575_PinTest(device_addr);
 
         osDelay(1000);
         //HAL_NVIC_SystemReset();
