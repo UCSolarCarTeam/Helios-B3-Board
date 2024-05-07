@@ -6,12 +6,13 @@
  ******************************************************************************
 */
 /* Includes -----------------------------------------------------------------*/
+#include "GPIO_Module_Driver.hpp"
 #include "SystemDefines.hpp"
 #include "UARTDriver.hpp"
+#include "Mutex.hpp"
 
 // Tasks
 #include "CubeTask.hpp"
-#include "I2C_Drivers.h"
 
 /* Drivers ------------------------------------------------------------------*/
 namespace Driver {
@@ -40,7 +41,9 @@ void run_main() {
 
     // Should never reach here
     //CUBE_ASSERT(false, "osKernelStart() failed");
-    
+
+    Mutex* i2cMutex = new Mutex();
+    PCA8575_Init(i2cMutex);
     while (1)
     {
         uint8_t device_addr = 0x20; // Device address, 0x20 for the PCA85
