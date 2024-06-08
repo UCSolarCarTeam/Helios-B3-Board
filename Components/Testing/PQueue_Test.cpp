@@ -388,7 +388,7 @@ void test_pqueue_max_depth_exceeded() {
     // Fill up the queue to its maximum depth
     for (int i = 0; i < 3; ++i) {
         bool sent = pQueue.Send(i, Priority::NORMAL);
-        CUBE_PRINT(sent, "Sending to PQueue failed");
+        CUBE_PRINT("Sending to PQueue failed: %d", sent);
     }
 
     // Attempt to send another item, which should fail
