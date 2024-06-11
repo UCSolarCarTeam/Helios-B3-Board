@@ -3,8 +3,12 @@
  *
  *  Created on: Feb 7, 2024
  *      Author: dominic
+ * 
+ *  Modified on: June, 11, 2024
+ *      By: Alend Maci
  */
 #include <GPIO_Module_Driver.hpp>
+#include <stm32l152xe.h>
 
 extern I2C_HandleTypeDef hi2c1;
 uint16_t pins;
@@ -24,7 +28,12 @@ void PCA8575_Init(Mutex* mutex) {
     hi2c1.Init.OwnAddress2 = 0;
     hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
     hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-    HAL_I2C_Init(&hi2c1);
+
+    // Checks if the I2C1 peripheral is already initialized
+    if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+    {
+        CUBE_PRINT("[!] Error initializing I2C1!\n");
+    }
 }
 
 /**
@@ -35,10 +44,12 @@ void PCA8575_Init(Mutex* mutex) {
   */
 void PCA8575_Write(uint8_t device_addr, uint16_t data){
     pins = data;
-
     uint8_t payload[2] = {(uint8_t)(pins | 0xFF), (uint8_t)((pins | 0xFF00) >> 8)};
     i2cMutex->Lock();
-    HAL_I2C_Master_Transmit(&hi2c1, device_addr, payload, 2, 1000);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, device_addr, payload, 2, 1000);
+    if (status != HAL_OK) {
+        CUBE_PRINT("[!] Error writing to address %s\n", device_addr);
+    }
     i2cMutex->Unlock();
 }
 
@@ -66,7 +77,10 @@ void PCA8575_WritePin(uint8_t device_addr, uint16_t pin, uint8_t bit_state){
     uint8_t payload[2] = {(uint8_t)(data | 0xFF), (uint8_t)((data | 0xFF00) >> 8)};
 
     i2cMutex->Lock();
-    HAL_I2C_Master_Transmit(&hi2c1, device_addr, payload, 2, 1000);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, device_addr, payload, 2, 1000);
+    if (status != HAL_OK) {
+        CUBE_PRINT("[!] Error setting pin %s\n", device_addr);
+    }
     i2cMutex->Unlock();
 }
 
@@ -79,7 +93,11 @@ uint16_t PCA8575_Read(uint8_t device_addr){
     uint8_t buffer[2];
 
     i2cMutex->Lock();
-    HAL_I2C_Master_Receive(&hi2c1, device_addr, buffer, 2, 1000);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Receive(&hi2c1, device_addr, buffer, 2, 1000);
+    if (status != HAL_OK) {
+        CUBE_PRINT("[!] Error reading from address %s\n", device_addr);
+    }
+
     i2cMutex->Unlock();
 
     uint16_t data = buffer[0] | (buffer[1] << 8);
