@@ -126,7 +126,7 @@ void PCA8575_SetDirection(uint8_t device_addr, uint16_t direction) {
 }
 
 
-// Test Methods
+//-----------------------Test Methods----------------------------------
 
 /**
   * @brief Tests the PCA8575 by writing and reading a 16-bit value
@@ -137,14 +137,17 @@ uint16_t PCA8575_DataTest(uint8_t device_addr) {
     CUBE_PRINT("Setting up test...\n");
     PCA8575_Write(device_addr, 0x0000); // Clear the pins
 
-    CUBE_PRINT("Testing Data Read/Write\n");
+    CUBE_PRINT("-Testing Data Read/Write-\n");
     uint16_t data_to_write = 0xA5A5; // test data
     for(int i = 0; i < 16; i++) {
       PCA8575_Write(device_addr, data_to_write); // Write data
-      CUBE_PRINT("Data written to PCA8575: %d\n", data_to_write); // Print data written
-      
       uint16_t data_read = PCA8575_Read(device_addr); // Read data
-      CUBE_PRINT("Data read from PCA8575: %d\n", data_read); // Print data read
+      if (data_read != data_to_write) {
+        CUBE_PRINT("[!] Data read: %d doesn't match data sent: %d\n", data_read, data_to_write);
+      }else{
+        CUBE_PRINT("[✓] Data written to PCA8575: %d\n", data_to_write); // Print data written
+        CUBE_PRINT("[✓] Data read from PCA8575: %d\n", data_read); // Print data read
+      }
       data_to_write = data_to_write << 1; // Shift data to test reading
       osDelay(1000);
     }
@@ -160,11 +163,15 @@ uint16_t PCA8575_PinTest(uint8_t device_addr) {
     CUBE_PRINT("Setting Up Test...\n");
     PCA8575_Write(device_addr, 0x0000); // Clear the pins
 
-    CUBE_PRINT("Testing Pin Read/Write\n");
+    CUBE_PRINT("-Testing Pin Read/Write-\n");
     for (int test_pin = 0; test_pin < 16; test_pin++) {
         PCA8575_WritePin(device_addr, test_pin, 1); // Write the bit
         uint8_t bit_read = PCA8575_ReadPin(device_addr, test_pin); // Read the bit
-        CUBE_PRINT("Pin %d read as %d\n", test_pin, bit_read); // Print the bit
+        if(bit_read != test_pin){
+          CUBE_PRINT("[!] Pin %d didn't read as %d\n", test_pin, bit_read);
+        }else{
+          CUBE_PRINT("[✓]Pin %d read as %d\n", test_pin, bit_read); // Print the bit
+        }
         osDelay(1000);
     }
 
