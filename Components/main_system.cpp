@@ -10,6 +10,7 @@
 #include "UARTDriver.hpp"
 
 // Tasks
+#include "WatchdogTask.hpp"
 #include "CubeTask.hpp"
 #include "DebugTask.hpp"
 
@@ -24,6 +25,7 @@ namespace Driver {
 */
 void run_main() {
     // Init Tasks
+    WatchdogTask::Inst().InitTask();
     CubeTask::Inst().InitTask();
     DebugTask::Inst().InitTask();
 

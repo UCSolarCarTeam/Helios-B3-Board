@@ -38,6 +38,12 @@ enum GLOBAL_COMMANDS : uint8_t
 /* Task Parameter Definitions ------------------------------------------------------------------*/
 /* - Lower priority number means lower priority task ---------------------------------*/
 
+// WATCHDOG TASK
+constexpr uint8_t WATCHDOG_TASK_RTOS_PRIORITY = 2;            // Priority of the uart task
+constexpr uint8_t WATCHDOG_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the uart task queue
+constexpr uint16_t WATCHDOG_TASK_STACK_DEPTH_WORDS = 512;    // Size of the uart task stack
+
+
 // UART TASK
 constexpr uint8_t UART_TASK_RTOS_PRIORITY = 2;            // Priority of the uart task
 constexpr uint8_t UART_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the uart task queue
