@@ -17,13 +17,13 @@
 
 void PCA8575_Init(Mutex* mutex);
 void PCA8575_Write(uint16_t device_addr, uint16_t data);
-void PCA8575_WritePin(uint8_t device_addr, uint16_t pin, uint8_t bit_state);
-uint16_t PCA8575_Read(uint8_t device_addr);
-uint8_t PCA8575_ReadPin(uint8_t device_addr);
+void PCA8575_WritePin(uint16_t device_addr, uint16_t pin, uint8_t bit_state);
+uint16_t PCA8575_Read(uint16_t device_addr);
+uint8_t PCA8575_ReadPin(uint16_t device_addr);
 
 //Test Methods
-uint16_t PCA8575_DataTest(uint8_t device_addr);
-uint16_t PCA8575_PinTest(uint8_t device_addr);
-uint16_t PCA8575_PinWaitTest(uint8_t device_addr);
+uint16_t PCA8575_DataTest(uint16_t device_addr);
+uint16_t PCA8575_PinTest(uint16_t device_addr);
+uint16_t PCA8575_PinWaitTest(uint16_t device_addr);
 
 #endif /* INC_I2C_DRIVERS_H_ */

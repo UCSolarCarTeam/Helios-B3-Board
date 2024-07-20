@@ -60,7 +60,7 @@ void PCA8575_Write(uint16_t device_addr, uint16_t data){
   * @param bit_state: The state to set pin to, 0 or 1
   * @retval None
   */
-void PCA8575_WritePin(uint8_t device_addr, uint16_t pin, uint8_t bit_state){
+void PCA8575_WritePin(uint16_t device_addr, uint16_t pin, uint8_t bit_state){
     uint16_t data = PCA8575_Read(device_addr);
     uint16_t mask = 1 << pin;
 
@@ -77,7 +77,7 @@ void PCA8575_WritePin(uint8_t device_addr, uint16_t pin, uint8_t bit_state){
     uint8_t payload[2] = {(uint8_t)(data | 0xFF), (uint8_t)((data | 0xFF00) >> 8)};
 
     i2cMutex->Lock();
-    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, device_addr, payload, 2, 1000);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, device_addr << 1, payload, 2, 1000);
     if (status != HAL_OK) {
         CUBE_PRINT("[!] Error setting pin %s\n", device_addr);
     }
@@ -89,11 +89,11 @@ void PCA8575_WritePin(uint8_t device_addr, uint16_t pin, uint8_t bit_state){
   * @param device_addr: I2C device address, 7-bit
   * @retval 16-bit value read from the pins
   */
-uint16_t PCA8575_Read(uint8_t device_addr){
+uint16_t PCA8575_Read(uint16_t device_addr){
     uint8_t buffer[2];
 
     i2cMutex->Lock();
-    HAL_StatusTypeDef status = HAL_I2C_Master_Receive(&hi2c1, device_addr, buffer, 2, 1000);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Receive(&hi2c1, device_addr << 1, buffer, 2, 1000);
     if (status != HAL_OK) {
         CUBE_PRINT("[!] Error reading from address %s\n", device_addr);
     }
@@ -111,7 +111,7 @@ uint16_t PCA8575_Read(uint8_t device_addr){
   * @param pin: Pin to read
   * @retval 1-bit value read from the specified pin
   */
-uint8_t PCA8575_ReadPin(uint8_t device_addr, uint8_t pin) {
+uint8_t PCA8575_ReadPin(uint16_t device_addr, uint8_t pin) {
     uint8_t data = PCA8575_Read(device_addr);
     return (data >> pin) & 0x01;
 }
@@ -121,7 +121,7 @@ uint8_t PCA8575_ReadPin(uint8_t device_addr, uint8_t pin) {
   * @param direction: 16-bit value to set the directions pins
   * @retval None
   */
-void PCA8575_SetDirection(uint8_t device_addr, uint16_t direction) {
+void PCA8575_SetDirection(uint16_t device_addr, uint16_t direction) {
     PCA8575_Write(device_addr, direction);
 }
 
@@ -133,7 +133,7 @@ void PCA8575_SetDirection(uint8_t device_addr, uint16_t direction) {
   * @param device_addr: I2C device address, 7-bit
   * @retval 16-bit value read from the pins
   */
-uint16_t PCA8575_DataTest(uint8_t device_addr) {
+uint16_t PCA8575_DataTest(uint16_t device_addr) {
     CUBE_PRINT("Setting up test...\n");
     PCA8575_Write(device_addr, 0x0000); // Clear the pins
 
@@ -159,7 +159,7 @@ uint16_t PCA8575_DataTest(uint8_t device_addr) {
   * @param device_addr: I2C device address, 7-bit
   * @retval 1-bit value read from the specified pin
   */
-uint16_t PCA8575_PinTest(uint8_t device_addr) {
+uint16_t PCA8575_PinTest(uint16_t device_addr) {
     CUBE_PRINT("Setting Up Test...\n");
     PCA8575_Write(device_addr, 0x0000); // Clear the pins
 
@@ -184,7 +184,7 @@ uint16_t PCA8575_PinTest(uint8_t device_addr) {
   * @param device_addr: I2C device address, 7-bit
   * @retval 1-bit value read from the specified pin
   */
-uint16_t PCA8575_PinWaitTest(uint8_t device_addr) {
+uint16_t PCA8575_PinWaitTest(uint16_t device_addr) {
     CUBE_PRINT("Setting Up Test...\n");
     PCA8575_Write(device_addr, 0x0000); // Clear the pins
     uint8_t test_pin = 2;
