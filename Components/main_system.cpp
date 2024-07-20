@@ -46,7 +46,7 @@ void run_main() {
     PCA8575_Init(i2cMutex);
     while (1)
     {
-        uint8_t device_addr = 0x20; // Device address, 0x20 for the PCA85
+        uint16_t device_addr = 0x21; // Device address, 0x20 for the PCA85
 
         // Test Data Read/Write
         PCA8575_DataTest(device_addr);

@@ -42,11 +42,11 @@ void PCA8575_Init(Mutex* mutex) {
   * @param data: 16-bit value to write
   * @retval None
   */
-void PCA8575_Write(uint8_t device_addr, uint16_t data){
+void PCA8575_Write(uint16_t device_addr, uint16_t data){
     pins = data;
     uint8_t payload[2] = {(uint8_t)(pins | 0xFF), (uint8_t)((pins | 0xFF00) >> 8)};
     i2cMutex->Lock();
-    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, device_addr, payload, 2, 1000);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, device_addr << 1, payload, 2, 1000);
     if (status != HAL_OK) {
         CUBE_PRINT("[!] Error writing to address %s\n", device_addr);
     }

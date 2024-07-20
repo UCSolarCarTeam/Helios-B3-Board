@@ -16,7 +16,7 @@
 #define PCA8575_ADDR 0x20 << 1;
 
 void PCA8575_Init(Mutex* mutex);
-void PCA8575_Write(uint8_t device_addr, uint16_t data);
+void PCA8575_Write(uint16_t device_addr, uint16_t data);
 void PCA8575_WritePin(uint8_t device_addr, uint16_t pin, uint8_t bit_state);
 uint16_t PCA8575_Read(uint8_t device_addr);
 uint8_t PCA8575_ReadPin(uint8_t device_addr);
