@@ -46,15 +46,19 @@ void run_main() {
     PCA8575_Init(i2cMutex);
     while (1)
     {
-        uint16_t device_addr = 0x21; // Device address, 0x20 for the PCA85
+        uint16_t device_addr = 0x21; // Device address, 0x21 for the PCA85
 
+        //Testing with osiliscope to see if the pins are toggling (TEMP DELETE LATER)
+        PCA8575_WritePin(device_addr, 0, 1);
+        osDelay(2000);
+        PCA8575_WritePin(device_addr, 0, 0);
         // Test Data Read/Write
-        PCA8575_DataTest(device_addr);
+        //PCA8575_DataTest(device_addr);
 
         // Test Pin Read/Write
-        PCA8575_PinTest(device_addr);
+        //PCA8575_PinTest(device_addr);
 
-        osDelay(1000);
+        osDelay(2000);
         //HAL_NVIC_SystemReset();
     }
 }
