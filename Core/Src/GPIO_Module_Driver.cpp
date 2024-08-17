@@ -20,7 +20,7 @@ Mutex* i2cMutex;
 void PCA8575_Init(Mutex* mutex) {
 	i2cMutex = mutex;
     hi2c1.Instance = I2C1;
-    hi2c1.Init.ClockSpeed = 100000;
+    hi2c1.Init.ClockSpeed = 400000;
     hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
     hi2c1.Init.OwnAddress1 = 0;
     hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -46,7 +46,7 @@ void PCA8575_Write(uint16_t device_addr, uint16_t data){
     pins = data;
     uint8_t payload[2] = {(uint8_t)(pins | 0xFF), (uint8_t)((pins | 0xFF00) >> 8)};
     i2cMutex->Lock();
-    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, device_addr << 1, payload, 2, 1000);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, (device_addr << 1) & 0xFE, payload, 2, 1000);
     if (status != HAL_OK) {
         CUBE_PRINT("[!] Error writing to address %s\n", device_addr);
     }
@@ -77,7 +77,7 @@ void PCA8575_WritePin(uint16_t device_addr, uint16_t pin, uint8_t bit_state){
     uint8_t payload[2] = {(uint8_t)(data | 0xFF), (uint8_t)((data | 0xFF00) >> 8)};
 
     i2cMutex->Lock();
-    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, device_addr << 1, payload, 2, 1000);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, (device_addr << 1) & 0xFE, payload, 2, 1000);
     if (status != HAL_OK) {
         CUBE_PRINT("[!] Error setting pin %s\n", device_addr);
     }
@@ -93,7 +93,7 @@ uint16_t PCA8575_Read(uint16_t device_addr){
     uint8_t buffer[2];
 
     i2cMutex->Lock();
-    HAL_StatusTypeDef status = HAL_I2C_Master_Receive(&hi2c1, device_addr << 1, buffer, 2, 1000);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Receive(&hi2c1, (device_addr << 1) & 0xFF, buffer, 2, 1000);
     if (status != HAL_OK) {
         CUBE_PRINT("[!] Error reading from address %s\n", device_addr);
     }
