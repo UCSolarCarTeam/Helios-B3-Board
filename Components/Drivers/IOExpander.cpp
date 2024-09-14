@@ -32,9 +32,9 @@ bool IOExpander::SetPin(IOExpanderPin pin, IOState state) {
        state >= IOState::ERROR) return false;
     
     // Set pending write
-    uint8_t port = pin / 10;
-    uint8_t pin = pin % 10;
-    pending_write_[port] = (pending_write_[port] & ~(1 << pin)) | (state << pin);
+    uint8_t port = (uint8_t)pin / 10;
+    uint8_t num = (uint8_t)pin % 10;
+    pending_write_[port] = (pending_write_[port] & ~(1 << num)) | ((uint8_t)state << num);
 
     return true;
 }
@@ -78,10 +78,10 @@ IOState IOExpander::GetPinState(IOExpanderPin pin) {
     if(pin >= IOExpanderPin::IO_NUM_PINS) return IOState::ERROR;
     
     // Check if pin is an input based on last write
-    uint8_t port = pin / 10;
-    uint8_t pin = pin % 10;
-    if (last_write_[port] & (1 << pin)) {
-        return last_read_[port] & (1 << pin) ? IOState::HIGH : IOState::LOW;    
+    uint8_t port = (uint8_t)pin / 10;
+    uint8_t num = (uint8_t)pin % 10;
+    if (last_write_[port] & (1 << num)) {
+        return last_read_[port] & (1 << num) ? IOState::HIGH : IOState::LOW;
     }
 
     return IOState::ERROR;
