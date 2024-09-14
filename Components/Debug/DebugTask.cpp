@@ -32,6 +32,7 @@ DebugTask::DebugTask() : Task(TASK_DEBUG_QUEUE_DEPTH_OBJS), kUart_(UART::Debug)
 {
     memset(debugBuffer, 0, sizeof(debugBuffer));
     debugMsgIdx = 0;
+    debugRxChar = 0;
     isDebugMsgReady = false;
 }
 
