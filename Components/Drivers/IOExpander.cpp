@@ -55,6 +55,39 @@ bool IOExpander::SetPinNow(IOExpanderPin pin, IOState state) {
 }
 
 /**
+ * @brief Toggle pin state (from LOW to HIGH or HIGH to LOW)
+ * 
+ * Based on the current pending write state
+ * 
+ * @param pin Pin to toggle
+ * @return true on success, false on failure (invalid arguments)
+ */
+bool IOExpander::TogglePin(IOExpanderPin pin) {
+    // Check for invalid arguments
+    if(pin >= IOExpanderPin::IO_NUM_PINS) return false;
+    
+    // Set pending write
+    uint8_t port = (uint8_t)pin / 10;
+    uint8_t num = (uint8_t)pin % 10;
+    pending_write_[port] ^= (1 << num);
+
+    return true;
+}
+
+/**
+ * @brief Toggle pin state and commit
+ * 
+ * @param pin Pin to toggle
+ * @return true on success, false on failure 
+ */
+bool IOExpander::TogglePinNow(IOExpanderPin pin) {
+    if (TogglePin(pin)) {
+        Commit();
+    }
+    return false;
+}
+
+/**
  * @brief Update IO Expander Read State
  * @return true on success, false on failure
  */

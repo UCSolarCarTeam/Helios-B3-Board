@@ -89,6 +89,8 @@ public:
     bool Commit(); // Commit pending write
     bool SetPin(IOPin pin, IOState state); // Set pin state
     bool SetPinNow(IOPin pin, IOState state); // Set pin state and commit
+    bool TogglePin(IOPin pin); // Toggle pin state (from LOW to HIGH or HIGH to LOW)
+    bool TogglePinNow(IOPin pin); // Toggle pin state and commit
 
     bool Update(); // Update IO Expander Read State
     IOState GetPinState(IOPin pin); // Get pin state (note. last read state)
