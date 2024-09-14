@@ -6,10 +6,13 @@
 */
 
 /* Includes ------------------------------------------------------------------*/
+#include "main_system.hpp"
 #include "DebugTask.hpp"
 #include "Command.hpp"
 #include "CubeUtils.hpp"
 #include <cstring>
+
+#include "IOExpander.hpp"
 
 // External Tasks (to send debug commands to)
 
@@ -21,6 +24,7 @@
 constexpr uint8_t DEBUG_TASK_PERIOD = 100;
 
 /* Variables -----------------------------------------------------------------*/
+static IOExpander ioExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(0,0,0));
 
 /* Prototypes ----------------------------------------------------------------*/
 
@@ -99,8 +103,55 @@ void DebugTask::HandleDebugMessage(const char* msg)
             CUBE_PRINT("\n%d", val);
         }
     }
+    else if (strncmp(msg, "iox_hi ", 7) == 0) {
+        // Set IO Expander pin high
+        int32_t val = Utils::ExtractIntParameter(msg, 7);
+        if (val != ERRVAL) {
+            bool res = ioExpander.SetPinNow(static_cast<IOPin>(val), IOState::HIGH);
+            if (res == false) {
+                CUBE_PRINT("\nIO Expander Set Pin Failed");
+            }
+        }
+    }
+    else if (strncmp(msg, "iox_lo ", 7) == 0) {
+        // Set IO Expander pin low
+        int32_t val = Utils::ExtractIntParameter(msg, 7);
+        if (val != ERRVAL) {
+            bool res = ioExpander.SetPinNow(static_cast<IOPin>(val), IOState::LOW);
+            if (res == false) {
+                CUBE_PRINT("\nIO Expander Set Pin Failed");
+            }
+        }
+    }
+    else if (strncmp(msg, "iox_tog ", 8) == 0) {
+        // Toggle IO Expander pin
+        int32_t val = Utils::ExtractIntParameter(msg, 8);
+        if (val != ERRVAL) {
+            bool res = ioExpander.TogglePinNow(static_cast<IOPin>(val));
+            if (res == false) {
+                CUBE_PRINT("\nIO Expander Toggle Pin Failed");
+            }
+        }
+    }
+    else if (strncmp(msg, "iox_rd ", 7) == 0) {
+        // Read IO Expander pin
+        int32_t val = Utils::ExtractIntParameter(msg, 7);
+        if (val != ERRVAL) {
+            IOState state = ioExpander.GetPinState(static_cast<IOPin>(val));
+            CUBE_PRINT("\nIO Expander Pin %d State: %d", val, state);
+        }
+    }
+
 
     //-- SYSTEM / CHAR COMMANDS -- (Must be last)
+    else if (strncmp(msg, "iox_upd", 7) == 0) {
+        // Update IO Expander
+        ioExpander.Update();
+    }
+    else if (strncmp(msg, "iox_com", 7) == 0) {
+        // Commit IO Expander
+        ioExpander.Commit();
+    }
     else if (strcmp(msg, "sysreset") == 0) {
         // Reset the system
         CUBE_ASSERT(false, "System reset requested");
