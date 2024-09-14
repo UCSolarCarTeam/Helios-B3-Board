@@ -43,8 +43,11 @@ namespace UART {
 /* System Handles ------------------------------------------------------------------*/
 extern CRC_HandleTypeDef hcrc;       // CRC - Hardware CRC System Handle
 
+extern I2C_HandleTypeDef hi2c2;      // I2C - IO Expander System Handle
+
 namespace SystemHandles {
     constexpr CRC_HandleTypeDef* CRC_Handle = &hcrc;
+    constexpr I2C_HandleTypeDef* I2C_Expander = &hi2c2;
 }
 
 
