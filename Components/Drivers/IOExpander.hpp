@@ -84,8 +84,6 @@ public:
      */
     IOExpander(I2C_HandleTypeDef* i2c, uint8_t addr) : hi2c_(i2c), address_(I2C_ASSERT_WRITE_ADDR(addr)) {}
 
-    bool Init(bool recover = false); // Initialize IO Expander
-
     bool Commit(); // Commit pending write
     bool SetPin(IOPin pin, IOState state); // Set pin state
     bool SetPinNow(IOPin pin, IOState state); // Set pin state and commit
