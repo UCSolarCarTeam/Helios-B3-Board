@@ -119,3 +119,19 @@ IOState IOExpander::GetPinState(IOExpanderPin pin) {
 
     return IOState::ERROR;
 }
+
+/**
+ * @brief Get pin state with immediate update 
+ * 
+ * @param pin Pin to get state of
+ * @return IOState State of the pin
+ *    ERROR if pin is not set as an input
+ *         or if pin is invalid
+ *         or if I2C read fails
+ */
+IOState IOExpander::GetPinStateNow(IOExpanderPin pin) {
+    if (Update()) {
+        return GetPinState(pin);
+    }
+    return IOState::ERROR;
+}
