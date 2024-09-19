@@ -24,7 +24,7 @@
 constexpr uint8_t DEBUG_TASK_PERIOD = 100;
 
 /* Variables -----------------------------------------------------------------*/
-static IOExpander ioExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(0,0,0));
+static IOExpander ioExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1,0,0));
 
 /* Prototypes ----------------------------------------------------------------*/
 

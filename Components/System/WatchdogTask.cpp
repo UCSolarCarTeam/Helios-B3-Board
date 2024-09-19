@@ -73,7 +73,7 @@ void WatchdogTask::Run(void * pvParams)
 
         Command cm;
 
-        CUBE_PRINT(">> Run [%d] s", tempSecondCounter++);
+        CUBE_PRINT(">> Run [%d] s\n", tempSecondCounter++);
 
         // Ingest the command queue, up to 5 commands
         uint8_t proced = 0;

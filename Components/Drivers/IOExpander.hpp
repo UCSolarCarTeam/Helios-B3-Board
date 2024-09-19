@@ -121,7 +121,7 @@ protected:
  * @return const uint8_t 
  */
 inline const uint8_t IOExpander::CalculateAddress(uint8_t ad0, uint8_t ad1, uint8_t ad2) {
-    return 0x20 | (ad2 << 2) | (ad1 << 1) | ad0;
+    return (0x20 | (ad2 << 2) | (ad1 << 1) | ad0) << 1;
 }
 
 // -- Platform Specific Functions ------------------------------------------------
