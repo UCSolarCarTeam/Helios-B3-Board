@@ -94,7 +94,7 @@ public:
     IOState GetPinState(IOPin pin); // Get pin state (note. last read state)
     IOState GetPinStateNow(IOPin pin); // Get pin state with update
 
-    static inline const uint8_t CalculateAddress(uint8_t a2, uint8_t a1, uint8_t a0);
+    static inline const uint8_t CalculateAddress(uint8_t ad0, uint8_t ad1, uint8_t ad2);
 
 protected:
     // -- Variables -------------------------------------------------------------
