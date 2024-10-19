@@ -30,17 +30,19 @@ enum GLOBAL_COMMANDS : uint8_t
     COMMAND_NONE = 0,        // No command, packet can probably be ignored
     TASK_SPECIFIC_COMMAND,    // Runs a task specific command when given this object
     DATA_COMMAND,             // Data command, used to send data to a task. Target is stored in taskCommand
-    CONTROL_ACTION,             // Control actions, used in Rocket State Machine, direct translation to RCU<->DMB Protocol
-    REQUEST_COMMAND,            // Request command
-    HEARTBEAT_COMMAND,          // Control actions for heartbeat commands
-    RADIOHB_CHANGE_PERIOD,      // Change Radio HB Period to Provided TaskCommand Period in Seconds
-    PROTOCOL_COMMAND,           // Protocol command, used for commands to the Protocol Task
-    TELEMETRY_CHANGE_PERIOD,    // Change Telemetry Period to Provided TaskCommand Period in Milliseconds
 };
+
+/* Cube++ Optional Code Configuration ------------------------------------------------------------------*/
 
 
 /* Task Parameter Definitions ------------------------------------------------------------------*/
 /* - Lower priority number means lower priority task ---------------------------------*/
+
+// WATCHDOG TASK
+constexpr uint8_t WATCHDOG_TASK_RTOS_PRIORITY = 2;            // Priority of the uart task
+constexpr uint8_t WATCHDOG_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the uart task queue
+constexpr uint16_t WATCHDOG_TASK_STACK_DEPTH_WORDS = 512;    // Size of the uart task stack
+
 
 // UART TASK
 constexpr uint8_t UART_TASK_RTOS_PRIORITY = 2;            // Priority of the uart task

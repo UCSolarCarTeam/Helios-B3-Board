@@ -55,5 +55,8 @@ dkms.conf
 **/.DS_Store
 
 # Compiled Files
-Debug/
-Release/
+/Debug/
+/Release/
+
+# User
+*.orig
