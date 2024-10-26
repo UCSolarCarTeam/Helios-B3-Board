@@ -524,6 +524,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOC, LED_RED_Pin|LED_BLUE_Pin|LED_GREEN_Pin|CS_CAN_N_Pin
                           |SPI_Data_CS1_Pin|SPI_Data_CS0_Pin|Board_SLCT_1_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(Board_SLCT_0_GPIO_Port, Board_SLCT_0_Pin, GPIO_PIN_RESET);
+
   /*Configure GPIO pins : board_int_1_Pin CAN_RX1BF_Pin CAN_RX0BF_Pin CAN_INT_Pin */
   GPIO_InitStruct.Pin = board_int_1_Pin|CAN_RX1BF_Pin|CAN_RX0BF_Pin|CAN_INT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
@@ -553,8 +556,9 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : Board_SLCT_0_Pin */
   GPIO_InitStruct.Pin = Board_SLCT_0_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(Board_SLCT_0_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
