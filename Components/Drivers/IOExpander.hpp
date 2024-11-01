@@ -30,6 +30,8 @@
 // -- Includes ------------------------------------------------------------------
 #include "main_system.hpp" // This should have the platform specific HAL included
 #include <stdint.h>
+#include <array>
+#include <string>
 
 // -- Macros --------------------------------------------------------------------
 #define I2C_TIMEOUT_MS 1000
@@ -63,7 +65,7 @@ enum class IOState {
     HIGH = 1,
     HI = HIGH,
 
-    INPUT = 1,
+    INPUT = 2,
     ERROR
 };
 
@@ -93,6 +95,8 @@ public:
     bool Update(); // Update IO Expander Read State
     IOState GetPinState(IOPin pin); // Get pin state (note. last read state)
     IOState GetPinStateNow(IOPin pin); // Get pin state with update
+    std::array<IOState, 16> GetExpanderState(); // Get exapnder state
+    std::array<IOState, 16> GetExpanderStateNow(); // Get expander state with update
 
     static inline const uint8_t CalculateAddress(uint8_t ad0, uint8_t ad1, uint8_t ad2);
 
@@ -135,6 +139,16 @@ inline bool IOExpander::I2C_Read(uint8_t dev, uint8_t* dest, uint8_t len) {
     if (HAL_I2C_Master_Receive(hi2c_, dev, dest, len, I2C_TIMEOUT_MS) == HAL_OK)
         return true;
     return false;
+}
+
+std::string IOStateToString(IOState state) {
+    switch (state) {
+        case IOState::LOW: return "LOW";
+        case IOState::HIGH: return "HIGH";
+        case IOState::INPUT: return "HIGH";
+        case IOState::ERROR: return "ERROR";
+        default: return "Unknown State";
+    }
 }
 
 #endif // PCA8575_IO_EXPANDER_HPP_

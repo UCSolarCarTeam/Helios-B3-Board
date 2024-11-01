@@ -2,6 +2,9 @@
     "files.associations": {
         "cstring": "cpp",
         "__config": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "array": "cpp",
+        "xstring": "cpp",
+        "xlocinfo": "cpp"
     }
 }

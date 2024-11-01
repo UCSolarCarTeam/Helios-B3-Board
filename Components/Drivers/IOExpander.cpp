@@ -135,3 +135,40 @@ IOState IOExpander::GetPinStateNow(IOExpanderPin pin) {
     }
     return IOState::ERROR;
 }
+
+/**
+ * @brief Get pin state of all pins
+ * 
+ * @return array of IOState, each index corresponding to each pin
+ */
+std::array<IOState, 16> IOExpander::GetExpanderState() {
+    std::array<PinState, 16> expanderState;
+
+    for(uint8_t i = 0; i < 8; i++) {
+        IOPin pin = static_cast<IOPin>(i);
+        expanderState[i] = GetPinState(pin);
+    }
+
+    for(uint8_t i = 10; i < 18; i++) {
+        IOPin pin = static_cast<IOPin>(i);
+        expanderState[i - 2] = GetPinState(pin);
+    }
+
+    return expanderState;
+}
+
+/**
+ * @brief Get pin in state of all pins with Update
+ * 
+ * @return array of IOState, each index corresponding to a pin
+ */
+std::array<IOState, 16> IOExpander::GetExpanderStateNow() {
+    if(Update()) {
+        return GetExpanderState();
+    }
+        // Initialize and return an array filled with ERROR state for failure
+    std::array<IOState, 16> errorState;
+    errorState.fill(IOState::ERROR);
+    return errorState;
+}
+

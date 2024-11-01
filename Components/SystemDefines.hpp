@@ -54,5 +54,9 @@ constexpr uint8_t TASK_DEBUG_PRIORITY = 2;            // Priority of the debug t
 constexpr uint8_t TASK_DEBUG_QUEUE_DEPTH_OBJS = 10;        // Size of the debug task queue
 constexpr uint16_t TASK_DEBUG_STACK_DEPTH_WORDS = 512;        // Size of the debug task stack
 
+// GPIO TASK
+constexpr uint8_t GPIO_TASK_PRIORITY = 2;            // Priority of the GPIO task
+constexpr uint8_t GPIO_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the GPIO task queue
+constexpr uint16_t GPIO_TASK_STACK_DEPTH_WORDS = 512;        // Size of the GPIO task stack
 
 #endif // CUBE_MAIN_SYSTEM_DEFINES_H
