@@ -44,7 +44,6 @@ void GPIOTask::InitTask()
  */
 void GPIOTask::Run(void * pvParams)
 {
-
     // Initialize Expander Objects
     IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0 ,0));
     IOExpander powerBoardExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(0, 0, 1));
@@ -62,97 +61,97 @@ void GPIOTask::Run(void * pvParams)
             switch (static_cast<IOPin>(i))
             {
             case IOPin::P00:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P00 (Forward/Neutral/Reverse Combo): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P01:
-                CUBE_PRINT("    - P01: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P01 (Forward/Neutral/Reverse Combo): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P02:
-                CUBE_PRINT("    - P02: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P02 (Array Disconnect): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P03:
-                CUBE_PRINT("    - P03: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P03 (Race Mode Enable): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P04:
-                CUBE_PRINT("    - P04: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P04 (Headlights Enable): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P05:
-                CUBE_PRINT("    - P05: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P05 (Display Screen Rotate): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P06:
-                CUBE_PRINT("    - P06: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P06 (Proximity Sensor Mute): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P07:
-                CUBE_PRINT("    - P07: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P07 (Lap Button): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P10:
-                CUBE_PRINT("    - P10: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P10 (Horn Enable): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P11:
-                CUBE_PRINT("    - P11: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P11 (Left Signal Enable): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P12:
-                CUBE_PRINT("    - P12: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P12 (Right Signal Enable): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P13:
-                CUBE_PRINT("    - P13: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P13 (Emergency Hazard): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P14:
-                CUBE_PRINT("    - P14: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P14 (Motor Reset): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P15:
-                CUBE_PRINT("    - P15: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P15 (Parking Break Detect): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P16:
-                CUBE_PRINT("    - P16: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P16 (Mechanical Break): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P17:
-                CUBE_PRINT("    - P17: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P17 (Green LED): %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
