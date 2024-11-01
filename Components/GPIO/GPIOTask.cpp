@@ -68,91 +68,91 @@ void GPIOTask::Run(void * pvParams)
                 }
                 break;
             case IOPin::P01:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P01: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P02:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P02: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P03:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P03: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P04:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P04: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P05:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P05: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P06:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P06: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P07:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P07: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P10:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P10: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P11:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P11: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P12:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P12: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P13:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P13: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P14:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P14: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P15:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P15: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P16:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P16: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
                 break;
             case IOPin::P17:
-                CUBE_PRINT("    - P00: %s", IOStateToString(driverControlState[i]).c_str());
+                CUBE_PRINT("    - P17: %s", IOStateToString(driverControlState[i]).c_str());
                 if (driverControlState[i] == IOState::HIGH) {
 
                 }
