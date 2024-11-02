@@ -103,13 +103,15 @@ uint16_t SPI_Task::readData(void){
 void SPI_Task::readAccelerationPedal(){
   GPIO::SPI_DATA_CS0::Off();
   GPIO::SPI_DATA_CS1::Off();
-  CUBE_PRINT("Acceleration reading: %u", readData());
+  uint16_t accelerationPedalReading = readData();
+  CUBE_PRINT("Acceleration reading: %u", accelerationPedalReading);
 }
 
 void SPI_Task::readBrakingPedal(){
   GPIO::SPI_DATA_CS0::Off();
   GPIO::SPI_DATA_CS1::On();
-  CUBE_PRINT("Braking reading: %u", readData());
+  uint16_t breakPedalReading = readData();
+  CUBE_PRINT("Braking reading: %u", breakPedalReading);
 }
 /**
 * @brief Instance Run loop for the SPI Task, runs on scheduler start as long as the task is initialized.
