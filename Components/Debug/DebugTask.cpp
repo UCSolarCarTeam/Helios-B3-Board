@@ -13,6 +13,7 @@
 #include <cstring>
 
 #include "IOExpander.hpp"
+#include "SPI/SPI_Task.hpp"
 
 // External Tasks (to send debug commands to)
 
@@ -25,6 +26,7 @@ constexpr uint8_t DEBUG_TASK_PERIOD = 100;
 
 /* Variables -----------------------------------------------------------------*/
 static IOExpander ioExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1,0,0));
+static SPI_Task test_SPI_Pedals(SystemHandles::SPI1_Handle);
 
 /* Prototypes ----------------------------------------------------------------*/
 
@@ -95,6 +97,12 @@ void DebugTask::HandleDebugMessage(const char* msg)
     if (strncmp(msg, "echo ", 5) == 0) {
         // Echo the message (without the 'echo')
         CUBE_PRINT("\n%s", &msg[5]);
+    }
+    else if (strncmp(msg, "readAccel ", 5) == 0) {
+        test_SPI_Pedals.readAccelerationPedal();
+    }
+    else if (strncmp(msg, "readBrake ", 5) == 0) {
+        test_SPI_Pedals.readBrakingPedal();
     }
     else if (strncmp(msg, "iecho ", 6) == 0) {
         // Int echo the message (echo an int parameter)

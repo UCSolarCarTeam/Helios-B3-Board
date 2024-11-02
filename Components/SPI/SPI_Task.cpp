@@ -11,8 +11,9 @@
 /**
 * @brief Constructor for SPI Task
 */
-SPI_Task::SPI_Task() : Task(SPI_TAK_QUEUE_DEPTH_OBJS)
+SPI_Task::SPI_Task(SPI_HandleTypeDef* hspi) : Task(SPI_TAK_QUEUE_DEPTH_OBJS)
 {
+    hspi_ = hspi;
 }
 
 /**
@@ -71,7 +72,7 @@ uint16_t SPI_Task::reverseBits(uint16_t bitsToReverse){
 
 
 bool SPI_Task::SPI_Read(uint16_t sizeInBytes){
-    if(HAL_SPI_Receive(SystemHandles::SPI1_Handle,last_read_,sizeInBytes,SPI1_TIMEOUT_MS) == HAL_OK){
+    if(HAL_SPI_Receive(hspi_,last_read_,sizeInBytes,SPI1_TIMEOUT_MS) == HAL_OK){
         return true;
     }else{
         last_read_[0] = 0xFF;
@@ -99,6 +100,17 @@ uint16_t SPI_Task::readData(void){
     return reverseBits(rawData);
 }
 
+void SPI_Task::readAccelerationPedal(){
+  GPIO::SPI_DATA_CS0::Off();
+  GPIO::SPI_DATA_CS1::Off();
+  CUBE_PRINT("Acceleration reading: %u", readData());
+}
+
+void SPI_Task::readBrakingPedal(){
+  GPIO::SPI_DATA_CS0::Off();
+  GPIO::SPI_DATA_CS1::On();
+  CUBE_PRINT("Braking reading: %u", readData());
+}
 /**
 * @brief Instance Run loop for the SPI Task, runs on scheduler start as long as the task is initialized.
 * @param pvParams RTOS Passed void parameters, contains a pointer to the object instance (from InitTask), should not be used
@@ -118,16 +130,7 @@ void SPI_Task::Run(void * pvParams){
     * 3. Read the ADC output on SPI MISO
    */
   BoardSelectLow();
-
-  //Acceleration
-  GPIO::SPI_DATA_CS0::Off();
-  GPIO::SPI_DATA_CS1::Off();
-
-
-
-  //Braking
-  GPIO::SPI_DATA_CS0::Off();
-  GPIO::SPI_DATA_CS1::On();
-
+  readAccelerationPedal();
+  readBrakingPedal();
   osDelay(10); //Delay to reach 100 readings/s
 }
