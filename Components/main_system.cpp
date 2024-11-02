@@ -13,7 +13,7 @@
 #include "WatchdogTask.hpp"
 #include "CubeTask.hpp"
 #include "DebugTask.hpp"
-#include "SPI_Task.hpp"
+//#include "SPI_Task.hpp"
 
 /* Drivers ------------------------------------------------------------------*/
 namespace Driver {
