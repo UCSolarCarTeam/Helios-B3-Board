@@ -33,7 +33,7 @@ public:
         return inst;
     }
 
-    SPI_Task(SPI_HandleTypeDef* hspi);               // Public Constructor testing
+    SPI_Task(SPI_HandleTypeDef* hspi);               // Public Constructor for testing. Converting to private after 
 
     void InitTask();
 

@@ -121,7 +121,6 @@ void SPI_Task::Run(void * pvParams){
 
 
    /**
-    * TODO: Logic
     * 1. First decoder selects Y0 as low to enable SPI Select on 2nd decoder
     *  -> Board Select 0 and 1 = LOW
     *
@@ -131,8 +130,10 @@ void SPI_Task::Run(void * pvParams){
     *
     * 3. Read the ADC output on SPI MISO
    */
-  BoardSelectLow();
-  readAccelerationPedal();
-  readBrakingPedal();
-  osDelay(SPI_TASK_DELAY); //Delay to reach 100 readings/s
+  while(1){
+    BoardSelectLow();
+    readAccelerationPedal();
+    readBrakingPedal();
+    osDelay(SPI_TASK_DELAY); //Delay to reach 100 readings/s
+  }
 }
