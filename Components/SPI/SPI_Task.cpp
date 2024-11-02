@@ -134,5 +134,5 @@ void SPI_Task::Run(void * pvParams){
   BoardSelectLow();
   readAccelerationPedal();
   readBrakingPedal();
-  osDelay(10); //Delay to reach 100 readings/s
+  osDelay(SPI_TASK_DELAY); //Delay to reach 100 readings/s
 }

@@ -14,6 +14,8 @@
 
 /* Macros/Enums ------------------------------------------------------------*/
 #define SPI1_TIMEOUT_MS 1000
+#define SPI_TASK_FREQUENCY 1
+#define SPI_TASK_DELAY  1000/SPI_TASK_FREQUENCY
 
 enum SPI_COMMANDS  {
     SPI_NONE = 0, /** TODO: Add commands */
