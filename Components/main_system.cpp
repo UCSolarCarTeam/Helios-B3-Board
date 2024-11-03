@@ -13,7 +13,7 @@
 #include "WatchdogTask.hpp"
 #include "CubeTask.hpp"
 #include "DebugTask.hpp"
-#include "GPIOTask.hpp"
+#include "GPIO/GPIOTask.hpp"
 
 /* Drivers ------------------------------------------------------------------*/
 namespace Driver {

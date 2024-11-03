@@ -37,6 +37,6 @@ private:
     GPIOTask();                                 // Private constructor
     GPIOTask(const GPIOTask&);                  // Prevent copy-construction
     GPIOTask& operator=(const GPIOTask&);       // Prevent assignment
-}
+};
 
 #endif

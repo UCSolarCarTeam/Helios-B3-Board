@@ -113,6 +113,7 @@ protected:
     // -- Platform specific functions -------------------------------------------
     bool I2C_Write(uint8_t dev, uint8_t* data, uint8_t len);
     bool I2C_Read(uint8_t dev, uint8_t* dest, uint8_t len);
+    std::string IOStateToStringTest(IOState state);
 };
 
 // -- Static Functions -----------------------------------------------------------
@@ -141,7 +142,7 @@ inline bool IOExpander::I2C_Read(uint8_t dev, uint8_t* dest, uint8_t len) {
     return false;
 }
 
-std::string IOStateToString(IOState state) {
+inline std::string IOExpander::IOStateToStringTest(IOState state) {
     switch (state) {
         case IOState::LOW: return "LOW";
         case IOState::HIGH: return "HIGH";
