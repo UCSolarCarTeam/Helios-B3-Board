@@ -117,49 +117,49 @@ void GPIOTask::Run(void * pvParams)
         	switch (static_cast<IOPin>(i))
         	{
 				case IOPin::P10:
-					CUBE_PRINT("    - P10 (Horn Enable): %d\n", driverControlState[i]);
+					CUBE_PRINT("    - P10 (Horn Enable): %d\n", driverControlState[i-2]);
 					if (driverControlState[i-2] == IOState::HIGH) {
 
 					}
 					break;
 				case IOPin::P11:
-					CUBE_PRINT("    - P11 (Left Signal Enable): %d\n", driverControlState[i]);
+					CUBE_PRINT("    - P11 (Left Signal Enable): %d\n", driverControlState[i-2]);
 					if (driverControlState[i-2] == IOState::HIGH) {
 
 					}
 					break;
 				case IOPin::P12:
-					CUBE_PRINT("    - P12 (Right Signal Enable): %d\n", driverControlState[i]);
+					CUBE_PRINT("    - P12 (Right Signal Enable): %d\n", driverControlState[i-2]);
 					if (driverControlState[i-2] == IOState::HIGH) {
 
 					}
 					break;
 				case IOPin::P13:
-					CUBE_PRINT("    - P13 (Emergency Hazard): %d\n", driverControlState[i]);
+					CUBE_PRINT("    - P13 (Emergency Hazard): %d\n", driverControlState[i-2]);
 					if (driverControlState[i-2] == IOState::HIGH) {
 
 					}
 					break;
 				case IOPin::P14:
-					CUBE_PRINT("    - P14 (Motor Reset): %d\n", driverControlState[i]);
+					CUBE_PRINT("    - P14 (Motor Reset): %d\n", driverControlState[i-2]);
 					if (driverControlState[i-2] == IOState::HIGH) {
 
 					}
 					break;
 				case IOPin::P15:
-					CUBE_PRINT("    - P15 (Parking Break Detect): %d\n", driverControlState[i]);
+					CUBE_PRINT("    - P15 (Parking Break Detect): %d\n", driverControlState[i-2]);
 					if (driverControlState[i-2] == IOState::HIGH) {
 
 					}
 					break;
 				case IOPin::P16:
-					CUBE_PRINT("    - P16 (Mechanical Break): %d\n", driverControlState[i]);
+					CUBE_PRINT("    - P16 (Mechanical Break): %d\n", driverControlState[i-2]);
 					if (driverControlState[i-2] == IOState::HIGH) {
 
 					}
 					break;
 				case IOPin::P17:
-					CUBE_PRINT("    - P17 (Green LED): %d\n", driverControlState[i]);
+					CUBE_PRINT("    - P17 (Green LED): %d\n", driverControlState[i-2]);
 					if (driverControlState[i-2] == IOState::HIGH) {
 
 					}
