@@ -31,7 +31,6 @@
 #include "main_system.hpp" // This should have the platform specific HAL included
 #include <stdint.h>
 #include <array>
-#include <string>
 
 // -- Macros --------------------------------------------------------------------
 #define I2C_TIMEOUT_MS 1000
@@ -68,6 +67,43 @@ enum class IOState {
     INPUT = 2,
     ERROR
 };
+
+/* ------------------------------- Namespace for Alternative IOPin names -------------------------------*/
+namespace DriverControls {
+    constexpr IOPin FORWARD_NEUTRAL_REVERSE_H = IOPin::P00;
+    constexpr IOPin FORWARD_NEUTRAL_REVERSE_L = IOPin::P01;
+    constexpr IOPin ARRAYS_DISCONNECT = IOPin::P02;
+    constexpr IOPin RACE_MODE_ENABLE = IOPin::P03;
+    constexpr IOPin HEADLIGHTS_ENABLE = IOPin::P04;
+    constexpr IOPin DISPLAY_SCREEN_ROTATE = IOPin::P05;
+    constexpr IOPin PROXIMITY_SENSOR_ENABLE = IOPin::P06;
+    constexpr IOPin LAP_BUTTON = IOPin::P07;
+    constexpr IOPin HORN_ENABLE = IOPin::P10;
+    constexpr IOPin LEFT_SIGNAL_ENABLE = IOPin::P11;
+    constexpr IOPin RIGHT_SIGNAL_ENABLE = IOPin::P12;
+    constexpr IOPin EMERGENCY_HAZARD = IOPin::P13;
+    constexpr IOPin MOTOR_RESET = IOPin::P14;
+    constexpr IOPin PARKING_BRAKE_DETECT = IOPin::P15;
+    constexpr IOPin MECHANICAL_BRAKE = IOPin::P16;
+    constexpr IOPin GREEN_LED = IOPin::P17;
+}
+
+namespace PowerBoard {
+    constexpr IOPin RIGHT_TURN_LIGHT_SIGNAL = IOPin::P00;
+    constexpr IOPin LEFT_TURN_LIGHT_SIGNAL = IOPin::P01;
+    constexpr IOPin DAYTIME_RUNNING_LIGHT_SIGNAL = IOPin::P02;
+    constexpr IOPin HEADLIGHT_SIGNAL = IOPin::P03;
+    constexpr IOPin BRAKE_LIGHT_SIGNAL = IOPin::P04;
+    constexpr IOPin HORN_SIGNAL = IOPin::P05;
+    constexpr IOPin ORANGE_LED = IOPin::P06;
+    constexpr IOPin GREEN_LED = IOPin::P07;
+
+    constexpr IOPin P13 = IOPin::P13;
+    constexpr IOPin P14 = IOPin::P14;
+    constexpr IOPin P15 = IOPin::P15;
+    constexpr IOPin P16 = IOPin::P16;
+    constexpr IOPin P17 = IOPin::P17;
+}
 
 // -- Typedefs ------------------------------------------------------------------
 typedef IOPin IOExpanderPin; // In case we want to change the name of IOPin
@@ -113,7 +149,6 @@ protected:
     // -- Platform specific functions -------------------------------------------
     bool I2C_Write(uint8_t dev, uint8_t* data, uint8_t len);
     bool I2C_Read(uint8_t dev, uint8_t* dest, uint8_t len);
-    std::string IOStateToStringTest(IOState state);
 };
 
 // -- Static Functions -----------------------------------------------------------
@@ -140,16 +175,6 @@ inline bool IOExpander::I2C_Read(uint8_t dev, uint8_t* dest, uint8_t len) {
     if (HAL_I2C_Master_Receive(hi2c_, dev, dest, len, I2C_TIMEOUT_MS) == HAL_OK)
         return true;
     return false;
-}
-
-inline std::string IOExpander::IOStateToStringTest(IOState state) {
-    switch (state) {
-        case IOState::LOW: return "LOW";
-        case IOState::HIGH: return "HIGH";
-        case IOState::INPUT: return "HIGH";
-        case IOState::ERROR: return "ERROR";
-        default: return "Unknown State";
-    }
 }
 
 #endif // PCA8575_IO_EXPANDER_HPP_
