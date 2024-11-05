@@ -54,5 +54,14 @@ constexpr uint8_t TASK_DEBUG_PRIORITY = 2;            // Priority of the debug t
 constexpr uint8_t TASK_DEBUG_QUEUE_DEPTH_OBJS = 10;        // Size of the debug task queue
 constexpr uint16_t TASK_DEBUG_STACK_DEPTH_WORDS = 512;        // Size of the debug task stack
 
+// CAN RX TASK
+constexpr uint8_t CAN_RX_TASK_RTOS_PRIORITY = 2;            // Priority of the CAN RX task
+constexpr uint8_t CAN_RX_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the CAN RX task queue
+constexpr uint16_t CAN_RX_TASK_STACK_DEPTH_WORDS = 512;    // Size of the CAN RX task stack
+
+//// CAN TX TASK
+//constexpr uint8_t CAN_TX_TASK_RTOS_PRIORITY = 2;            // Priority of the CAN TX task
+//constexpr uint8_t CAN_TX_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the CAN TX task queue
+//constexpr uint16_t CAN_TX_TASK_STACK_DEPTH_WORDS = 512;    // Size of the CAN TX task stack
 
 #endif // CUBE_MAIN_SYSTEM_DEFINES_H
