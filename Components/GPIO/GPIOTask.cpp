@@ -58,7 +58,7 @@ void GPIOTask::Run(void * pvParams)
         // TODO: Do Something to power board >_< based on driver control state or something...
         // Print for Now
         CUBE_PRINT("Driver Control State...\n");
-        for (uint8_t i = 1; i < 8; i++) {
+        for (uint8_t i = 0; i < 8; i++) {
             switch (static_cast<IOPin>(i))
             {
             case DriverControls::FORWARD_NEUTRAL_REVERSE_H:
@@ -268,9 +268,10 @@ void GPIOTask::Run(void * pvParams)
         }
 
         driverControlExpander.TogglePinNow(DriverControls::FORWARD_NEUTRAL_REVERSE_H);
+        // powerBoardExpander.GetPinStateNow(PowerBoard::P13);
 
         // Commit changes to Power board
-        // powerBoardExpander.Commit();
+        powerBoardExpander.Commit();
 
         // Operate task at specified TASK_FREQUENCY
         osDelay(TASK_DELAY);

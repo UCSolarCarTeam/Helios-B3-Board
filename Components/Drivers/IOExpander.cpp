@@ -144,7 +144,7 @@ IOState IOExpander::GetPinStateNow(IOPin pin) {
 std::array<IOState, 16> IOExpander::GetExpanderState() {
     std::array<IOState, 16> expanderState;
 
-    for(uint8_t i = 1; i < 8; i++) {
+    for(uint8_t i = 0; i < 8; i++) {
         IOPin pin = static_cast<IOPin>(i);
         expanderState[i] = GetPinState(pin);
     }
