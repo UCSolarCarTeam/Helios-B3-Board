@@ -1,8 +1,6 @@
 #include "CAN.h"
 
 // defined this so I could say "for ever" in an  infinite for loop
-#define ever (;;)
-
 /*-------------------------------SPI interface instructions-------------------------------*/
 
 /**
@@ -177,7 +175,7 @@ void ConfigureCANSPI(CANPeripheral *peripheral)
 	CANSTAT_STATUS = 0;
 
 	// Toggle CAN_TEST_SETUP to 1 for loopback mode, 0 for normal mode
-	#if 1
+	#if 0
 		CAN_IC_WRITE_REGISTER_BITWISE(CANCTRL, 0xE7, 0x44, peripheral);	// Put IC in loop-back mode for testing as well as enable CLKOUT pin with 1:1 prescaler
 		// HAL_Delay(100);
 		CAN_IC_READ_REGISTER(CANSTAT, &CANSTAT_STATUS, peripheral); // 0x44
@@ -200,7 +198,7 @@ uint8_t checkAvailableTXChannel(CANPeripheral *peripheral)
     // uint32_t prevWakeTime = xTaskGetTickCount(); 	//Delay is fine if we have a CanTxGatekeeperTask
 
 	//  Check if TXBnCTRL.TXREQ is set, if not then buffer is available to use
-    for ever
+    for (;;)
     {
 		/*
 		TODO: REMOVE THIS STUFF

@@ -5,6 +5,10 @@
 #include "cmsis_os.h"
 #include "CANRegisters.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     uint16_t ID;
     uint32_t extendedID;
@@ -48,4 +52,7 @@ extern uint8_t greenStatus;
 
 void pollCanSetup();
 
+#ifdef __cplusplus
+}
+#endif
 // https://www.codesdope.com/blog/article/making-a-queue-using-linked-list-in-c/

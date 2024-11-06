@@ -1,6 +1,8 @@
 #include "CANRXTask.hpp"
-
-extern CANPeripheral peripheral1;
+#include "CAN/CAN.h"
+#include "CAN/CANRegisters.h"
+#include "main_system.hpp"
+#include <stdint.h>
 
 /**
  * @brief Constructor for CANRXTask
@@ -32,7 +34,8 @@ void CANRXTask::InitTask()
  * @brief Main run code for CANRXTask
  * @param pvParams Parameters passed to the task
  */
-void CANRXTask::Run(void * pvParams){
+void CANRXTask::Run(void * pvParams)
+{
     uint8_t CANRxFlag_0 = 0;
     uint8_t CANRxFlag_1 = 0;
 
@@ -47,7 +50,7 @@ void CANRXTask::Run(void * pvParams){
     CANPeripheral peripheral1 = {
     	.CS_PORT = CS_CAN_N_GPIO_Port,
 		.CS_PIN = CS_CAN_N_Pin,
-		.hspi = &hspi2
+		.hspi = SystemHandles::CAN_SPI_Handler
     };
 
 	uint32_t ID = 0;
@@ -68,6 +71,8 @@ void CANRXTask::Run(void * pvParams){
 //		.data = {0xAA}
 //	};
 
+	ConfigureCANSPI(&peripheral1);
+
     while (1)
     {
         CANINTF_STATUS = 0;
@@ -81,6 +86,9 @@ void CANRXTask::Run(void * pvParams){
         // clear interrupts and error flags in case
         CAN_IC_WRITE_REGISTER(CANINTF, 0x00, &peripheral1);
         CAN_IC_WRITE_REGISTER(EFLG, 0x00, &peripheral1);
+
+        CUBE_PRINT("CANINTF 1: %u\n", CANINTF_STATUS);
+        CUBE_PRINT("EFLG 1: %u\n", EFLG_STATUS);
 
         CAN_IC_READ_STATUS(&CAN_STATUS, &peripheral1);
 
@@ -102,6 +110,8 @@ void CANRXTask::Run(void * pvParams){
         CAN_IC_READ_REGISTER(EFLG, &EFLG_STATUS, &peripheral1);
         CAN_IC_READ_STATUS(&CAN_STATUS, &peripheral1);
 
+        CUBE_PRINT("CANINTF 2: %u\n", CANINTF_STATUS);
+        CUBE_PRINT("EFLG 2: %u\n", EFLG_STATUS);
 
         if (CANINTF_STATUS & 0x01) {
         	CANRxFlag_0 = 1;

@@ -10,8 +10,6 @@
 #include "SystemDefines.hpp"
 #include "CubeDefines.hpp"
 
-#include "CAN.h"
-#include "CANRegisters.h"
 
 class CANRXTask : public Task
 {
@@ -35,3 +33,4 @@ private:
     CANRXTask(const CANRXTask&);                        // Prevent copy-construction
     CANRXTask& operator=(const CANRXTask&);            // Prevent assignment
 };
+
