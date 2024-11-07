@@ -101,10 +101,9 @@ uint16_t SPI_Task::readData(void){
     uint16_t rawData = (last_read_[0] << 8) | last_read_[1];
 
     // Mask out the leading 4 bits (which should be zeros) and any trailing bits beyond 10
-    // 0000_00MX_XXXX_XXXL    0b1111_1111_1100
-    rawData = (rawData << 6) & 0xFFC0;
-    //Should be MX_XXXX_XXXL_00_0000 -> MXXX_XXXX_XL00_0000
-    return rawData >> 4; //0000_00_MXXX_XXXX_XL
+    // 0000_MXXX_XXXX_XL00  &  0b0000_1111_1111_1100
+    rawData = (rawData & 0x0FFC) >> 2; //0000_00_MXXX_XXXX_XL
+    return rawData;
 }
 
 void SPI_Task::readAccelerationPedal_P(){
