@@ -28,18 +28,20 @@ public:
      * @brief Singleton Constructor
      * TODO: Add &hspx as input for portability
      */
-    static SPI_Task& Inst(SPI_HandleTypeDef* hspi = nullptr){ //Singleton Design Pattern
-        static SPI_Task inst(hspi);
+    static SPI_Task& Inst(){ //Singleton Design Pattern
+        static SPI_Task inst;
         return inst;
     }
 
-    SPI_Task(SPI_HandleTypeDef* hspi);               // Public Constructor for testing. Converting to private after 
+    SPI_Task();               // Public Constructor for testing. Converting to private after 
 
     void InitTask();
 
     /** Debug Functions Change to private later */
-    void readAccelerationPedal();
-    void readBrakingPedal();
+    void readAccelerationPedal_P();
+    void readAccelerationPedal_N();
+    void readBrakingPedal_P();
+    void readBrakingPedal_N();
 
 protected:
     static void RunTask(void* pvParams) { SPI_Task::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
@@ -57,6 +59,7 @@ private:
 
     //** Helper Functions */
     void BoardSelectLow();                            //Set board select GPIO pins low
+    void BoardSelectHigh();                           //Set board select GPIO pins high
     uint16_t reverseBits(uint16_t bitsToReverse);     //Reverses bits of ADC reading as MSB is read first
     uint16_t readData(void);                          //Reads serial data output of the conversion result
     bool SPI_Read(uint16_t sizeInBytes);               //Reads SPI with HAL command onto protected last_read_
