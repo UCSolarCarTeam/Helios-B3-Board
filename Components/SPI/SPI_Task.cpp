@@ -106,42 +106,77 @@ uint16_t SPI_Task::readData(void){
     return rawData;
 }
 
-void SPI_Task::readAccelerationPedal_P(){
+uint16_t SPI_Task::readAccelerationPedal_P(){
   GPIO::SPI_DATA_CS0::Off();
   GPIO::SPI_DATA_CS1::Off();
   BoardSelectLow();
   uint16_t accelerationPedalReading = readData();
-  CUBE_PRINT("Acceleration P reading: %u\n", accelerationPedalReading);
+//   CUBE_PRINT("Acceleration P reading: %u\n", accelerationPedalReading);
   BoardSelectHigh();
+  return accelerationPedalReading;
 }
 
-void SPI_Task::readAccelerationPedal_N(){
+uint16_t SPI_Task::readAccelerationPedal_N(){
   GPIO::SPI_DATA_CS0::On();
   GPIO::SPI_DATA_CS1::Off();
   BoardSelectLow();
   uint16_t accelerationPedalReading = readData();
-  CUBE_PRINT("Acceleration N reading: %u\n", accelerationPedalReading);
+//   CUBE_PRINT("Acceleration N reading: %u\n", accelerationPedalReading);
   BoardSelectHigh();
+  return accelerationPedalReading;
 }
 
-void SPI_Task::readBrakingPedal_P(){
+uint16_t SPI_Task::readBrakingPedal_P(){
   GPIO::SPI_DATA_CS0::Off();
   GPIO::SPI_DATA_CS1::On();
   //Delay here
   BoardSelectLow();
   uint16_t breakPedalReading = readData();
-  CUBE_PRINT("Braking P reading: %u\n", breakPedalReading);
+//   CUBE_PRINT("Braking P reading: %u\n", breakPedalReading);
   BoardSelectHigh();
+  return breakPedalReading;
 }
 
-void SPI_Task::readBrakingPedal_N(){
+uint16_t SPI_Task::readBrakingPedal_N(){
   GPIO::SPI_DATA_CS0::On();
   GPIO::SPI_DATA_CS1::On();
   BoardSelectLow();
   uint16_t breakPedalReading = readData();
-  CUBE_PRINT("Braking N reading: %u\n", breakPedalReading);
+//   CUBE_PRINT("Braking N reading: %u\n", breakPedalReading);
   BoardSelectHigh();
+  return breakPedalReading;
 }
+
+float SPI_Task::calculatePedalPosition(uint16_t pedalReading) {
+    // Ensure pedalReading is within the valid ADC range
+    if (pedalReading < ADC_MIN) {
+        pedalReading = ADC_MIN;
+    } else if (pedalReading > ADC_MAX) {
+        pedalReading = ADC_MAX;
+    }
+
+    // Calculate the position percentage
+    return ((float)(pedalReading - ADC_MIN) / (ADC_MAX - ADC_MIN)) * 100.0f;
+}
+
+float SPI_Task::getAccelerationPedalPercent() {
+    uint16_t accelPedalReadingP = readAccelerationPedal_P();
+    uint16_t accelPedalReadingN = readAccelerationPedal_N();
+
+    //Optional check  accelPedalReadingP + accelPedalReadingN != ADC_MAX + ADC_MIN roughly equal
+
+    return calculatePedalPosition(accelPedalReadingP);
+}
+
+float SPI_Task::getBrakePedalPercent() {
+    uint16_t brakePedalReadingP = readBrakingPedal_P();
+    uint16_t brakePedalReadingN = readBrakingPedal_N();
+
+    //Optional check: if (brakePedalReadingP + brakePedalReadingN != ADC_MAX + ADC_MIN) {
+
+    return calculatePedalPosition(brakePedalReadingP);
+}
+
 /**
 * @brief Instance Run loop for the SPI Task, runs on scheduler start as long as the task is initialized.
 * @param pvParams RTOS Passed void parameters, contains a pointer to the object instance (from InitTask), should not be used
@@ -162,10 +197,11 @@ void SPI_Task::Run(void * pvParams){
     * 3. Read the ADC output on SPI MISO
    */
   while(1){
-    readAccelerationPedal_P();
-    readAccelerationPedal_N();
-    readBrakingPedal_P();
-    readBrakingPedal_N();
+    float accelerationPedalPercent = getAccelerationPedalPercent();
+    CUBE_PRINT("Acceleration Pedal Position: %.2f%%\n", accelerationPedalPercent);
+
+    float brakingPedalPercent = getBrakePedalPercent();
+    CUBE_PRINT("Braking Pedal Position: %.2f%%\n", brakingPedalPercent);
     osDelay(SPI_TASK_DELAY); //Delay to reach 100 readings/s
   }
 }

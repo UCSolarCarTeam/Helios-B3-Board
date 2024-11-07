@@ -15,6 +15,8 @@
 /* Macros/Enums ------------------------------------------------------------*/
 #define SPI1_TIMEOUT_MS 1000
 #define SPI_TASK_FREQUENCY 1
+#define ADC_MIN 102    // Corresponds to 10% of V_in
+#define ADC_MAX 921    // Corresponds to 90% of V_in
 #define SPI_TASK_DELAY  1000/SPI_TASK_FREQUENCY
 
 enum SPI_COMMANDS  {
@@ -38,10 +40,10 @@ public:
     void InitTask();
 
     /** Debug Functions Change to private later */
-    void readAccelerationPedal_P();
-    void readAccelerationPedal_N();
-    void readBrakingPedal_P();
-    void readBrakingPedal_N();
+    uint16_t readAccelerationPedal_P();
+    uint16_t readAccelerationPedal_N();
+    uint16_t readBrakingPedal_P();
+    uint16_t readBrakingPedal_N();
 
 protected:
     static void RunTask(void* pvParams) { SPI_Task::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
@@ -63,6 +65,9 @@ private:
     uint16_t reverseBits(uint16_t bitsToReverse);     //Reverses bits of ADC reading as MSB is read first
     uint16_t readData(void);                          //Reads serial data output of the conversion result
     bool SPI_Read(uint16_t sizeInBytes);               //Reads SPI with HAL command onto protected last_read_
+    float calculatePedalPosition(uint16_t pedalReading); //calculate the pedal position as a percentage
+    float getAccelerationPedalPercent(); 
+    float getBrakePedalPercent();
 
 };
 
