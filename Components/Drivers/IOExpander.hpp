@@ -134,6 +134,10 @@ public:
     std::array<IOState, 16> GetExpanderState(); // Get exapnder state
     std::array<IOState, 16> GetExpanderStateNow(); // Get expander state with update
 
+    // -- Getter Functions ------------------------------------------------------
+    inline uint16_t GetLastRead(); // Get last read
+    inline uint16_t GetLastWrite(); // Get last read
+
     static inline const uint8_t CalculateAddress(uint8_t ad0, uint8_t ad1, uint8_t ad2);
 
 protected:
@@ -144,7 +148,6 @@ protected:
     uint8_t last_write_[2] = {0xFF, 0xFF};
     uint8_t pending_write_[2] = {0xFF, 0xFF};
     uint8_t last_read_[2] = {0xFF, 0xFF};
-
 protected:
     // -- Platform specific functions -------------------------------------------
     bool I2C_Write(uint8_t dev, uint8_t* data, uint8_t len);
@@ -175,6 +178,15 @@ inline bool IOExpander::I2C_Read(uint8_t dev, uint8_t* dest, uint8_t len) {
     if (HAL_I2C_Master_Receive(hi2c_, dev, dest, len, I2C_TIMEOUT_MS) == HAL_OK)
         return true;
     return false;
+}
+
+// -- Getter Function ------------------------------------------------------------
+inline uint16_t IOExpander::GetLastRead() {
+    return IOExpander::last_read_[0] | (IOExpander::last_read_[1] << 8);
+}
+
+inline uint16_t IOExpander::GetLastWrite() {
+    return IOExpander::last_write_[0] | (IOExpander::last_write_[1] << 8);
 }
 
 #endif // PCA8575_IO_EXPANDER_HPP_

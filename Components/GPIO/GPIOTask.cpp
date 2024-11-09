@@ -48,9 +48,11 @@ void GPIOTask::Run(void * pvParams)
     IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0 ,0));
     IOExpander powerBoardExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(0, 0, 1));
 
-    while (1) {
-        Command cm;
+    // Expander status for CAN messages
+    uint16_t powerBoardStatus = 0;
+    uint16_t driverControlStatus = 0;
 
+    while (1) {
         // Poll GPIO State of driver controls
         // Note on IOState array: index 0-7 are pins 0-7, index 8-15 are pins 10-17
         std::array<IOState,16> driverControlState = driverControlExpander.GetExpanderStateNow();
@@ -266,9 +268,6 @@ void GPIOTask::Run(void * pvParams)
                 break;
         	}
         }
-
-        driverControlExpander.TogglePinNow(DriverControls::FORWARD_NEUTRAL_REVERSE_H);
-        // powerBoardExpander.GetPinStateNow(PowerBoard::P13);
 
         // Commit changes to Power board
         powerBoardExpander.Commit();

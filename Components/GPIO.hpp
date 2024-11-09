@@ -44,6 +44,7 @@ namespace GPIO
 
         inline bool IsOn() { return HAL_GPIO_ReadPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin) == GPIO_PIN_SET; }
     }
+    
     namespace BOARD_SELECT_0
     {
         inline void On() {HAL_GPIO_WritePin(Board_SLCT_0_GPIO_Port, Board_SLCT_0_Pin, GPIO_PIN_SET); }
