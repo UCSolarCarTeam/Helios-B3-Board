@@ -56,7 +56,6 @@ PCD_HandleTypeDef hpcd_USB_FS;
 
 osThreadId defaultTaskHandle;
 
-CanTransmitTask canTransmitTask;  // Declare the CAN transmit task instance
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -121,7 +120,7 @@ int main(void)
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
   run_interface();
-  canTransmitTask.InitTask(); // Initialize your CAN transmit task
+
   #if 0
   /* USER CODE END 2 */
 
