@@ -1,13 +1,19 @@
 #include "CANRXTask.hpp"
-#include "CAN/CAN.h"
-#include "CAN/CANRegisters.h"
+#include "CAN.h"
+#include "CANRegisters.h"
 #include "main_system.hpp"
 #include <stdint.h>
 
+
+CANPeripheral peripheral1 = {
+	.CS_PORT = CS_CAN_N_GPIO_Port,
+	.CS_PIN = CS_CAN_N_Pin,
+	.hspi = SystemHandles::CAN_SPI
+};
 /**
  * @brief Constructor for CANRXTask
  */
-CANRXTask::CANRXTask() : Task(CAN_RX_TASK_QUEUE_DEPTH_OBJS) {}
+CANRXTask::CANRXTask() : Task(CAN_TASK_QUEUE_DEPTH_OBJS) {}
 
 /**
  * @brief Init task for RTOS
@@ -21,9 +27,9 @@ void CANRXTask::InitTask()
     BaseType_t rtValue =
         xTaskCreate((TaskFunction_t)CANRXTask::RunTask,
             (const char*)"CANRXTask",
-            (uint16_t)CAN_RX_TASK_STACK_DEPTH_WORDS,
+            (uint16_t)CAN_TASK_STACK_DEPTH_WORDS,
             (void*)this,
-            (UBaseType_t)CAN_RX_TASK_RTOS_PRIORITY,
+            (UBaseType_t)CAN_TASK_RTOS_PRIORITY,
             (TaskHandle_t*)&rtTaskHandle);
 
     // Ensure creation succeded
@@ -46,12 +52,6 @@ void CANRXTask::Run(void * pvParams)
     uint8_t TXB0CTRL_STATUS = 0;
     uint8_t TXB1CTRL_STATUS = 0;
     uint8_t TXB2CTRL_STATUS = 0;
-
-    CANPeripheral peripheral1 = {
-    	.CS_PORT = CS_CAN_N_GPIO_Port,
-		.CS_PIN = CS_CAN_N_Pin,
-		.hspi = SystemHandles::CAN_SPI_Handler
-    };
 
 	uint32_t ID = 0;
 	uint8_t DLC = 0;
@@ -155,25 +155,26 @@ void CANRXTask::Run(void * pvParams)
 void CANRXTask::HandleCommand(Command& cm)
 {
     CANMsg msg;
+    msg.ID = 0;
     msg.DLC = 1; // Assuming DLC of 1 for each command; adjust as needed.
     msg.data[0] = 1; // Example data; set according to command specifics.
 
     // Handle command based on address/type
-    switch (cm.GetCommand()) {
+    switch (cm.GetTaskCommand()) {
         case LIGHTS_INPUT_BASE:
-            msg.ID = 0x701;
+            msg.extendedID = 0x701;
             sendExtendedCANMessage(&msg, &peripheral1);
             CUBE_PRINT("Sent Lights Input command\n");
             break;
 
         case DRIVER_BASE:
-            msg.ID = 0x703;
+            msg.extendedID = 0x703;
             sendExtendedCANMessage(&msg, &peripheral1);
             CUBE_PRINT("Sent Driver command\n");
             break;
 
         case LIGHTS_STATUS_BASE:
-            msg.ID = 0x711;
+            msg.extendedID = 0x711;
             sendExtendedCANMessage(&msg, &peripheral1);
             CUBE_PRINT("Sent Lights Status command\n");
             break;
@@ -185,20 +186,3 @@ void CANRXTask::HandleCommand(Command& cm)
 
     cm.Reset();  // Clear command data after processing
 }
-
-/**
- * @brief Handle a command
- * @param cm Command to handle
- */
-//void CANRXTask::HandleCommand(Command& cm){
-//    // Handle the command
-//    switch (cm.GetTaskCommand()) {
-//    case EVENT_DEBUG_RX_COMPLETE:
-//        // Handle the debug message
-//        CUBE_PRINT("CAN RX Task received debug message: %s\n", cm.GetDataPointer());
-//        break;
-//    default:
-//        CUBE_PRINT("CAN RX Task received unknown command: %d\n", cm.GetTaskCommand());
-//        break;
-//    }
-//}

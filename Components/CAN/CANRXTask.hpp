@@ -18,9 +18,9 @@
 //};
 // Enums for CAN message commands related to lights and signals
 enum CANRX_COMMANDS {
-    LIGHTS_INPUT_BASE = 0x701,    // Command for lights input
-    DRIVER_BASE = 0x703,          // Command for driver data
-    LIGHTS_STATUS_BASE = 0x711    // Command for lights status
+    LIGHTS_INPUT_BASE,    // Command for lights input
+    DRIVER_BASE,          // Command for driver data
+    LIGHTS_STATUS_BASE    // Command for lights status
 };
 
 

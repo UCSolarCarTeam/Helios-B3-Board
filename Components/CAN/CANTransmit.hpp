@@ -12,7 +12,6 @@
 
 #include "Task.hpp"              // Base class for tasks
 #include "SystemDefines.hpp"     // For CANPeripheral, CANMsg, etc.
-#include "cmsis_os2.h"         // Include CMSIS RTOS header         // Include CMSIS RTOS header
 #include "CanRegisters.h"        // Include CAN register definitions
 #include "FreeRTOS.h"
 #include "queue.h"               // RTOS Queue for message handling

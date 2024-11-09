@@ -294,7 +294,7 @@ void sendExtendedCANMessage(CANMsg *msg, CANPeripheral *peripheral)
 	// Initializations
 	uint8_t sendCommand = 0x80 + (1 << channel); //instruction to send CAN message on channel
 	uint8_t TXBNSIDH = (msg->extendedID >> 21) & 0xFF;
-	uint8_t TXBNSIDL = (((msg->extendedID >> 18) & 0x07) << 5) | 0x08 | ((msg->ID >> 16) & 0x03);
+	uint8_t TXBNSIDL = (((msg->extendedID >> 18) & 0x07) << 5) | 0x08 | ((msg->extendedID >> 16) & 0x03);
 	uint8_t TXBNEID8 = (msg->extendedID >> 8) & 0xFF;
 	uint8_t TXBNEID0 = msg->extendedID & 0xFF;
 	uint8_t TXBNDLC = msg->DLC & 0x0F;
@@ -366,7 +366,7 @@ void receiveCANMessage(uint8_t channel, uint32_t* ID, uint8_t* DLC, uint8_t* dat
 		CAN_IC_READ_REGISTER(initialDataBufferAddress + i, &data[i], peripheral); //read from relevant data registers
 	}
 
-	CAN_IC_WRITE_REGISTER_BITWISE(CANINTF, channel + 1, channel + 1, peripheral); //clear interrupts
+	CAN_IC_WRITE_REGISTER_BITWISE(CANINTF, channel + 1, 0, peripheral); //clear interrupts
 	return;
 }
 

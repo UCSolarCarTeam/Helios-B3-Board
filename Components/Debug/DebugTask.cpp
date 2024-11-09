@@ -9,10 +9,14 @@
 #include "main_system.hpp"
 #include "DebugTask.hpp"
 #include "Command.hpp"
+#include "Queue.hpp"
+#include "Task.hpp"
 #include "CubeUtils.hpp"
 #include <cstring>
 
 #include "IOExpander.hpp"
+#include "CANRXTask.hpp"
+#include "CAN.h"
 
 // External Tasks (to send debug commands to)
 
@@ -142,6 +146,22 @@ void DebugTask::HandleDebugMessage(const char* msg)
         }
     }
 
+    //-- CAN COMMANDS --//
+    else if (strcmp(msg, "can_lights_input") == 0) {
+        Command cmd(DATA_COMMAND, LIGHTS_INPUT_BASE);
+        Queue* evtQ = CANRXTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+    }
+    else if (strcmp(msg, "can_driver_base") == 0) {
+        Command cmd(DATA_COMMAND, DRIVER_BASE);
+        Queue* evtQ = CANRXTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+    }
+    else if (strcmp(msg, "light_status_base") == 0) {
+        Command cmd(DATA_COMMAND, LIGHTS_STATUS_BASE);
+        Queue* evtQ = CANRXTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+    }
 
     //-- SYSTEM / CHAR COMMANDS -- (Must be last)
     else if (strncmp(msg, "iox_upd", 7) == 0) {

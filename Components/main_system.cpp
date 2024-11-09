@@ -13,6 +13,7 @@
 #include "WatchdogTask.hpp"
 #include "CubeTask.hpp"
 #include "DebugTask.hpp"
+#include "CAN/CANRXTask.hpp"
 
 /* Drivers ------------------------------------------------------------------*/
 namespace Driver {
@@ -28,6 +29,7 @@ void run_main() {
     WatchdogTask::Inst().InitTask();
     CubeTask::Inst().InitTask();
     DebugTask::Inst().InitTask();
+    CANRXTask::Inst().InitTask();
 
     // Print System Boot Info : Warning, don't queue more than 10 prints before scheduler starts
     CUBE_PRINT("\n-- CUBE SYSTEM --\n");
