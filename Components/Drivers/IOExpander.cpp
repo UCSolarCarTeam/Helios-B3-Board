@@ -26,7 +26,7 @@ bool IOExpander::Commit() {
  * 
  * @return true on success, false on failure (invalid arguments)
  */
-bool IOExpander::SetPin(IOExpanderPin pin, IOState state) {
+bool IOExpander::SetPin(IOPin pin, IOState state) {
     // Check for invalid arguments
     if(pin >= IOExpanderPin::IO_NUM_PINS ||
        state >= IOState::ERROR) return false;
@@ -47,7 +47,7 @@ bool IOExpander::SetPin(IOExpanderPin pin, IOState state) {
  * 
  * @return true on success, false on failure
  */
-bool IOExpander::SetPinNow(IOExpanderPin pin, IOState state) {
+bool IOExpander::SetPinNow(IOPin pin, IOState state) {
     if (SetPin(pin, state)) {
         return Commit();
     }
@@ -62,7 +62,7 @@ bool IOExpander::SetPinNow(IOExpanderPin pin, IOState state) {
  * @param pin Pin to toggle
  * @return true on success, false on failure (invalid arguments)
  */
-bool IOExpander::TogglePin(IOExpanderPin pin) {
+bool IOExpander::TogglePin(IOPin pin) {
     // Check for invalid arguments
     if(pin >= IOExpanderPin::IO_NUM_PINS) return false;
     
@@ -80,7 +80,7 @@ bool IOExpander::TogglePin(IOExpanderPin pin) {
  * @param pin Pin to toggle
  * @return true on success, false on failure 
  */
-bool IOExpander::TogglePinNow(IOExpanderPin pin) {
+bool IOExpander::TogglePinNow(IOPin pin) {
     if (TogglePin(pin)) {
         Commit();
     }
@@ -106,7 +106,7 @@ bool IOExpander::Update() {
  *     ERROR if pin is not set as an input
  *           or if pin is invalid
  */
-IOState IOExpander::GetPinState(IOExpanderPin pin) {
+IOState IOExpander::GetPinState(IOPin pin) {
     // Check for invalid arguments
     if(pin >= IOExpanderPin::IO_NUM_PINS) return IOState::ERROR;
     
@@ -129,9 +129,46 @@ IOState IOExpander::GetPinState(IOExpanderPin pin) {
  *         or if pin is invalid
  *         or if I2C read fails
  */
-IOState IOExpander::GetPinStateNow(IOExpanderPin pin) {
+IOState IOExpander::GetPinStateNow(IOPin pin) {
     if (Update()) {
         return GetPinState(pin);
     }
     return IOState::ERROR;
 }
+
+/**
+ * @brief Get pin state of all pins
+ * 
+ * @return array of IOState, each index corresponding to each pin
+ */
+std::array<IOState, 16> IOExpander::GetExpanderState() {
+    std::array<IOState, 16> expanderState;
+
+    for(uint8_t i = 0; i < 8; i++) {
+        IOPin pin = static_cast<IOPin>(i);
+        expanderState[i] = GetPinState(pin);
+    }
+
+    for(uint8_t i = 10; i < 18; i++) {
+        IOPin pin = static_cast<IOPin>(i);
+        expanderState[i - 2] = GetPinState(pin);
+    }
+
+    return expanderState;
+}
+
+/**
+ * @brief Get pin in state of all pins with Update
+ * 
+ * @return array of IOState, each index corresponding to a pin
+ */
+std::array<IOState, 16> IOExpander::GetExpanderStateNow() {
+    if(Update()) {
+        return GetExpanderState();
+    }
+        // Initialize and return an array filled with ERROR state for failure
+    std::array<IOState, 16> errorState;
+    errorState.fill(IOState::ERROR);
+    return errorState;
+}
+
