@@ -123,28 +123,28 @@ void CANRXTask::Run(void * pvParams)
         CUBE_PRINT("CANINTF 2: %u\n", CANINTF_STATUS);
         CUBE_PRINT("EFLG 2: %u\n", EFLG_STATUS);
 
-        if (CANINTF_STATUS & 0x01) {
-        	CANRxFlag_0 = 1;
-        }
-        if (CANINTF_STATUS & 0x02) {
-        	CANRxFlag_1 = 1;
-        }
-
-        // Receive CAN_Messages
-        if (CANRxFlag_0 == 1) {
-        	CUBE_PRINT("RX_BUFFER RECV 0\n");
-            receiveCANMessage(0, &ID, &DLC, data, &peripheral1);
-        }
-        if (CANRxFlag_1 == 1) {
-        	CUBE_PRINT("RX_BUFFER RECV 1\n");
-        	receiveCANMessage(1, &ID, &DLC, data, &peripheral1);
-        }
+//        if (CANINTF_STATUS & 0x01) {
+//        	CANRxFlag_0 = 1;
+//        }
+//        if (CANINTF_STATUS & 0x02) {
+//        	CANRxFlag_1 = 1;
+//        }
+//
+//        // Receive CAN_Messages
+//        if (CANRxFlag_0 == 1) {
+//        	CUBE_PRINT("RX_BUFFER RECV 0\n");
+//            receiveCANMessage(0, &ID, &DLC, data, &peripheral1);
+//        }
+//        if (CANRxFlag_1 == 1) {
+//        	CUBE_PRINT("RX_BUFFER RECV 1\n");
+//        	receiveCANMessage(1, &ID, &DLC, data, &peripheral1);
+//        }
 
         CAN_IC_READ_STATUS(&CAN_STATUS, &peripheral1);
         CANRxFlag_0 = 0;
         CANRxFlag_1 = 0;
 
-        osDelay(500);
+        osDelay(2000);
     }
 }
 
@@ -160,7 +160,7 @@ void CANRXTask::HandleCommand(Command& cm)
     msg.data[0] = 1; // Example data; set according to command specifics.
 
     // Handle command based on address/type
-    switch (cm.GetTaskCommand()) {
+    switch (static_cast<CANRX_COMMANDS>(cm.GetTaskCommand())) {
         case LIGHTS_INPUT_BASE:
             msg.extendedID = 0x701;
             sendExtendedCANMessage(&msg, &peripheral1);
