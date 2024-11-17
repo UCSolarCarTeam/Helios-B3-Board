@@ -15,6 +15,9 @@
 #include "IOExpander.hpp"
 #include "SPI/SPI_Task.hpp"
 
+#include "CAN/CANTxTask.hpp"
+#include "CAN.h"
+
 // External Tasks (to send debug commands to)
 
 /* Macros --------------------------------------------------------------------*/
@@ -149,6 +152,22 @@ void DebugTask::HandleDebugMessage(const char* msg)
         }
     }
 
+    //-- CAN Commands --
+    else if (strcmp(msg, "can_lights_input") == 0) {
+        Command cmd(DATA_COMMAND, LIGHTS_INPUT_BASE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+    }
+    else if (strcmp(msg, "can_driver_base") == 0) {
+        Command cmd(DATA_COMMAND, DRIVER_BASE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+    }
+    else if (strcmp(msg, "light_status_base") == 0) {
+        Command cmd(DATA_COMMAND, LIGHTS_STATUS_BASE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+    }
 
     //-- SYSTEM / CHAR COMMANDS -- (Must be last)
     else if (strncmp(msg, "iox_upd", 7) == 0) {
