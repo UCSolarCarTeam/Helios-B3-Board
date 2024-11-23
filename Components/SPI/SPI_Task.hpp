@@ -19,6 +19,11 @@
 #define ADC_MAX 921    // Corresponds to 90% of V_in
 #define SPI_TASK_DELAY  1000/SPI_TASK_FREQUENCY
 
+extern volatile uint16_t g_accelerationReading_P;
+extern volatile uint16_t g_accelerationReading_N;
+extern volatile uint16_t g_brakeReading_P;
+extern volatile uint16_t g_brakeReading_N;
+
 enum SPI_COMMANDS  {
     SPI_NONE = 0, /** TODO: Add commands */
 };

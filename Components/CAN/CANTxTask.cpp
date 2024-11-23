@@ -14,6 +14,7 @@
 #include "CAN.h"
 #include "CANRegisters.h"
 
+#include "SPI_Task.hpp"
 
 CANPeripheral peripheral1 = {
 	.CS_PORT = CS_CAN_N_GPIO_Port,
@@ -95,7 +96,19 @@ void CANTxTask::HandleCommand(Command& cm)
         case DRIVER_BASE:
             msg.extendedID = 0x703;
             msg.DLC = 4;
-            msg.data[0] = 0xBB;
+
+            // msg.data[0] = (g_accelerationReading_P & 0xFF); //LSB
+            // msg.data[1] = ((g_accelerationReading_P>>8) & 0xFF); //MSB
+
+            // msg.data[2] = (g_accelerationReading_N & 0xFF); //LSB
+            // msg.data[3] = ((g_accelerationReading_N>>8) & 0xFF); //MSB
+
+            // msg.data[4] = (g_brakeReading_P & 0xFF); //LSB
+            // msg.data[5] = ((g_brakeReading_P>>8) & 0xFF); //MSB
+
+            // msg.data[6] = (g_brakeReading_N & 0xFF); //LSB
+            // msg.data[7] = ((g_brakeReading_N>>8) & 0xFF); //MSB
+
             CUBE_PRINT("Sent Driver command\n");
             break;
 

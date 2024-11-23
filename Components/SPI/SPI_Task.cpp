@@ -113,6 +113,7 @@ uint16_t SPI_Task::readAccelerationPedal_P(){
   uint16_t accelerationPedalReading = readData();
 //   CUBE_PRINT("Acceleration P reading: %u\n", accelerationPedalReading);
   BoardSelectHigh();
+  g_accelerationReading_P = accelerationPedalReading;
   return accelerationPedalReading;
 }
 
@@ -123,6 +124,7 @@ uint16_t SPI_Task::readAccelerationPedal_N(){
   uint16_t accelerationPedalReading = readData();
 //   CUBE_PRINT("Acceleration N reading: %u\n", accelerationPedalReading);
   BoardSelectHigh();
+  g_accelerationReading_N = accelerationPedalReading;
   return accelerationPedalReading;
 }
 
@@ -134,6 +136,7 @@ uint16_t SPI_Task::readBrakingPedal_P(){
   uint16_t breakPedalReading = readData();
 //   CUBE_PRINT("Braking P reading: %u\n", breakPedalReading);
   BoardSelectHigh();
+  g_brakeReading_P = breakPedalReading;
   return breakPedalReading;
 }
 
@@ -144,6 +147,7 @@ uint16_t SPI_Task::readBrakingPedal_N(){
   uint16_t breakPedalReading = readData();
 //   CUBE_PRINT("Braking N reading: %u\n", breakPedalReading);
   BoardSelectHigh();
+  g_brakeReading_N = breakPedalReading;
   return breakPedalReading;
 }
 
