@@ -82,18 +82,26 @@ void CANTxTask::HandleCommand(Command& cm)
     switch (static_cast<CAN_TX_COMMANDS>(cm.GetTaskCommand())) {
         case LIGHTS_INPUT_BASE:
             msg.extendedID = 0x701;
-            msg.data[0] = 0xAA;
+            // Dynamically allocate memory
+            msg.DLC = 1; //Dynamically allocate memory?
+            // cm.AllocateData(msg.DLC);
+            // uint8_t* commandDataPointer = cm.GetDataPointer();
+            // commandDataPointer[0] = 0xAA; //...
+            // cm.FreeData();
+            msg.data[0] = 0xAA; //Dummy Data, TODO: Replace with actual data
             CUBE_PRINT("Sent Lights Input command\n");
             break;
 
         case DRIVER_BASE:
             msg.extendedID = 0x703;
+            msg.DLC = 4;
             msg.data[0] = 0xBB;
             CUBE_PRINT("Sent Driver command\n");
             break;
 
         case LIGHTS_STATUS_BASE:
             msg.extendedID = 0x711;
+            msg.DLC = 1;
             msg.data[0] = 0xCC;
             CUBE_PRINT("Sent Lights Status command\n");
             break;
