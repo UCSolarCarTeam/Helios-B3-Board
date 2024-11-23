@@ -269,19 +269,32 @@ void GPIOTask::Run(void * pvParams)
         	}
         }
 
-        powerBoardExpander.TogglePin(PowerBoard::BRAKE_LIGHT_SIGNAL);
-        powerBoardExpander.TogglePin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL);
-        powerBoardExpander.TogglePin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL);
-        powerBoardExpander.TogglePin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL);
-        powerBoardExpander.TogglePin(PowerBoard::HEADLIGHT_SIGNAL);
-        powerBoardExpander.TogglePin(PowerBoard::HORN_SIGNAL);
+//        powerBoardExpander.TogglePin(PowerBoard::BRAKE_LIGHT_SIGNAL);
+//        powerBoardExpander.TogglePin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL);
+//        powerBoardExpander.TogglePin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL);
+//        powerBoardExpander.TogglePin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL);
+//        powerBoardExpander.TogglePin(PowerBoard::HEADLIGHT_SIGNAL);
+//        powerBoardExpander.TogglePin(PowerBoard::HORN_SIGNAL);
 
+//        powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::LOW);
+//        powerBoardExpander.SetPin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL, IOState::LOW);
+//        powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
+//        powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
+//        powerBoardExpander.SetPin(PowerBoard::HEADLIGHT_SIGNAL, IOState::LOW);
+//        powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::LOW);
+
+        powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::HIGH);
+        powerBoardExpander.SetPin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL, IOState::HIGH);
+        powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+        powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+        powerBoardExpander.SetPin(PowerBoard::HEADLIGHT_SIGNAL, IOState::HIGH);
+        powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::HIGH);
 
         powerBoardExpander.TogglePin(PowerBoard::ORANGE_LED);
         powerBoardExpander.TogglePin(PowerBoard::GREEN_LED);
 
         // Commit changes to Power board
-        //powerBoardExpander.Commit();
+        // powerBoardExpander.Commit();
 
         // Operate task at specified TASK_FREQUENCY
         osDelay(TASK_DELAY);

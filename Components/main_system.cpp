@@ -33,7 +33,7 @@ void run_main() {
     DebugTask::Inst().InitTask();
     SPI_Task::Inst().InitTask();
     GPIOTask::Inst().InitTask();
-    CANTxTask::Inst().InitTask();
+    // CANTxTask::Inst().InitTask();
 
     // Print System Boot Info : Warning, don't queue more than 10 prints before scheduler starts
     CUBE_PRINT("\n-- CUBE SYSTEM --\n");
