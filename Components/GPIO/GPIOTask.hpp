@@ -27,6 +27,11 @@ public:
     }
 
     void InitTask();
+    
+    /**Getters for CAN formatting */
+    uint8_t LightsInputsBase();
+    uint8_t DriverBase();
+    uint8_t LightStatus();
 
 protected:
     static void RunTask(void* pvParams) { GPIOTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
@@ -37,6 +42,11 @@ private:
     GPIOTask();                                 // Private constructor
     GPIOTask(const GPIOTask&);                  // Prevent copy-construction
     GPIOTask& operator=(const GPIOTask&);       // Prevent assignment
+
+
+    //** Potential private variable for refactoring code 
+    // IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0)); */
+
 };
 
 #endif

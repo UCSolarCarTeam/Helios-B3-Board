@@ -5,6 +5,9 @@
         "typeinfo": "cpp",
         "array": "cpp",
         "xstring": "cpp",
-        "xlocinfo": "cpp"
+        "xlocinfo": "cpp",
+        "algorithm": "cpp",
+        "list": "cpp",
+        "xutility": "cpp"
     }
 }

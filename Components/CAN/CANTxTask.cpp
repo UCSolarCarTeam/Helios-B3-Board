@@ -14,7 +14,13 @@
 #include "CAN.h"
 #include "CANRegisters.h"
 
-#include "SPI_Task.hpp"
+#include "GPIO/GPIOTask.hpp"
+#include "SPI/SPI_Task.hpp"
+
+
+//Example
+uint16_t accelerationReading = SPI_Task::Inst().getAccelerationReading_P();
+
 
 CANPeripheral peripheral1 = {
 	.CS_PORT = CS_CAN_N_GPIO_Port,
@@ -79,17 +85,15 @@ void CANTxTask::HandleCommand(Command& cm)
     msg.DLC = 1; // Assuming DLC of 1 for each command; adjust as needed.
     // msg.data[0] = 1; // Example data; set according to command specifics.
 
+    uint8_t u8_data = 0;
+    uint32_t u32_data = 0;
     // Handle command based on address/type
     switch (static_cast<CAN_TX_COMMANDS>(cm.GetTaskCommand())) {
-        case LIGHTS_INPUT_BASE:
+        case LIGHTS_INPUT_BASE: 
             msg.extendedID = 0x701;
-            // Dynamically allocate memory
-            msg.DLC = 1; //Dynamically allocate memory?
-            // cm.AllocateData(msg.DLC);
-            // uint8_t* commandDataPointer = cm.GetDataPointer();
-            // commandDataPointer[0] = 0xAA; //...
-            // cm.FreeData();
-            msg.data[0] = 0xAA; //Dummy Data, TODO: Replace with actual data
+            msg.DLC = 1; 
+            u8_data = GPIOTask::Inst().LightsInputsBase();
+            msg.data[0] = u8_data;
             CUBE_PRINT("Sent Lights Input command\n");
             break;
 
@@ -97,25 +101,14 @@ void CANTxTask::HandleCommand(Command& cm)
             msg.extendedID = 0x703;
             msg.DLC = 4;
 
-            // msg.data[0] = (g_accelerationReading_P & 0xFF); //LSB
-            // msg.data[1] = ((g_accelerationReading_P>>8) & 0xFF); //MSB
-
-            // msg.data[2] = (g_accelerationReading_N & 0xFF); //LSB
-            // msg.data[3] = ((g_accelerationReading_N>>8) & 0xFF); //MSB
-
-            // msg.data[4] = (g_brakeReading_P & 0xFF); //LSB
-            // msg.data[5] = ((g_brakeReading_P>>8) & 0xFF); //MSB
-
-            // msg.data[6] = (g_brakeReading_N & 0xFF); //LSB
-            // msg.data[7] = ((g_brakeReading_N>>8) & 0xFF); //MSB
-
             CUBE_PRINT("Sent Driver command\n");
             break;
 
         case LIGHTS_STATUS_BASE:
             msg.extendedID = 0x711;
             msg.DLC = 1;
-            msg.data[0] = 0xCC;
+            u8_data = GPIOTask::Inst().LightStatus();
+            msg.data[0] = u8_data;
             CUBE_PRINT("Sent Lights Status command\n");
             break;
 
