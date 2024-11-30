@@ -1,5 +1,7 @@
-M8N.c:92:10:UBX_M8N_CHECKSUM	2
-M8N.c:117:6:UBX_M8N_NAV_POSLLH_Parsing	1
-M8N.c:131:6:CONFIG_Transmit	5
-M8N.c:163:10:UBX_GET_LENGTH	2
-M8N.c:177:6:GPS_Initialization	2
+../Core/Src/M8N.c:98:6:UBX_Transmit	2
+../Core/Src/M8N.c:107:6:UBX_Receive	2
+../Core/Src/M8N.c:129:10:UBX_M8N_CHECKSUM	2
+../Core/Src/M8N.c:154:6:UBX_M8N_NAV_POSLLH_Parsing	1
+../Core/Src/M8N.c:168:6:CONFIG_Transmit	4
+../Core/Src/M8N.c:201:10:UBX_GET_LENGTH	2
+../Core/Src/M8N.c:213:6:GPS_Initialization	3

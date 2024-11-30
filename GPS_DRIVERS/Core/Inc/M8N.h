@@ -10,6 +10,7 @@
 #define INC_M8N_H_
 
 #include<stdint.h>
+#include "stm32l1xx_hal.h"
 
 /*-------------- Private Macros --------------*/
 #define GPS_DEVICE_ADDRESS (0x42 << 1)	// GPS device address is 0x42, left-shifted for STM32 uses 7-bit address
@@ -81,6 +82,11 @@ uint16_t UBX_M8N_CHECKSUM(uint8_t *buffer, uint8_t buflen);
  *  Refer to U-Blox 8 / U-Blox M8 Receiver desciption and protocol specification
 */
 void CONFIG_Transmit(uint8_t *buffer, uint16_t buflen);
+
+/* WRITE COMMENT
+ *
+ */
+HAL_StatusTypeDef WaitUntilI2CReady(uint32_t timeout_ms);
 
 /*  Initialize GPS with our desired configs
  *  i.e. i2c communication with UBX message protocol

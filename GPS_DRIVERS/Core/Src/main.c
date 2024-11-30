@@ -109,7 +109,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART2_UART_Init();
-  MX_USART1_UART_Init();
+  MX_USART1_UART_Init(); // Using this for UART communication
   /* USER CODE BEGIN 2 */
 
   // Setup GPS receiver with desired configurations
@@ -122,23 +122,34 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	printf("Working!\r\n");
     // set first element of buffer as the address of data stream register
 	// If GPS_BUFFER == 0xFF, then it means that there is no data for the GPS to send
 	GPS_BUFFER[0] = GPS_DATA_REGISTER;
 
 	// Transmit to GPS, let it know I want data
-	hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
-	if ( hal != HAL_OK ) {
-		printf("data transmit went wrong\r\n");
-	}
+	//hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
+	//if ( hal != HAL_OK ) {
+	//	printf("data transmit went wrong\r\n");
+	//}
+	UBX_Transmit(GPS_BUFFER, BUFFER_SIZE);
 
 	// if HAL_OK then receive data
 	// set bit zero on device address for read access
-	hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
-	if ( hal != HAL_OK ) {
-		printf("data receive went wrong\r\n");
-	}
-
+	// | 0x01
+	//hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
+	//if ( hal != HAL_OK ) {
+	//	printf("data receive went wrong\r\n");
+	//}
+	UBX_Receive(GPS_BUFFER, BUFFER_SIZE);
+	printf("GPS_BUFFER (Length: %):\n", BUFFER_SIZE);
+	    for (size_t i = 0; i < BUFFER_SIZE; i++) {
+	        printf("%02X ", GPS_BUFFER[i]);
+	        if ((i + 1) % 16 == 0) { // Break line every 16 bytes for better readability
+	            printf("\n");
+	        }
+	    }
+	    printf("\n");
 	// buffer[0] == 0xff when there is no data
 	if (GPS_BUFFER[0] != 0xff) {
 
@@ -151,12 +162,16 @@ int main(void)
 	  // if computed checksum = expected checksum, then data is valid
 	  if (computedChecksum == expectedChecksum) {
 		UBX_M8N_NAV_POSLLH_Parsing(GPS_BUFFER, &data);					      // parses data
-		HAL_UART_Transmit(&huart2, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);    // transmit data to pc through UART (for testing)
+		HAL_UART_Transmit(&huart1, &data, BUFFER_SIZE, HAL_MAX_DELAY);    // transmit data to pc through UART (for testing)
 	  } else {
 		// The data received from GPS is invalid
 		printf("The checksum is invalid!\r\n");
-		// uint8_t test[] = "The checksum is invalid!\r\n";
-		// HAL_UART_Transmit(&huart1, test, sizeof(test), HAL_MAX_DELAY);
+		printf("[ i ] The Computer Checksum: 0x%02X, Expected Checksum: 0x%02X\r\n", computedChecksum, expectedChecksum);
+
+		UBX_M8N_NAV_POSLLH_Parsing(GPS_BUFFER, &data);	// parses data
+		HAL_UART_Transmit(&huart1, GPS_BUFFER, BUFFER_SIZE, HAL_MAX_DELAY);
+		printf("Longitude: %u (in 1e-7 degrees)\r\n", data.lon);
+		printf("\r\n");
 	  }
 	} else {
 	  // The GPS does not have data to send over
