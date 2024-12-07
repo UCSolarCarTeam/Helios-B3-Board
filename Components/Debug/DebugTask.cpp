@@ -15,7 +15,7 @@
 #include "IOExpander.hpp"
 #include "SPI/SPI_Task.hpp"
 
-#include "CAN/CANTxTask.hpp"
+#include "CANTx/CANTxTask.hpp"
 #include "CAN.h"
 
 // External Tasks (to send debug commands to)
