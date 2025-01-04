@@ -13,9 +13,8 @@
 
 void CANRxTask::Run(void *pvParams)
 {
-    ConfigureCANSPI(&peripheral1);
+    //ConfigureCANSPI(&peripheral1);
     Queue CAN_RX_QUEUE = Queue();
-    Mutex 
     // Mutex
 
     while (1)

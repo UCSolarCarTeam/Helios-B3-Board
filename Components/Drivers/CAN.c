@@ -374,6 +374,6 @@ void receiveCANMessage(uint8_t channel, uint32_t* ID, uint8_t* DLC, uint8_t* dat
 //TODO: Add to ConfigureCANSPI()
 void Setup_CANRx_Interrupt_Buffer(CANPeripheral *peripheral){
 	//Enable RX Buffer Interrupts 
-	CAN_IC_WRITE_REGISTER_BITWISE(BFPCTRL,0x0F,0x0F, peripheral) //NOTE: CANPeripheral, coupled 
+	CAN_IC_WRITE_REGISTER_BITWISE(BFPCTRL,0x0F,0x0F, peripheral); //NOTE: CANPeripheral, coupled 
 	//RXnBUF goes low to indicate a message in that buffer is received 
 }
