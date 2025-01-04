@@ -370,4 +370,3 @@ void receiveCANMessage(uint8_t channel, uint32_t* ID, uint8_t* DLC, uint8_t* dat
 	CAN_IC_WRITE_REGISTER_BITWISE(CANINTF, channel + 1, 0, peripheral); //clear interrupts
 	return;
 }
-
