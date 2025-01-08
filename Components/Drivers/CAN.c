@@ -191,6 +191,7 @@ void ConfigureCANSPI(CANPeripheral *peripheral)
 	CAN_IC_WRITE_REGISTER(CANINTE, 0xA0, peripheral); 	//configure interrupts, currently enable ERRIF
 	CAN_IC_WRITE_REGISTER(CANINTF, 0x00, peripheral); 	//clear INTE flags
 	CAN_IC_WRITE_REGISTER(EFLG, 0x00, peripheral);
+	Setup_CANRx_Interrupt_Buffer(peripheral);
 }
 
 /*-------------------------------------------------------------------------------------------*/
@@ -366,14 +367,13 @@ void receiveCANMessage(uint8_t channel, uint32_t* ID, uint8_t* DLC, uint8_t* dat
 	{
 		CAN_IC_READ_REGISTER(initialDataBufferAddress + i, &data[i], peripheral); //read from relevant data registers
 	}
-
 	CAN_IC_WRITE_REGISTER_BITWISE(CANINTF, channel + 1, 0, peripheral); //clear interrupts
 	return;
 }
 
-//TODO: Add to ConfigureCANSPI() or CANRXTask
+//TODO: Add to ConfigureCANSPI() or CANRXTask to decouple. For now added to ConfigureCANSPI()
 void Setup_CANRx_Interrupt_Buffer(CANPeripheral *peripheral){
-	//Enable RX Buffer Interrupts 
-	CAN_IC_WRITE_REGISTER_BITWISE(BFPCTRL,0x0F,0x0F, peripheral); //NOTE: CANPeripheral, coupled 
-	//RXnBUF goes low to indicate a message in that buffer is received 
+	CAN_IC_WRITE_REGISTER_BITWISE(BFPCTRL,0x0F,0x0F, peripheral); //Enable interrupt PIN (CAN_RX0BUF, CAN_RX1BUF)
+	CAN_IC_WRITE_REGISTER_BITWISE(CANINTE,0x03,0x03,peripheral); //Enable interrupt PIN (CAN_INT)
+	//Active low interrupt pins
 }

@@ -40,7 +40,7 @@ void CANRxTask::Run(void *pvParams)
     while (1)
     {
         /***
-         * MCP2510: https://usw.365.altium.com/librarycomponentsapi/api/v1/References/79FC5B82-F317-4482-BD19-9D6F8666BE78 
+         * MCP2510: https://usw.365.altium.com/librarycomponentsapi/api/v1/References/79FC5B82-F317-4482-BD19-9D6F8666BE78
          * Plan:
          * On buffer interrupt add to queue
          * While(1) Task processes Queue
@@ -58,20 +58,44 @@ void CANRxTask::Run(void *pvParams)
          * 4. Handle buffer
          */
 
-        //TODO: Update TX with new Addresses 
+        // TODO: Update TX with new Addresses
 
+        //  Wait forever for a command on interrupt
+        Command cm;
+        this->CAN_RX_QUEUE->ReceiveWait(cm);
+        // qEvtQueue->ReceiveWait(cm);
+
+        // Process the command
+        HandleCommand(cm);
+
+        cm.Reset();
+    }
+}
+
+void CANRxTask::HandleCommand(Command &cm)
+{
+
+    switch (static_cast<CAN_RX_COMMANDS>(cm.GetTaskCommand()))
+    {
+    case CAN_INTERRUPT_HAPPENED:
+        CUBE_PRINT("Received a CAN RX Message by interrupt\n");
+        break;
+    default:
+        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
+        break;
     }
 }
 
 // Handle CAN_INT Callback here ?
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
+    // NOTE: Can Implement Call back on RXBUF0 and RXBUF1 and decode the message accordingly.
     if (GPIO_Pin == CAN_INT_Pin)
     {
         // Handle or Event Flag into CPP Task
         Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_INTERRUPT_HAPPENED);
-            CANRxTask::Inst()
-                .GetCAN_RX_QUEUE()
-                ->SendFromISR(canInterruptHappenedCommandFlag);    
+        CANRxTask::Inst()
+            .GetCAN_RX_QUEUE()
+            ->SendFromISR(canInterruptHappenedCommandFlag);
     }
 }

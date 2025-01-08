@@ -27,6 +27,7 @@ public:
 protected:
     static void RunTask(void* pvParams) { CANRxTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
     void Run(void * pvParams); // Main run code
+    void HandleCommand(Command& cm);
 
 private:
     CANRxTask();        // Private constructor

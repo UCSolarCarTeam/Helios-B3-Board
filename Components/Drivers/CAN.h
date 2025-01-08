@@ -39,6 +39,7 @@ void CAN_IC_WRITE_REGISTER(uint8_t address, uint8_t value, CANPeripheral *periph
 void CAN_IC_READ_STATUS(uint8_t* buffer, CANPeripheral *peripheral);
 void CAN_IC_RESET(CANPeripheral *peripheral);
 void CAN_IC_REQUEST_TO_SEND(uint8_t channel, CANPeripheral *peripheral);
+void Setup_CANRx_Interrupt_Buffer(CANPeripheral *peripheral); //Setup interrupts on CAN IC 
 
 // CAN Operation Functions
 void ConfigureCANSPI(CANPeripheral *peripheral);
