@@ -6,7 +6,13 @@
 */
 #include "Task.hpp"
 #include "main.h"
+#include "Queue.hpp"
+#include "Mutex.hpp"
+#include "CAN.h"
 
+enum CAN_RX_COMMANDS {
+    CAN_INTERRUPT_HAPPENED, //Task specific command queued on CAN_INT ISR
+};
 class CANRxTask : public Task
 {
 public:
@@ -16,6 +22,7 @@ public:
     }
 
     void InitTask();
+    Queue* GetCAN_RX_QUEUE() const { return CAN_RX_QUEUE; }
 
 protected:
     static void RunTask(void* pvParams) { CANRxTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
@@ -25,4 +32,5 @@ private:
     CANRxTask();        // Private constructor
     CANRxTask(const CANRxTask&);                        // Prevent copy-construction
     CANRxTask& operator=(const CANRxTask&);            // Prevent assignment
+    Queue* CAN_RX_QUEUE;
 };

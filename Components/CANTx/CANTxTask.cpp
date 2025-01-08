@@ -35,7 +35,7 @@ CANTxTask::CANTxTask() : Task(CAN_TX_TASK_QUEUE_DEPTH_OBJS)
 void CANTxTask::InitTask()
 {
     // Make sure the task is not already initialized
-    CUBE_ASSERT(rtTaskHandle == nullptr, "Cannot initialize GPIO task twice");
+    CUBE_ASSERT(rtTaskHandle == nullptr, "Cannot initialize CAN Tx task twice");
 
     BaseType_t rtValue =
         xTaskCreate((TaskFunction_t)CANTxTask::RunTask,

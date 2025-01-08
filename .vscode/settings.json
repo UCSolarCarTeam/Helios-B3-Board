@@ -8,6 +8,7 @@
         "xlocinfo": "cpp",
         "algorithm": "cpp",
         "list": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "runinterface.hpp": "c"
     }
 }
