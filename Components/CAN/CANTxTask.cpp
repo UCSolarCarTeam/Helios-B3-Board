@@ -57,16 +57,26 @@ void CANTxTask::Run(void *pvParams)
     ConfigureCANSPI(&peripheral1);
     while (1)
     {
-
+        CANMsg msg;
+        msg.ID = 0;
+        msg.DLC = 1; // Assuming DLC of 1 for each command; adjust as needed.
         // Wait forever for a command
-        Command cm;
-        qEvtQueue->ReceiveWait(cm);
-
-        // Process the command
-        HandleCommand(cm);
-
-        cm.Reset();
+        for(int id = 0; id < 2004; ++id){
+            msg.extendedID = id;
+            msg.DLC = 1;
+            msg.data[0] = 0;
+            CUBE_PRINT("PINGING ID # %d\n", id);
+            sendExtendedCANMessage(&msg, &peripheral1);
+            osDelay(1000);
+        }
     }
+}
+
+int CANTxTask::getId(){
+    return messageId;
+}
+int CANTxTask::incrementId(){
+    return messageId++;
 }
 
 /**
@@ -128,6 +138,15 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("Sent Lights Status command\n");
         break;
 
+    case MPPT_Test1:
+        for(int id = 0; id < 2004; ++id){
+            msg.extendedID = id;
+            msg.DLC = 1;
+            msg.data[0] = 0;
+            CUBE_PRINT("PINGING ID # %d\n", id);
+            osDelay(1000);
+        }
+        break;
     default:
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
         break;

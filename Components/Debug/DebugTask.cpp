@@ -168,6 +168,11 @@ void DebugTask::HandleDebugMessage(const char* msg)
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
     }
+    else if (strcmp(msg, "mppt") == 0) {
+        Command cmd(DATA_COMMAND, MPPT_Test1);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+    }
 
     //-- SYSTEM / CHAR COMMANDS -- (Must be last)
     else if (strncmp(msg, "iox_upd", 7) == 0) {

@@ -21,7 +21,9 @@
 enum CAN_TX_COMMANDS {
     LIGHTS_INPUT_BASE,    // Command for lights input
     DRIVER_BASE,          // Command for driver data
-    LIGHTS_STATUS_BASE    // Command for lights status
+    LIGHTS_STATUS_BASE,    // Command for lights status
+    MPPT_Test1,           //Find CAN Address
+    // MPPT_Test2,           //Send Frames
 };
 
 /* Macros ------------------------------------------------------------------*/
@@ -37,6 +39,8 @@ public:
     }
 
     void InitTask();
+    int getId();
+    int incrementId();
 
 protected:
     static void RunTask(void* pvParams) { CANTxTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
@@ -48,6 +52,8 @@ private:
     CANTxTask();        // Private constructor
     CANTxTask(const CANTxTask&);                        // Prevent copy-construction
     CANTxTask& operator=(const CANTxTask&);            // Prevent assignment
+
+    int messageId;
 };
 
 #endif

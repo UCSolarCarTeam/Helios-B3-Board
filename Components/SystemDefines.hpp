@@ -65,7 +65,7 @@ constexpr uint8_t GPIO_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the GPIO ta
 constexpr uint16_t GPIO_TASK_STACK_DEPTH_WORDS = 512;        // Size of the GPIO task stack
 
 // CAN TX TASK
-constexpr uint8_t CAN_TX_TASK_PRIORITY = 2;            // Priority of the CAN_TX task
+constexpr uint8_t CAN_TX_TASK_PRIORITY = 3;            // Priority of the CAN_TX task
 constexpr uint8_t CAN_TX_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the CAN_TX task queue
 constexpr uint16_t CAN_TX_TASK_STACK_DEPTH_WORDS = 512;        // Size of the CAN_TX task stack
 
