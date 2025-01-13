@@ -253,7 +253,7 @@ void sendCANMessage(CANMsg *msg, CANPeripheral *peripheral)
     uint8_t initialBufferAddress = TXB0CTRL + 16*(channel);
 
 	// Initializations
-	uint8_t sendCommand = 0x80 + (0x01 < channel); 	   //instruction to send CAN message on buffer 1
+	uint8_t sendCommand = 0x80 + (0x01 << channel); 	   //instruction to send CAN message on buffer 1
 	uint8_t TXBNSIDH = (msg->ID & 0b11111111000) >> 3; // mask upper ID register (SD 10-3)
 	uint8_t TXBNSIDL = (msg->ID & 0b111) << 5; 	   	   // mask lower ID register (SD 2-0)
 	uint8_t TXBNDLC = msg->DLC & 0x0F;				   // mask DLC

@@ -55,26 +55,44 @@ void CANTxTask::InitTask()
 void CANTxTask::Run(void *pvParams)
 {
     ConfigureCANSPI(&peripheral1);
+
+    CANMsg msg;
+    msg.extendedID = 0x00;
+    msg.DLC = 8; // Assuming DLC of 1 for each command; adjust as needed.
+    msg.data[0] = 0;
+    msg.data[1] = 0;
+    msg.data[2] = 0;
+    msg.data[3] = 0;
+    msg.data[4] = 0;
+    msg.data[5] = 0;
+    msg.data[6] = 0;
+    msg.data[7] = 0;
+
+    uint16_t testID = 0x600;
+
     while (1)
     {
-        CANMsg msg;
-        msg.ID = 0;
-        msg.DLC = 1; // Assuming DLC of 1 for each command; adjust as needed.
-        // Wait forever for a command
-        for(int id = 0; id < 2004; ++id){
-            msg.extendedID = id;
-            msg.DLC = 1;
-            msg.data[0] = 0;
-            CUBE_PRINT("PINGING ID # %d\n", id);
-            sendExtendedCANMessage(&msg, &peripheral1);
-            osDelay(1000);
-        }
+
+        msg.ID = testID;
+        CUBE_PRINT("PINGING ID # %d\n", testID);
+        sendCANMessage(&msg, &peripheral1);
+
+        testID += 1;
+
+        osDelay(1000);
+
+//        // Wait forever for a command
+//        for(uint16_t id = 0; id < 2048; id++){
+//
+//
+//        }
     }
 }
 
 int CANTxTask::getId(){
     return messageId;
 }
+
 int CANTxTask::incrementId(){
     return messageId++;
 }
