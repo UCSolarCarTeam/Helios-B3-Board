@@ -29,7 +29,7 @@ public:
     void InitTask();
     
     /**Getters for CAN formatting */
-    uint8_t LightsInputsBase();
+    uint8_t LightsInputs();
     uint8_t DriverBase();
     uint8_t LightStatus();
 

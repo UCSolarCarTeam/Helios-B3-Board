@@ -154,7 +154,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
 
     //-- CAN Commands --
     else if (strcmp(msg, "can_lights_input") == 0) {
-        Command cmd(DATA_COMMAND, LIGHTS_INPUT_BASE);
+        Command cmd(DATA_COMMAND, LIGHTS_INPUT);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
     }

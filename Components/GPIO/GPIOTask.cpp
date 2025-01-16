@@ -38,7 +38,7 @@ void GPIOTask::InitTask()
     CUBE_ASSERT(rtValue == pdPASS, "GPIOTask::InitTask() - xTaskCreate() failed");
 }
 
-uint8_t GPIOTask::LightsInputsBase()
+uint8_t GPIOTask::LightsInputs()
 {
 
     // Initialize Expander Objects
@@ -50,17 +50,16 @@ uint8_t GPIOTask::LightsInputsBase()
     uint8_t headlightsOff = driverControlState[static_cast<int>(DriverControls::HEADLIGHTS_ENABLE)] == IOState::LOW; // True if headlights are off
     uint8_t signalRight = driverControlState[static_cast<int>(DriverControls::RIGHT_SIGNAL_ENABLE) - 2] == IOState::HIGH;
     uint8_t signalLeft = driverControlState[static_cast<int>(DriverControls::LEFT_SIGNAL_ENABLE) - 2] == IOState::HIGH;
-    uint8_t hazard = driverControlState[static_cast<int>(DriverControls::EMERGENCY_HAZARD) - 2] == IOState::HIGH;
+    uint8_t hazardLights = driverControlState[static_cast<int>(DriverControls::EMERGENCY_HAZARD) - 2] == IOState::HIGH;
 
-    /** Commented out are from Elysia, not implemented in Helios */
 
-    output |= (headlightsOff ? 1 : 0) << 0;  // Bit 0
-    // output |= (headlightsLow ? 1 : 0) << 1;  // Bit 1
-    // output |= (headlightsHigh ? 1 : 0) << 2; // Bit 2
-    output |= (signalRight ? 1 : 0) << 3;    // Bit 3
-    output |= (signalLeft ? 1 : 0) << 4;     // Bit 4
-    output |= (hazard ? 1 : 0) << 5;         // Bit 5
-    // output |= (interior ? 1 : 0) << 6;       // Bit 6
+    // output |= (headlightsLow ? 1 : 0) << 1;  
+    // output |= (headlightsHigh ? 1 : 0) << 2; 
+    output |= (signalRight ? 1 : 0) << 0;    // Bit 0
+    output |= (signalLeft ? 1 : 0) << 1;     // Bit 1
+    output |= (hazardLights ? 1 : 0) << 2;         // Bit 5
+    output |= (headlightsOff ? 1 : 0) << 3;  // Bit 3 , NOTE: True if headlights off
+    // output |= (interior ? 1 : 0) << 6;      
 
     return output; 
 }

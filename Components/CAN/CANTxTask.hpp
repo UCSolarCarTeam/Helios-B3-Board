@@ -19,7 +19,7 @@
 
 /* Enums ------------------------------------------------------------------*/
 enum CAN_TX_COMMANDS {
-    LIGHTS_INPUT_BASE,    // Command for lights input
+    LIGHTS_INPUT,    // Command for lights input
     DRIVER_BASE,          // Command for driver data
     LIGHTS_STATUS_BASE    // Command for lights status
 };

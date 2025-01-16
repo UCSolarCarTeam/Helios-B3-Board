@@ -87,10 +87,10 @@ void CANTxTask::HandleCommand(Command &cm)
     // Handle command based on address/type
     switch (static_cast<CAN_TX_COMMANDS>(cm.GetTaskCommand()))
     {
-    case LIGHTS_INPUT_BASE:
-        msg.extendedID = 0x701;
+    case LIGHTS_INPUT:
+        msg.extendedID = 0x610;
         msg.DLC = 1;
-        u8_data = GPIOTask::Inst().LightsInputsBase();
+        u8_data = GPIOTask::Inst().LightsInputs();
         msg.data[0] = u8_data;
         CUBE_PRINT("Sent Lights Input command\n");
         break;
