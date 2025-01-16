@@ -30,7 +30,7 @@ public:
     
     /**Getters for CAN formatting */
     uint8_t LightsInputs();
-    uint8_t DriverBase();
+    uint16_t DigitalInputs();
     uint8_t LightStatus();
 
 protected:

@@ -81,6 +81,7 @@ void CANTxTask::HandleCommand(Command &cm)
     // msg.data[0] = 1; // Example data; set according to command specifics.
 
     uint8_t u8_data = 0;
+    uint8_t u16_data = 0;
     uint16_t u16_acceleration = 0;
     uint16_t u16_braking = 0;
     uint32_t u32_data = 0;
@@ -95,6 +96,15 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("Sent Lights Input command\n");
         break;
 
+    case DIGITAL_INPUTS:
+        msg.extendedID = 0x611;
+        msg.DLC = 2;
+        u16_data = GPIOTask::Inst().DigitalInputs();
+        msg.data[1] = (u16_data >> 8) & 0xFF; // High byte
+        msg.data[0] = u16_data & 0x0F;        // Low byte
+        CUBE_PRINT("Sent Digital Inputs command\n");
+        break;
+
     case DRIVER_BASE:
         msg.extendedID = 0x703;
         msg.DLC = 4;
@@ -104,7 +114,7 @@ void CANTxTask::HandleCommand(Command &cm)
         u16_braking = SPI_Task::Inst().getBrakingReading_P() & 0x0FFF;           // Mask to ensure 12 bits
 
         // Combine the two 12-bit values into a 24-bit variable
-        u8_data = GPIOTask::Inst().DriverBase();
+        // u8_data = GPIOTask::Inst().DigitalInputs();
 
         // Combine all values into a single 32-bit variable
         u32_data = (static_cast<uint32_t>(u16_braking) << 12) | // Shift braking to bits 12–23

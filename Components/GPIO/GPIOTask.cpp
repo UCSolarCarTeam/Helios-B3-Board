@@ -64,19 +64,21 @@ uint8_t GPIOTask::LightsInputs()
     return output; 
 }
 
-uint8_t GPIOTask::DriverBase()
+uint16_t GPIOTask::DigitalInputs()
 {
     IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
     std::array<IOState, 16> driverControlState = driverControlExpander.GetExpanderStateNow();
 
-    // DriverControls::FORWARD_NEUTRAL_REVERSE_H ??
-    uint8_t output = 0;
+    uint16_t output = 0;
 
+    uint8_t raceModeEnable = driverControlState[static_cast<int>(DriverControls::RACE_MODE_ENABLE)] == IOState::HIGH;
     uint8_t lap = driverControlState[static_cast<int>(DriverControls::LAP_BUTTON)] == IOState::HIGH;
-    uint8_t horn = driverControlState[static_cast<int>(DriverControls::HORN_ENABLE) - 2] == IOState::HIGH;
-    uint8_t reset = driverControlState[static_cast<int>(DriverControls::MOTOR_RESET) - 2] == IOState::HIGH; // Assumed reset is motor_reset
-    uint8_t brakes = driverControlState[static_cast<int>(DriverControls::PARKING_BRAKE_DETECT) - 2] == IOState::HIGH 
-                          || driverControlState[static_cast<int>(DriverControls::MECHANICAL_BRAKE) - 2] == IOState::HIGH;
+    uint8_t hornSwitch = driverControlState[static_cast<int>(DriverControls::HORN_ENABLE) - 2] == IOState::HIGH;
+    uint8_t motorReset = driverControlState[static_cast<int>(DriverControls::MOTOR_RESET) - 2] == IOState::HIGH; // Assumed motorReset is motor_reset
+
+    uint8_t parkingBrake = driverControlState[static_cast<int>(DriverControls::PARKING_BRAKE_DETECT) - 2] == IOState::HIGH;
+    uint8_t mechanicalBreak = driverControlState[static_cast<int>(DriverControls::MECHANICAL_BRAKE) - 2] == IOState::HIGH;
+    uint8_t zoomZoom = driverControlState[static_cast<int>(DriverControls::GREEN_LED) - 2] == IOState::HIGH;
 
     uint8_t forward = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH
                       && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
@@ -84,23 +86,29 @@ uint8_t GPIOTask::DriverBase()
     uint8_t reverse = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH
                       && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::HIGH;
 
+    uint8_t neutral = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::LOW    //Assumption
+                      && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
+
     /**Forward and Reverse Encoding from Electrical Team */
      /* 10 forward 
      * 11 reverse
+     * 00 TODO: CHECK ASSUMPTION THIS IS NEUTRAL
      * 01 not implemented 
      */
 
-    /** Commented out are from Elysia, not implemented in Helios */
 
-    //** Sending bits 24-31, beginning of the data is from the SPI task */
-    output |= (brakes ? 1 : 0) << 0;     // Bit 24
-    output |= (forward ? 1 : 0) << 1;    // Bit 25
-    output |= (reverse ? 1 : 0) << 2;    // Bit 26
-    // output |= (pushToTalk ? 1 : 0) << 3; // Bit 27
-    output |= (horn ? 1 : 0) << 4;       // Bit 28
-    output |= (reset ? 1 : 0) << 5;      // Bit 29
-    // output |= (aux ? 1 : 0) << 6;        // Bit 30
-    output |= (lap ? 1 : 0) << 7;        // Bit 31
+    output |= (forward ? 1 : 0) << 0;    // Bit 0
+    output |= (neutral ? 1 : 0) << 1;    // Bit 1
+    output |= (reverse ? 1 : 0) << 2;    // Bit 2
+    output |= (hornSwitch ? 1 : 0) << 3;      //Bit 3
+    output |= (mechanicalBreak ? 1 : 0) << 4;     // Bit 4
+    output |= (parkingBrake ? 1 : 0) << 5;     // Bit 5
+    output |= (motorReset ? 1 : 0) << 6;      // Bit 6
+    output |= (raceModeEnable ? 1 : 0) << 7;      // Bit 7
+    output |= (lap ? 1 : 0) << 8;               // Bit 8
+
+    //TODO: What is zoom zoom ? Assumed to be greenLed                     Bit 9
+    output |= (zoomZoom ? 1 : 0) << 9;               // Bit 9
 
     return output;
 }
