@@ -159,7 +159,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
         bool res = evtQ->Send(cmd);
     }
     else if (strcmp(msg, "can_driver_base") == 0) {
-        Command cmd(DATA_COMMAND, DRIVER_BASE);
+        Command cmd(DATA_COMMAND, ANALOG_INPUTS);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
     }

@@ -82,8 +82,8 @@ void CANTxTask::HandleCommand(Command &cm)
 
     uint8_t u8_data = 0;
     uint8_t u16_data = 0;
-    uint16_t u16_acceleration = 0;
-    uint16_t u16_braking = 0;
+    uint16_t u12_acceleration = 0;
+    uint16_t u12_braking = 0;
     uint32_t u32_data = 0;
     // Handle command based on address/type
     switch (static_cast<CAN_TX_COMMANDS>(cm.GetTaskCommand()))
@@ -105,29 +105,23 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("Sent Digital Inputs command\n");
         break;
 
-    case DRIVER_BASE:
-        msg.extendedID = 0x703;
-        msg.DLC = 4;
+    case ANALOG_INPUTS:
+        msg.extendedID = 0x612;
+        msg.DLC = 3;
 
         // ASSUMPTION: Returning only the P of the pedal readings. 12 bits returned even though SPI IC returns 10, following the comm sheet
-        u16_acceleration = SPI_Task::Inst().getAccelerationReading_P() & 0x0FFF; // Mask to ensure 12 bits
-        u16_braking = SPI_Task::Inst().getBrakingReading_P() & 0x0FFF;           // Mask to ensure 12 bits
+        u12_acceleration = SPI_Task::Inst().getAccelerationReading_P() & 0x0FFF; // Mask to ensure 12 bits
+        u12_braking = SPI_Task::Inst().getBrakingReading_P() & 0x0FFF;           // Mask to ensure 12 bits
 
-        // Combine the two 12-bit values into a 24-bit variable
-        // u8_data = GPIOTask::Inst().DigitalInputs();
-
-        // Combine all values into a single 32-bit variable
-        u32_data = (static_cast<uint32_t>(u16_braking) << 12) | // Shift braking to bits 12–23
-                   (static_cast<uint32_t>(u8_data) << 24) |     // Shift u8_data to bits 24–31
-                   u16_acceleration;                            // Place acceleration in bits 0–11
-
+        // Pack the 12-bit acceleration and 12-bit braking into a 24-bit structure
+        u32_data = (u12_acceleration & 0x0FFF) | ((u12_braking & 0x0FFF) << 12);
+        
         // Split u32_data into bytes and assign to msg.data[]
         msg.data[0] = static_cast<uint8_t>(u32_data & 0xFF);         // Extract the first 8 bits (bits 0-7)
         msg.data[1] = static_cast<uint8_t>((u32_data >> 8) & 0xFF);  // Extract the next 8 bits (bits 8-15)
         msg.data[2] = static_cast<uint8_t>((u32_data >> 16) & 0xFF); // Extract the next 8 bits (bits 16-23)
-        msg.data[3] = static_cast<uint8_t>((u32_data >> 24) & 0xFF); // Extract the last 8 bits (bits 24-31)
 
-        CUBE_PRINT("Sent Driver command\n");
+        CUBE_PRINT("Sent Analog Inputs command\n");
         break;
 
     case LIGHTS_STATUS_BASE:
