@@ -66,6 +66,7 @@ void CANTxTask::Run(void *pvParams)
         HandleCommand(cm);
 
         cm.Reset();
+        // osDelay((1000 / CAN_TX_FREQ));
     }
 }
 

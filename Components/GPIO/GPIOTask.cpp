@@ -116,7 +116,7 @@ uint16_t GPIOTask::DigitalInputs()
 uint8_t GPIOTask::LightStatus()
 {
     IOExpander powerBoardExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(0, 0, 1));
-    std::array<IOState, POWER_BOARD_LENGTH> powerBoardState = powerBoardExpander.GetExpanderStateNow();
+    std::array<IOState, 16> powerBoardState = powerBoardExpander.GetExpanderStateNow();
 
     uint8_t output = 0;
 
