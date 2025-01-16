@@ -66,7 +66,7 @@ void CANTxTask::Run(void *pvParams)
         HandleCommand(cm);
 
         cm.Reset();
-        // osDelay((1000 / CAN_TX_FREQ));
+        osDelay((1000 / CAN_TX_FREQ));
     }
 }
 
@@ -95,6 +95,7 @@ void CANTxTask::HandleCommand(Command &cm)
         u8_data = GPIOTask::Inst().LightsInputs();
         msg.data[0] = u8_data;
         CUBE_PRINT("Sent Lights Input command\n");
+        this->CAN_TX_FREQ = 10;
         break;
 
     case DIGITAL_INPUTS:
@@ -104,6 +105,7 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.data[1] = (u16_data >> 8) & 0xFF; // High byte
         msg.data[0] = u16_data & 0x0F;        // Low byte
         CUBE_PRINT("Sent Digital Inputs command\n");
+        this->CAN_TX_FREQ = 20;
         break;
 
     case ANALOG_INPUTS:
@@ -123,6 +125,7 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.data[2] = static_cast<uint8_t>((u32_data >> 16) & 0xFF); // Extract the next 8 bits (bits 16-23)
 
         CUBE_PRINT("Sent Analog Inputs command\n");
+        this->CAN_TX_FREQ = 20;
         break;
 
     case LIGHTS_STATUS_BASE:
@@ -131,10 +134,12 @@ void CANTxTask::HandleCommand(Command &cm)
         u8_data = GPIOTask::Inst().LightStatus();
         msg.data[0] = u8_data;
         CUBE_PRINT("Sent Lights Status command\n");
+        this->CAN_TX_FREQ = 5;
         break;
 
     default:
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
+        this->CAN_TX_FREQ = 10;
         break;
     }
 
