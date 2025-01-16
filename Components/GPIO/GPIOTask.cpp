@@ -115,25 +115,25 @@ uint16_t GPIOTask::DigitalInputs()
 
 uint8_t GPIOTask::LightStatus()
 {
-    //Potential Refactor, use driverControlExpander as a private class variable
-    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
-    std::array<IOState, 16> driverControlState = driverControlExpander.GetExpanderStateNow();
+    IOExpander powerBoardExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(0, 0, 1));
+    std::array<IOState, POWER_BOARD_LENGTH> powerBoardState = powerBoardExpander.GetExpanderStateNow();
 
     uint8_t output = 0;
 
-    uint8_t leftSignal = driverControlState[static_cast<int>(DriverControls::RIGHT_SIGNAL_ENABLE) - 2] == IOState::HIGH;
-    uint8_t rightSignal = driverControlState[static_cast<int>(DriverControls::LEFT_SIGNAL_ENABLE) - 2] == IOState::HIGH;
-    uint8_t brakeLights = driverControlState[static_cast<int>(DriverControls::PARKING_BRAKE_DETECT) - 2] == IOState::HIGH 
-                          || driverControlState[static_cast<int>(DriverControls::MECHANICAL_BRAKE) - 2] == IOState::HIGH;
+    //NOTE: Check if there's an offset like arr[X - 2]; Offset starts at P13
+    uint8_t right_turn_light_signal = powerBoardState[static_cast<int>(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL)] == IOState::HIGH;
+    uint8_t left_turn_light_signal = powerBoardState[static_cast<int>(PowerBoard::LEFT_TURN_LIGHT_SIGNAL)] == IOState::HIGH;
+    uint8_t daytime_running_light_signal = powerBoardState[static_cast<int>(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL)] == IOState::HIGH;
+    uint8_t headlight_signal = powerBoardState[static_cast<int>(PowerBoard::HEADLIGHT_SIGNAL)] == IOState::HIGH;
+    uint8_t brake_light_signal = powerBoardState[static_cast<int>(PowerBoard::BRAKE_LIGHT_SIGNAL)] == IOState::HIGH;
+    uint8_t horn_signal = powerBoardState[static_cast<int>(PowerBoard::HORN_SIGNAL)] == IOState::HIGH;
 
-    /** Commented out are from Elysia, not implemented in Helios */
-
-    // output |= (lowBeams ? 1 : 0) << 0;        // Bit 0
-    // output |= (highBeams ? 1 : 0) << 1;       // Bit 1
-    output |= (brakeLights ? 1 : 0) << 2;     // Bit 2
-    output |= (leftSignal ? 1 : 0) << 3;      // Bit 3
-    output |= (rightSignal ? 1 : 0) << 4;     // Bit 4
-    // output |= (BMS_StrobeLight ? 1 : 0) << 5; // Bit 5
+    output |= (right_turn_light_signal ? 1 : 0) << 0;       // Bit 0
+    output |= (left_turn_light_signal ? 1 : 0) << 1;        // Bit 1
+    output |= (daytime_running_light_signal ? 1 : 0) << 2;  // Bit 2
+    output |= (headlight_signal ? 1 : 0) << 3;              // Bit 3
+    output |= (brake_light_signal ? 1 : 0) << 4;            // Bit 4
+    output |= (horn_signal ? 1 : 0) << 5;                   // Bit 5
 
     return output;
 }

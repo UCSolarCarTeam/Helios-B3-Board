@@ -125,7 +125,7 @@ void CANTxTask::HandleCommand(Command &cm)
         break;
 
     case LIGHTS_STATUS_BASE:
-        msg.extendedID = 0x711;
+        msg.extendedID = 0x620;
         msg.DLC = 1;
         u8_data = GPIOTask::Inst().LightStatus();
         msg.data[0] = u8_data;

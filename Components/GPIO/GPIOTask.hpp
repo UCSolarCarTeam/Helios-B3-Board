@@ -11,6 +11,8 @@
 #include "SystemDefines.hpp"
 #include "Timer.hpp"
 
+#define POWER_BOARD_LENGTH
+
 /*---------------------------------- Macros/Enums ----------------------------------*/
 enum GPIO_COMMANDS {
     GPIO_STATE = 0,
