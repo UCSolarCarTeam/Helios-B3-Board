@@ -118,7 +118,7 @@ void CANTxTask::HandleCommand(Command &cm)
 
         // Pack the 12-bit acceleration and 12-bit braking into a 24-bit structure
         u32_data = (u12_acceleration & 0x0FFF) | ((u12_braking & 0x0FFF) << 12);
-        
+
         // Split u32_data into bytes and assign to msg.data[]
         msg.data[0] = static_cast<uint8_t>(u32_data & 0xFF);         // Extract the first 8 bits (bits 0-7)
         msg.data[1] = static_cast<uint8_t>((u32_data >> 8) & 0xFF);  // Extract the next 8 bits (bits 8-15)

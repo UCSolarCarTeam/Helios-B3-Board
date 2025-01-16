@@ -47,21 +47,17 @@ uint8_t GPIOTask::LightsInputs()
 
     uint8_t output = 0;
 
-    uint8_t headlightsOff = driverControlState[static_cast<int>(DriverControls::HEADLIGHTS_ENABLE)] == IOState::LOW; // True if headlights are off
+    uint8_t headlightsSwitch = driverControlState[static_cast<int>(DriverControls::HEADLIGHTS_ENABLE)] == IOState::HIGH;
     uint8_t signalRight = driverControlState[static_cast<int>(DriverControls::RIGHT_SIGNAL_ENABLE) - 2] == IOState::HIGH;
     uint8_t signalLeft = driverControlState[static_cast<int>(DriverControls::LEFT_SIGNAL_ENABLE) - 2] == IOState::HIGH;
     uint8_t hazardLights = driverControlState[static_cast<int>(DriverControls::EMERGENCY_HAZARD) - 2] == IOState::HIGH;
 
+    output |= (signalRight ? 1 : 0) << 0;      // Bit 0
+    output |= (signalLeft ? 1 : 0) << 1;       // Bit 1
+    output |= (hazardLights ? 1 : 0) << 2;     // Bit 2
+    output |= (headlightsSwitch ? 1 : 0) << 3; // Bit 3 , NOTE: True if HEADLIGHTS_ENABLE is HIGH
 
-    // output |= (headlightsLow ? 1 : 0) << 1;  
-    // output |= (headlightsHigh ? 1 : 0) << 2; 
-    output |= (signalRight ? 1 : 0) << 0;    // Bit 0
-    output |= (signalLeft ? 1 : 0) << 1;     // Bit 1
-    output |= (hazardLights ? 1 : 0) << 2;         // Bit 5
-    output |= (headlightsOff ? 1 : 0) << 3;  // Bit 3 , NOTE: True if headlights off
-    // output |= (interior ? 1 : 0) << 6;      
-
-    return output; 
+    return output;
 }
 
 uint16_t GPIOTask::DigitalInputs()
@@ -74,41 +70,38 @@ uint16_t GPIOTask::DigitalInputs()
     uint8_t raceModeEnable = driverControlState[static_cast<int>(DriverControls::RACE_MODE_ENABLE)] == IOState::HIGH;
     uint8_t lap = driverControlState[static_cast<int>(DriverControls::LAP_BUTTON)] == IOState::HIGH;
     uint8_t hornSwitch = driverControlState[static_cast<int>(DriverControls::HORN_ENABLE) - 2] == IOState::HIGH;
-    uint8_t motorReset = driverControlState[static_cast<int>(DriverControls::MOTOR_RESET) - 2] == IOState::HIGH; // Assumed motorReset is motor_reset
+    uint8_t motorReset = driverControlState[static_cast<int>(DriverControls::MOTOR_RESET) - 2] == IOState::HIGH;
 
     uint8_t parkingBrake = driverControlState[static_cast<int>(DriverControls::PARKING_BRAKE_DETECT) - 2] == IOState::HIGH;
     uint8_t mechanicalBreak = driverControlState[static_cast<int>(DriverControls::MECHANICAL_BRAKE) - 2] == IOState::HIGH;
     uint8_t zoomZoom = driverControlState[static_cast<int>(DriverControls::GREEN_LED) - 2] == IOState::HIGH;
 
-    uint8_t forward = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH
-                      && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
+    uint8_t forward = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
 
-    uint8_t reverse = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH
-                      && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::HIGH;
+    uint8_t reverse = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::HIGH;
 
-    uint8_t neutral = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::LOW    //Assumption
+    uint8_t neutral = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::LOW // Assumption
                       && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
 
     /**Forward and Reverse Encoding from Electrical Team */
-     /* 10 forward 
+    /* 10 forward
      * 11 reverse
      * 00 TODO: CHECK ASSUMPTION THIS IS NEUTRAL
-     * 01 not implemented 
+     * 01 not implemented
      */
 
-
-    output |= (forward ? 1 : 0) << 0;    // Bit 0
-    output |= (neutral ? 1 : 0) << 1;    // Bit 1
-    output |= (reverse ? 1 : 0) << 2;    // Bit 2
-    output |= (hornSwitch ? 1 : 0) << 3;      //Bit 3
-    output |= (mechanicalBreak ? 1 : 0) << 4;     // Bit 4
-    output |= (parkingBrake ? 1 : 0) << 5;     // Bit 5
+    output |= (forward ? 1 : 0) << 0;         // Bit 0
+    output |= (neutral ? 1 : 0) << 1;         // Bit 1
+    output |= (reverse ? 1 : 0) << 2;         // Bit 2
+    output |= (hornSwitch ? 1 : 0) << 3;      // Bit 3
+    output |= (mechanicalBreak ? 1 : 0) << 4; // Bit 4
+    output |= (parkingBrake ? 1 : 0) << 5;    // Bit 5
     output |= (motorReset ? 1 : 0) << 6;      // Bit 6
-    output |= (raceModeEnable ? 1 : 0) << 7;      // Bit 7
-    output |= (lap ? 1 : 0) << 8;               // Bit 8
+    output |= (raceModeEnable ? 1 : 0) << 7;  // Bit 7
+    output |= (lap ? 1 : 0) << 8;             // Bit 8
 
-    //TODO: What is zoom zoom ? Assumed to be greenLed                     Bit 9
-    output |= (zoomZoom ? 1 : 0) << 9;               // Bit 9
+    // TODO: What is zoom zoom ? Assumed to be greenLed                     Bit 9
+    output |= (zoomZoom ? 1 : 0) << 9; // Bit 9
 
     return output;
 }
@@ -120,7 +113,7 @@ uint8_t GPIOTask::LightStatus()
 
     uint8_t output = 0;
 
-    //NOTE: Check if there's an offset like arr[X - 2]; Offset starts at P13
+    // NOTE: Check if there's an offset like arr[X - 2]; Offset starts at P13
     uint8_t right_turn_light_signal = powerBoardState[static_cast<int>(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL)] == IOState::HIGH;
     uint8_t left_turn_light_signal = powerBoardState[static_cast<int>(PowerBoard::LEFT_TURN_LIGHT_SIGNAL)] == IOState::HIGH;
     uint8_t daytime_running_light_signal = powerBoardState[static_cast<int>(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL)] == IOState::HIGH;
@@ -128,12 +121,12 @@ uint8_t GPIOTask::LightStatus()
     uint8_t brake_light_signal = powerBoardState[static_cast<int>(PowerBoard::BRAKE_LIGHT_SIGNAL)] == IOState::HIGH;
     uint8_t horn_signal = powerBoardState[static_cast<int>(PowerBoard::HORN_SIGNAL)] == IOState::HIGH;
 
-    output |= (right_turn_light_signal ? 1 : 0) << 0;       // Bit 0
-    output |= (left_turn_light_signal ? 1 : 0) << 1;        // Bit 1
-    output |= (daytime_running_light_signal ? 1 : 0) << 2;  // Bit 2
-    output |= (headlight_signal ? 1 : 0) << 3;              // Bit 3
-    output |= (brake_light_signal ? 1 : 0) << 4;            // Bit 4
-    output |= (horn_signal ? 1 : 0) << 5;                   // Bit 5
+    output |= (right_turn_light_signal ? 1 : 0) << 0;      // Bit 0
+    output |= (left_turn_light_signal ? 1 : 0) << 1;       // Bit 1
+    output |= (daytime_running_light_signal ? 1 : 0) << 2; // Bit 2
+    output |= (headlight_signal ? 1 : 0) << 3;             // Bit 3
+    output |= (brake_light_signal ? 1 : 0) << 4;           // Bit 4
+    output |= (horn_signal ? 1 : 0) << 5;                  // Bit 5
 
     return output;
 }
