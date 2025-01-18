@@ -9,7 +9,6 @@
 #include "IOExpander.hpp"
 
 /*----------------------- Macros -----------------------*/
-static uint8_t counterTick = 0;
 #define TASK_FREQUENCY 20 
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY;
 
@@ -403,8 +402,9 @@ void GPIOTask::Run(void *pvParams)
         // Commit changes to Power board
         // powerBoardExpander.Commit();
 
+        static uint8_t counterTick = 0;
+        checkCounterTick(counterTick);
         counterTick++;
-        checkCounterTick();
 
         // Operate task at specified TASK_FREQUENCY
         osDelay(TASK_DELAY);
@@ -429,7 +429,7 @@ void GPIOTask::Run(void *pvParams)
  * - `Lights Status` is sent every 200 ms along with `Lights_Input`.
  * - After 200 ms (`counterTick == 4`), the counter is reset to 0 for the next cycle.
  */
-void GPIOTask::checkCounterTick() {
+void GPIOTask::checkCounterTick(uint8_t counterTick) {
     // Always send every 50 ms
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, DIGITAL_INPUTS));
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, ANALOG_INPUTS));
