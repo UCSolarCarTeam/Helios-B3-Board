@@ -50,7 +50,6 @@ private:
     CANTxTask();                             // Private constructor
     CANTxTask(const CANTxTask &);            // Prevent copy-construction
     CANTxTask &operator=(const CANTxTask &); // Prevent assignment
-    int CAN_TX_FREQ = 10;
 };
 
 #endif

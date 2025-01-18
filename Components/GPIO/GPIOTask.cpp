@@ -9,7 +9,8 @@
 #include "IOExpander.hpp"
 
 /*----------------------- Macros -----------------------*/
-#define TASK_FREQUENCY 1
+static uint8_t counterTick = 0;
+#define TASK_FREQUENCY 20 
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY;
 
 /**
@@ -402,7 +403,43 @@ void GPIOTask::Run(void *pvParams)
         // Commit changes to Power board
         // powerBoardExpander.Commit();
 
+        counterTick++;
+        checkCounterTick();
+
         // Operate task at specified TASK_FREQUENCY
         osDelay(TASK_DELAY);
+    }
+}
+
+
+/**
+ * @brief Handles periodic tasks based on the `counterTick`.
+ *
+ * This function checks the `counterTick` value and triggers specific tasks
+ * according to the following schedule:
+ * - `Digital Inputs`: 20 Hz -> 50 ms (sent every execution cycle)
+ * - `Analog Inputs`: 20 Hz -> 50 ms (sent every execution cycle)
+ * - `Lights_Input`: 10 Hz -> 100 ms (`counterTick == 2`)
+ * - `Lights Status`: 5 Hz -> 200 ms (`counterTick == 4`)
+ *
+ * @details
+ * - A base delay of 50 ms is required to increment `counterTick` properly.
+ * - `Digital Inputs` and `Analog Inputs` are sent every 50 ms.
+ * - `Lights_Input` is sent every 100 ms.
+ * - `Lights Status` is sent every 200 ms along with `Lights_Input`.
+ * - After 200 ms (`counterTick == 4`), the counter is reset to 0 for the next cycle.
+ */
+void GPIOTask::checkCounterTick() {
+    // Always send every 50 ms
+    CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, DIGITAL_INPUTS));
+    CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, ANALOG_INPUTS));
+
+    if (counterTick == 2) { // 100 ms passed send LIGHTS_INPUT
+        CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, LIGHTS_INPUT));
+    }
+    if (counterTick == 4) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
+        CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, LIGHTS_INPUT));
+        CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, LIGHTS_STATUS_BASE));
+        counterTick = 0; // Reset the counter for the next cycle
     }
 }

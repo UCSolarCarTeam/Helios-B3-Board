@@ -9,6 +9,7 @@
 
 #include "Task.hpp"
 #include "SystemDefines.hpp"
+#include "CAN/CANTxTask.hpp"
 #include "Timer.hpp"
 
 /*---------------------------------- Macros/Enums ----------------------------------*/
@@ -44,6 +45,8 @@ private:
     GPIOTask();                            // Private constructor
     GPIOTask(const GPIOTask &);            // Prevent copy-construction
     GPIOTask &operator=(const GPIOTask &); // Prevent assignment
+
+    void checkCounterTick();
 
     //** Potential private variable for refactoring code
     // IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0)); */
