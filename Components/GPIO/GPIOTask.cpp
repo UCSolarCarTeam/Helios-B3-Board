@@ -402,9 +402,8 @@ void GPIOTask::Run(void *pvParams)
         // Commit changes to Power board
         // powerBoardExpander.Commit();
 
-        static uint8_t counterTick = 0;
-        checkCounterTick(counterTick);
-        counterTick++;
+        checkCounterTick();
+        this->counterTick++;
 
         // Operate task at specified TASK_FREQUENCY
         osDelay(TASK_DELAY);
@@ -429,17 +428,17 @@ void GPIOTask::Run(void *pvParams)
  * - `Lights Status` is sent every 200 ms along with `Lights_Input`.
  * - After 200 ms (`counterTick == 4`), the counter is reset to 0 for the next cycle.
  */
-void GPIOTask::checkCounterTick(uint8_t counterTick) {
+void GPIOTask::checkCounterTick() {
     // Always send every 50 ms
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, DIGITAL_INPUTS));
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, ANALOG_INPUTS));
 
-    if (counterTick == 2) { // 100 ms passed send LIGHTS_INPUT
+    if (this->counterTick == 2) { // 100 ms passed send LIGHTS_INPUT
         CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, LIGHTS_INPUT));
     }
-    if (counterTick == 4) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
+    if (this->counterTick == 4) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
         CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, LIGHTS_INPUT));
         CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, LIGHTS_STATUS_BASE));
-        counterTick = 0; // Reset the counter for the next cycle
+        this->counterTick = 0; // Reset the counter for the next cycle
     }
 }

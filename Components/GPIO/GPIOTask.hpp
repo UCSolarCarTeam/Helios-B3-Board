@@ -46,8 +46,8 @@ private:
     GPIOTask(const GPIOTask &);            // Prevent copy-construction
     GPIOTask &operator=(const GPIOTask &); // Prevent assignment
 
-    void checkCounterTick(uint8_t counterTick);
-
+    void checkCounterTick();
+    uint8_t counterTick = 0;
     //** Potential private variable for refactoring code
     // IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0)); */
 };
