@@ -153,7 +153,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
     }
 
     //-- CAN Commands --
-    else if (strcmp(msg, "can_lights_inputs") == 0) {
+    else if (strcmp(msg, "can_li") == 0) {
         Command cmd(DATA_COMMAND, LIGHTS_INPUT);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
@@ -162,7 +162,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
         }
 
     }
-    else if (strcmp(msg, "can_digital_inputs") == 0) {
+    else if (strcmp(msg, "can_di") == 0) {
         Command cmd(DATA_COMMAND, DIGITAL_INPUTS);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
@@ -170,7 +170,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
            CUBE_PRINT("Sent CAN Digital INPUT Command");
         }
     }
-    else if (strcmp(msg, "can_analog_inputs") == 0) {
+    else if (strcmp(msg, "can_ai") == 0) {
         Command cmd(DATA_COMMAND, ANALOG_INPUTS);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
@@ -178,7 +178,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
            CUBE_PRINT("Sent CAN Analog INPUT Command"); 
         }
     }
-    else if (strcmp(msg, "can_lights_status") == 0) {
+    else if (strcmp(msg, "can_ls") == 0) {
         Command cmd(DATA_COMMAND, LIGHTS_STATUS_BASE);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
