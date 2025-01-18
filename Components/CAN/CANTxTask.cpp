@@ -72,20 +72,13 @@ void CANTxTask::Run(void *pvParams)
 
     while (1)
     {
-
         msg.ID = testID;
-        CUBE_PRINT("PINGING ID # %d\n", testID);
-        sendCANMessage(&msg, &peripheral1);
+        CUBE_PRINT("PINGING ID # %x\n", testID);
+        // sendCANMessage(&msg, &peripheral1);
 
         testID += 1;
 
-        osDelay(1000);
-
-//        // Wait forever for a command
-//        for(uint16_t id = 0; id < 2048; id++){
-//
-//
-//        }
+        osDelay(1500);
     }
 }
 
