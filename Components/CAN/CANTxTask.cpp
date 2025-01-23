@@ -81,7 +81,7 @@ void CANTxTask::HandleCommand(Command &cm)
     // msg.data[0] = 1; // Example data; set according to command specifics.
 
     uint8_t u8_data = 0;
-    uint8_t u16_data = 0;
+    uint16_t u16_data = 0;
     uint16_t u12_acceleration = 0;
     uint16_t u12_braking = 0;
     uint32_t u32_data = 0;
@@ -100,9 +100,9 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.extendedID = 0x611;
         msg.DLC = 2;
         u16_data = GPIOTask::Inst().DigitalInputs();
-        msg.data[1] = (u16_data >> 8) & 0xFF; // High byte
-        msg.data[0] = u16_data & 0x0F;        // Low byte
-        CUBE_PRINT("Sent Digital Inputs command\n");
+        msg.data[1] = (u16_data >> 8) & 0x01; // High byte, only 9 bits
+        msg.data[0] = u16_data & 0xFF;        // Low byte
+        // CUBE_PRINT("Sent Digital Inputs command\n");
         break;
 
     case ANALOG_INPUTS:

@@ -9,7 +9,7 @@
 #include "IOExpander.hpp"
 
 /*----------------------- Macros -----------------------*/
-#define TASK_FREQUENCY 20 
+#define TASK_FREQUENCY 1
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY;
 
 /**
@@ -47,10 +47,10 @@ uint8_t GPIOTask::LightsInputs()
 
     uint8_t output = 0;
 
-    uint8_t headlightsSwitch = driverControlState[static_cast<int>(DriverControls::HEADLIGHTS_ENABLE)] == IOState::HIGH;
-    uint8_t signalRight = driverControlState[static_cast<int>(DriverControls::RIGHT_SIGNAL_ENABLE) - 2] == IOState::HIGH;
-    uint8_t signalLeft = driverControlState[static_cast<int>(DriverControls::LEFT_SIGNAL_ENABLE) - 2] == IOState::HIGH;
-    uint8_t hazardLights = driverControlState[static_cast<int>(DriverControls::EMERGENCY_HAZARD) - 2] == IOState::HIGH;
+    uint8_t headlightsSwitch = driverControlState[static_cast<int>(DriverControls::HEADLIGHTS_ENABLE)] == IOState::LOW;
+    uint8_t signalRight = driverControlState[static_cast<int>(DriverControls::RIGHT_SIGNAL_ENABLE)] == IOState::LOW;
+    uint8_t signalLeft = driverControlState[static_cast<int>(DriverControls::LEFT_SIGNAL_ENABLE)] == IOState::LOW;
+    uint8_t hazardLights = driverControlState[static_cast<int>(DriverControls::EMERGENCY_HAZARD)] == IOState::LOW;
 
     output |= (signalRight ? 1 : 0) << 0;      // Bit 0
     output |= (signalLeft ? 1 : 0) << 1;       // Bit 1
@@ -67,18 +67,18 @@ uint16_t GPIOTask::DigitalInputs()
 
     uint16_t output = 0;
 
-    uint8_t raceModeEnable = driverControlState[static_cast<int>(DriverControls::RACE_MODE_ENABLE)] == IOState::HIGH;
-    uint8_t lap = driverControlState[static_cast<int>(DriverControls::LAP_BUTTON)] == IOState::HIGH;
-    uint8_t hornSwitch = driverControlState[static_cast<int>(DriverControls::HORN_ENABLE) - 2] == IOState::HIGH;
-    uint8_t motorReset = driverControlState[static_cast<int>(DriverControls::MOTOR_RESET) - 2] == IOState::HIGH;
+    uint8_t raceModeEnable = driverControlState[static_cast<int>(DriverControls::RACE_MODE_ENABLE)] == IOState::LOW;
+    uint8_t lap = driverControlState[static_cast<int>(DriverControls::LAP_BUTTON)] == IOState::LOW;
+    uint8_t hornSwitch = driverControlState[static_cast<int>(DriverControls::HORN_ENABLE)] == IOState::LOW;
+    uint8_t motorReset = driverControlState[static_cast<int>(DriverControls::MOTOR_RESET)] == IOState::LOW;
 
-    uint8_t parkingBrake = driverControlState[static_cast<int>(DriverControls::PARKING_BRAKE_DETECT) - 2] == IOState::HIGH;
-    uint8_t mechanicalBreak = driverControlState[static_cast<int>(DriverControls::MECHANICAL_BRAKE) - 2] == IOState::HIGH;
-    uint8_t zoomZoom = driverControlState[static_cast<int>(DriverControls::GREEN_LED) - 2] == IOState::HIGH;
+    uint8_t parkingBrake = driverControlState[static_cast<int>(DriverControls::PARKING_BRAKE_DETECT)] == IOState::LOW;
+    uint8_t mechanicalBreak = driverControlState[static_cast<int>(DriverControls::MECHANICAL_BRAKE)] == IOState::LOW;
+    uint8_t zoomZoom = driverControlState[static_cast<int>(DriverControls::GREEN_LED)] == IOState::LOW;
 
-    uint8_t forward = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
+    uint8_t forward = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::LOW && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
 
-    uint8_t reverse = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::HIGH;
+    uint8_t reverse = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::LOW && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
 
     uint8_t neutral = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::LOW // Assumption
                       && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
@@ -114,12 +114,12 @@ uint8_t GPIOTask::LightStatus()
     uint8_t output = 0;
 
     // NOTE: Check if there's an offset like arr[X - 2]; Offset starts at P13
-    uint8_t right_turn_light_signal = powerBoardState[static_cast<int>(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL)] == IOState::HIGH;
-    uint8_t left_turn_light_signal = powerBoardState[static_cast<int>(PowerBoard::LEFT_TURN_LIGHT_SIGNAL)] == IOState::HIGH;
-    uint8_t daytime_running_light_signal = powerBoardState[static_cast<int>(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL)] == IOState::HIGH;
-    uint8_t headlight_signal = powerBoardState[static_cast<int>(PowerBoard::HEADLIGHT_SIGNAL)] == IOState::HIGH;
-    uint8_t brake_light_signal = powerBoardState[static_cast<int>(PowerBoard::BRAKE_LIGHT_SIGNAL)] == IOState::HIGH;
-    uint8_t horn_signal = powerBoardState[static_cast<int>(PowerBoard::HORN_SIGNAL)] == IOState::HIGH;
+    uint8_t right_turn_light_signal = powerBoardState[static_cast<int>(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL)] == IOState::LOW;
+    uint8_t left_turn_light_signal = powerBoardState[static_cast<int>(PowerBoard::LEFT_TURN_LIGHT_SIGNAL)] == IOState::LOW;
+    uint8_t daytime_running_light_signal = powerBoardState[static_cast<int>(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL)] == IOState::LOW;
+    uint8_t headlight_signal = powerBoardState[static_cast<int>(PowerBoard::HEADLIGHT_SIGNAL)] == IOState::LOW;
+    uint8_t brake_light_signal = powerBoardState[static_cast<int>(PowerBoard::BRAKE_LIGHT_SIGNAL)] == IOState::LOW;
+    uint8_t horn_signal = powerBoardState[static_cast<int>(PowerBoard::HORN_SIGNAL)] == IOState::LOW;
 
     output |= (right_turn_light_signal ? 1 : 0) << 0;      // Bit 0
     output |= (left_turn_light_signal ? 1 : 0) << 1;       // Bit 1
@@ -159,21 +159,21 @@ void GPIOTask::Run(void *pvParams)
             switch (static_cast<IOPin>(i))
             {
             case DriverControls::FORWARD_NEUTRAL_REVERSE_H:
-                // CUBE_PRINT("    - P00 (Forward/Neutral/Reverse Combo High): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P00 (Forward/Neutral/Reverse Combo High): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
-                    // powerBoardExpander.SetPin(PowerBoard::P13, IOState::HIGH);
+                    powerBoardExpander.SetPin(PowerBoard::P13, IOState::HIGH);
                 }
                 else if (driverControlState[i] == IOState::LOW)
                 {
-                    // powerBoardExpander.SetPin(PowerBoard::P13, IOState::LOW);
+                    powerBoardExpander.SetPin(PowerBoard::P13, IOState::LOW);
                 }
                 else if (driverControlState[i] == IOState::ERROR)
                 {
                 }
                 break;
             case DriverControls::FORWARD_NEUTRAL_REVERSE_L:
-                // CUBE_PRINT("    - P01 (Forward/Neutral/Reverse Combo Low): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P01 (Forward/Neutral/Reverse Combo Low): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
                 }
@@ -185,7 +185,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::ARRAYS_DISCONNECT:
-                // CUBE_PRINT("    - P02 (Array Disconnect): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P02 (Array Disconnect): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
                 }
@@ -197,7 +197,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::RACE_MODE_ENABLE:
-                // CUBE_PRINT("    - P03 (Race Mode Enable): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P03 (Race Mode Enable): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
                 }
@@ -209,21 +209,21 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::HEADLIGHTS_ENABLE:
-                // CUBE_PRINT("    - P04 (Headlights Enable): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P04 (Headlights Enable): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
-                    // powerBoardExpander.SetPin(PowerBoard::HEADLIGHT_SIGNAL, IOState::HIGH);
+                    powerBoardExpander.SetPin(PowerBoard::HEADLIGHT_SIGNAL, IOState::HIGH);
                 }
                 else if (driverControlState[i] == IOState::LOW)
                 {
-                    // powerBoardExpander.SetPin(PowerBoard::HEADLIGHT_SIGNAL, IOState::LOW);
+                    powerBoardExpander.SetPin(PowerBoard::HEADLIGHT_SIGNAL, IOState::LOW);
                 }
                 else if (driverControlState[i] == IOState::ERROR)
                 {
                 }
                 break;
             case DriverControls::DISPLAY_SCREEN_ROTATE:
-                // CUBE_PRINT("    - P05 (Display Screen Rotate): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P05 (Display Screen Rotate): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
                 }
@@ -235,7 +235,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::PROXIMITY_SENSOR_ENABLE:
-                // CUBE_PRINT("    - P06 (Proximity Sensor Mute): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P06 (Proximity Sensor Mute): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
                 }
@@ -247,7 +247,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::LAP_BUTTON:
-                // CUBE_PRINT("    - P07 (Lap Button): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P07 (Lap Button): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
                 }
@@ -269,49 +269,49 @@ void GPIOTask::Run(void *pvParams)
             switch (static_cast<IOPin>(i))
             {
             case DriverControls::HORN_ENABLE:
-                // CUBE_PRINT("    - P10 (Horn Enable): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P10 (Horn Enable): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
-                    // powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::HIGH);
+                    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::HIGH);
                 }
                 else if (driverControlState[i - 2] == IOState::LOW)
                 {
-                    // powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::LOW);
+                    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::LOW);
                 }
                 else if (driverControlState[i - 2] == IOState::ERROR)
                 {
                 }
                 break;
             case DriverControls::LEFT_SIGNAL_ENABLE:
-                // CUBE_PRINT("    - P11 (Left Signal Enable): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P11 (Left Signal Enable): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
-                    // powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+                    powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
                 }
                 else if (driverControlState[i - 2] == IOState::LOW)
                 {
-                    // powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
+                    powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
                 }
                 else if (driverControlState[i - 2] == IOState::ERROR)
                 {
                 }
                 break;
             case DriverControls::RIGHT_SIGNAL_ENABLE:
-                // CUBE_PRINT("    - P12 (Right Signal Enable): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P12 (Right Signal Enable): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
-                    // powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+                    powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
                 }
                 else if (driverControlState[i - 2] == IOState::LOW)
                 {
-                    // powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+                    powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
                 }
                 else if (driverControlState[i - 2] == IOState::ERROR)
                 {
                 }
                 break;
             case DriverControls::EMERGENCY_HAZARD:
-                // CUBE_PRINT("    - P13 (Emergency Hazard): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P13 (Emergency Hazard): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                 }
@@ -323,7 +323,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::MOTOR_RESET:
-                // CUBE_PRINT("    - P14 (Motor Reset): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P14 (Motor Reset): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                 }
@@ -335,7 +335,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::PARKING_BRAKE_DETECT:
-                // CUBE_PRINT("    - P15 (Parking Brake Detect): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P15 (Parking Brake Detect): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                 }
@@ -347,7 +347,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::MECHANICAL_BRAKE:
-                // CUBE_PRINT("    - P16 (Mechanical Brake): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P16 (Mechanical Brake): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                 }
@@ -359,7 +359,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::GREEN_LED:
-                // CUBE_PRINT("    - P17 (Green LED): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P17 (Green LED): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                 }
@@ -389,18 +389,18 @@ void GPIOTask::Run(void *pvParams)
         //        powerBoardExpander.SetPin(PowerBoard::HEADLIGHT_SIGNAL, IOState::LOW);
         //        powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::LOW);
 
-        powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::HIGH);
-        powerBoardExpander.SetPin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL, IOState::HIGH);
-        powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-        powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-        powerBoardExpander.SetPin(PowerBoard::HEADLIGHT_SIGNAL, IOState::HIGH);
-        powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::HIGH);
+        // powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::HIGH);
+        // powerBoardExpander.SetPin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL, IOState::HIGH);
+        // powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+        // powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+        // powerBoardExpander.SetPin(PowerBoard::HEADLIGHT_SIGNAL, IOState::HIGH);
+        // powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::HIGH);
 
-        powerBoardExpander.TogglePin(PowerBoard::ORANGE_LED);
-        powerBoardExpander.TogglePin(PowerBoard::GREEN_LED);
+        // powerBoardExpander.TogglePin(PowerBoard::ORANGE_LED);
+        // powerBoardExpander.TogglePin(PowerBoard::GREEN_LED);
 
         // Commit changes to Power board
-        // powerBoardExpander.Commit();
+        powerBoardExpander.Commit();
 
         checkCounterTick();
         this->counterTick++;
@@ -431,14 +431,14 @@ void GPIOTask::Run(void *pvParams)
 void GPIOTask::checkCounterTick() {
     // Always send every 50 ms
     CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, DIGITAL_INPUTS));
-    CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
+    // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
 
     if (this->counterTick == 2) { // 100 ms passed send LIGHTS_INPUT
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
+        // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
     }
     if (this->counterTick == 4) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
+        // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
+        // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
         this->counterTick = 0; // Reset the counter for the next cycle
     }
 }
