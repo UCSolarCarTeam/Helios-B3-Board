@@ -431,14 +431,14 @@ void GPIOTask::Run(void *pvParams)
 void GPIOTask::checkCounterTick() {
     // Always send every 50 ms
     CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, DIGITAL_INPUTS));
-    // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
+    CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
 
     if (this->counterTick == 2) { // 100 ms passed send LIGHTS_INPUT
-        // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
     }
     if (this->counterTick == 4) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
-        // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
-        // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
         this->counterTick = 0; // Reset the counter for the next cycle
     }
 }
