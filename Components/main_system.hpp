@@ -46,6 +46,8 @@ extern CRC_HandleTypeDef hcrc;       // CRC - Hardware CRC System Handle
 
 extern I2C_HandleTypeDef hi2c2;      // I2C - IO Expander System Handle
 
+extern I2C_HandleTypeDef hi2c1;		// I2C - Sensor Handle
+
 extern SPI_HandleTypeDef hspi1;     // SPI - SPI 1 System Handler
 
 extern SPI_HandleTypeDef hspi2;     // SPI - SPI 2 System Handler
@@ -55,6 +57,7 @@ namespace SystemHandles {
     constexpr I2C_HandleTypeDef* I2C_Expander = &hi2c2;
     constexpr SPI_HandleTypeDef* SPI1_Handle = &hspi1;
     constexpr SPI_HandleTypeDef* CAN_SPI = &hspi2;
+    constexpr I2C_HandleTypeDef* Sensor_Handle = &hi2c1;
 }
 
 #endif /* MAIN_SYSTEM_HPP_ */
