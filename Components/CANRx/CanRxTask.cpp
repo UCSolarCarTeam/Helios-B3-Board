@@ -7,6 +7,13 @@
 
 #include "CanRxTask.hpp"
 
+
+//Maybe add a header file
+CANPeripheral peripheral2 = {
+    .CS_PORT = CS_CAN_N_GPIO_Port,
+    .CS_PIN = CS_CAN_N_Pin,
+    .hspi = SystemHandles::CAN_SPI};
+
 /**
  * @brief Constructor for CANTxTask
  */
@@ -35,7 +42,7 @@ void CANRxTask::InitTask()
 
 void CANRxTask::Run(void *pvParams)
 {
-    // ConfigureCANSPI(&peripheral1);
+    ConfigureCANSPI(&peripheral2);
 
     while (1)
     {
@@ -82,19 +89,5 @@ void CANRxTask::HandleCommand(Command &cm)
     default:
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
         break;
-    }
-}
-
-// Handle CAN_INT Callback here ?
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-    // NOTE: Can Implement Call back on RXBUF0 and RXBUF1 and decode the message accordingly.
-    if (GPIO_Pin == CAN_INT_Pin)
-    {
-        // Handle or Event Flag into CPP Task
-        Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_INTERRUPT_HAPPENED);
-        CANRxTask::Inst()
-            .GetCAN_RX_QUEUE()
-            ->SendFromISR(canInterruptHappenedCommandFlag);
     }
 }

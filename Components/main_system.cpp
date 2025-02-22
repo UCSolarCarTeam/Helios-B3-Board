@@ -16,6 +16,7 @@
 #include "SPI/SPI_Task.hpp"
 #include "GPIO/GPIOTask.hpp"
 #include "CANTx/CANTxTask.hpp"
+#include "CANRx/CanRxTask.hpp"
 
 /* Drivers ------------------------------------------------------------------*/
 namespace Driver {
@@ -31,9 +32,10 @@ void run_main() {
     WatchdogTask::Inst().InitTask();
     CubeTask::Inst().InitTask();
     DebugTask::Inst().InitTask();
-    SPI_Task::Inst().InitTask();
-    GPIOTask::Inst().InitTask();
+    // SPI_Task::Inst().InitTask();
+    // GPIOTask::Inst().InitTask();
     // CANTxTask::Inst().InitTask();
+    CANRxTask::Inst().InitTask();
 
     // Print System Boot Info : Warning, don't queue more than 10 prints before scheduler starts
     CUBE_PRINT("\n-- CUBE SYSTEM --\n");
