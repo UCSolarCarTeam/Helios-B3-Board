@@ -100,10 +100,10 @@ void DebugTask::HandleDebugMessage(const char* msg)
         // Echo the message (without the 'echo')
         CUBE_PRINT("\n%s", &msg[5]);
     }
-    else if (strncmp(msg, "readAccel ", 5) == 0) {
+    else if (strncmp(msg, "readAccel ", strlen("readAccel ")) == 0) {
         // test_SPI_Pedals.readAccelerationPedal();
     }
-    else if (strncmp(msg, "readBrake ", 5) == 0) {
+    else if (strncmp(msg, "readBrake ", strlen("readBrake ")) == 0) {
         // test_SPI_Pedals.readBrakingPedal();
     }
     else if (strncmp(msg, "iecho ", 6) == 0) {
@@ -153,17 +153,17 @@ void DebugTask::HandleDebugMessage(const char* msg)
     }
 
     //-- CAN Commands --
-    else if (strcmp(msg, "can_lights_input") == 0) {
+    else if (strncmp(msg, "can_lights_input ", strlen("can_lights_input ")) == 0) {
         Command cmd(DATA_COMMAND, LIGHTS_INPUT_BASE);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
     }
-    else if (strcmp(msg, "can_driver_base") == 0) {
+    else if (strncmp(msg, "can_driver_base ", strlen("can_driver_base ")) == 0) {
         Command cmd(DATA_COMMAND, DRIVER_BASE);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
     }
-    else if (strcmp(msg, "light_status_base") == 0) {
+    else if (strncmp(msg, "light_status_base ", strlen("light_status_base ")) == 0) {
         Command cmd(DATA_COMMAND, LIGHTS_STATUS_BASE);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);

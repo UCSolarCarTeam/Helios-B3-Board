@@ -22,7 +22,7 @@ public:
     }
 
     void InitTask();
-    Queue* GetCAN_RX_QUEUE() const { return CAN_RX_QUEUE; }
+    Queue* GetCAN_RX_QUEUE() const { return qEvtQueue; }
 
 protected:
     static void RunTask(void* pvParams) { CANRxTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
@@ -33,5 +33,4 @@ private:
     CANRxTask();        // Private constructor
     CANRxTask(const CANRxTask&);                        // Prevent copy-construction
     CANRxTask& operator=(const CANRxTask&);            // Prevent assignment
-    Queue* CAN_RX_QUEUE;
 };

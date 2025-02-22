@@ -65,7 +65,7 @@ enum class IOState {
     HI = HIGH,
 
     INPUT = 2,
-    ERROR
+    ERROR = 3
 };
 
 /* ------------------------------- Namespace for Alternative IOPin names -------------------------------*/

@@ -18,7 +18,7 @@ enum DEBUG_TASK_COMMANDS {
 };
 
 /* Macros ------------------------------------------------------------------*/
-constexpr uint16_t DEBUG_RX_BUFFER_SZ_BYTES = 16;
+constexpr uint16_t DEBUG_RX_BUFFER_SZ_BYTES = 32;
 
 /* Class ------------------------------------------------------------------*/
 class DebugTask : public Task, public UARTReceiverBase

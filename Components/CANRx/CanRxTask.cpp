@@ -53,7 +53,7 @@ void CANRxTask::Run(void *pvParams)
          *      - CAN_RX_QUEUE.SendFromISR()
          *      - Parse data into command
          *            receiveCANMessage()
-         * 3. Mutex the SPI Peripheral?
+         * 3. Mutex the SPI Peripheral
          *      Mutex
          * 4. Handle buffer
          */
@@ -62,8 +62,7 @@ void CANRxTask::Run(void *pvParams)
 
         //  Wait forever for a command on interrupt
         Command cm;
-        this->CAN_RX_QUEUE->ReceiveWait(cm);
-        // qEvtQueue->ReceiveWait(cm);
+        qEvtQueue->ReceiveWait(cm);
 
         // Process the command
         HandleCommand(cm);
