@@ -44,6 +44,27 @@ namespace GPIO
 
         inline bool IsOn() { return HAL_GPIO_ReadPin(LED_GREEN_GPIO_Port, LED_GREEN_Pin) == GPIO_PIN_SET; }
     }
+    
+    namespace BOARD_SELECT_0
+    {
+        inline void On() {HAL_GPIO_WritePin(Board_SLCT_0_GPIO_Port, Board_SLCT_0_Pin, GPIO_PIN_SET); }
+        inline void Off() {HAL_GPIO_WritePin(Board_SLCT_0_GPIO_Port, Board_SLCT_0_Pin, GPIO_PIN_RESET); }
+    }
+    namespace BOARD_SELECT_1
+    {
+        inline void On() {HAL_GPIO_WritePin(Board_SLCT_1_GPIO_Port, Board_SLCT_1_Pin, GPIO_PIN_SET); }
+        inline void Off() {HAL_GPIO_WritePin(Board_SLCT_1_GPIO_Port, Board_SLCT_1_Pin, GPIO_PIN_RESET); }
+    }
+    namespace SPI_DATA_CS0
+    {
+        inline void On() {HAL_GPIO_WritePin(SPI_Data_CS0_GPIO_Port, SPI_Data_CS0_Pin, GPIO_PIN_SET); }
+        inline void Off() {HAL_GPIO_WritePin(SPI_Data_CS0_GPIO_Port, SPI_Data_CS0_Pin, GPIO_PIN_RESET); }
+    }
+    namespace SPI_DATA_CS1
+    {
+        inline void On() {HAL_GPIO_WritePin(SPI_Data_CS1_GPIO_Port, SPI_Data_CS1_Pin, GPIO_PIN_SET); }
+        inline void Off() {HAL_GPIO_WritePin(SPI_Data_CS1_GPIO_Port, SPI_Data_CS1_Pin, GPIO_PIN_RESET); }
+    }
 }
 
 #endif /* HELIOS_INCLUDE_SC_CORE_GPIO_H */
