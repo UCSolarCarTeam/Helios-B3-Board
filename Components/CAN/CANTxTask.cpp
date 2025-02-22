@@ -131,6 +131,14 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.data[0] = u8_data;
         CUBE_PRINT("Sent Lights Status command\n");
         break;
+    
+    case HEARTBEAT:
+        msg.extendedID = 0x600;
+        msg.DLC = 1;
+        msg.data[0] = 1;
+        CUBE_PRINT("Sent Heartbeat \n");
+        break;
+
 
     default:
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());

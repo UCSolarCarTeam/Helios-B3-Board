@@ -420,6 +420,7 @@ void GPIOTask::Run(void *pvParams)
  * - `Analog Inputs`: 20 Hz -> 50 ms (sent every execution cycle)
  * - `Lights_Input`: 10 Hz -> 100 ms (`counterTick == 2`)
  * - `Lights Status`: 5 Hz -> 200 ms (`counterTick == 4`)
+ * - 'Heartbeat' : 1 Hz -> 1000 ms (`counterTick == 20`)
  *
  * @details
  * - A base delay of 50 ms is required to increment `counterTick` properly.
@@ -431,7 +432,7 @@ void GPIOTask::Run(void *pvParams)
 void GPIOTask::checkCounterTick() {
     // Always send every 50 ms
     CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, DIGITAL_INPUTS));
-    CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
+    // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
 
     if (this->counterTick == 2) { // 100 ms passed send LIGHTS_INPUT
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
@@ -439,6 +440,10 @@ void GPIOTask::checkCounterTick() {
     if (this->counterTick == 4) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
+    }
+    if(this->counterTick == 20){
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,HEARTBEAT));
         this->counterTick = 0; // Reset the counter for the next cycle
     }
+
 }
