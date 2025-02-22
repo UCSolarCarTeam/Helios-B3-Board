@@ -85,24 +85,42 @@ void CANTxTask::HandleCommand(Command &cm)
     uint16_t u12_acceleration = 0;
     uint16_t u12_braking = 0;
     uint32_t u32_data = 0;
+    static volatile uint8_t u8_randomTestData = 0;
+    static volatile uint16_t u16_randomTestData = 0;
+    static volatile uint32_t u32_randomTestData = 0;
+
     // Handle command based on address/type
     switch (static_cast<CAN_TX_COMMANDS>(cm.GetTaskCommand()))
     {
     case LIGHTS_INPUT:
         msg.extendedID = 0x610;
         msg.DLC = 1;
-        u8_data = GPIOTask::Inst().LightsInputs();
+        // u8_data = GPIOTask::Inst().LightsInputs();
+        // u8_data = 0xFF;
+        u8_data = u8_randomTestData;
+        u8_randomTestData++;
+        if(u8_randomTestData == 255){
+            u8_randomTestData = 0;
+        }
         msg.data[0] = u8_data;
         CUBE_PRINT("Sent Lights Input command\n");
+        CUBE_PRINT("Sent Lights input data : %d\n", u8_data);
         break;
 
     case DIGITAL_INPUTS:
         msg.extendedID = 0x611;
         msg.DLC = 2;
-        u16_data = GPIOTask::Inst().DigitalInputs();
+        // u16_data = GPIOTask::Inst().DigitalInputs();
+        // u16_data = 0xFFFF;
+        u16_data = u16_randomTestData;
+        u16_randomTestData++;
+        if(u16_randomTestData == 65535){
+            u16_randomTestData = 0;
+        }
         msg.data[1] = (u16_data >> 8) & 0x01; // High byte, only 9 bits
         msg.data[0] = u16_data & 0xFF;        // Low byte
-        // CUBE_PRINT("Sent Digital Inputs command\n");
+        CUBE_PRINT("Sent Digital Inputs command\n");
+        CUBE_PRINT("Sent Digital input data : %d\n", u16_data);
         break;
 
     case ANALOG_INPUTS:
@@ -110,11 +128,14 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.DLC = 3;
 
         // ASSUMPTION: Returning only the P of the pedal readings. 12 bits returned even though SPI IC returns 10, following the comm sheet
-        u12_acceleration = SPI_Task::Inst().getAccelerationReading_P() & 0x0FFF; // Mask to ensure 12 bits
-        u12_braking = SPI_Task::Inst().getBrakingReading_P() & 0x0FFF;           // Mask to ensure 12 bits
+        // u12_acceleration = SPI_Task::Inst().getAccelerationReading_P() & 0x0FFF; // Mask to ensure 12 bits
+        // u12_braking = SPI_Task::Inst().getBrakingReading_P() & 0x0FFF;           // Mask to ensure 12 bits
 
         // Pack the 12-bit acceleration and 12-bit braking into a 24-bit structure
-        u32_data = (u12_acceleration & 0x0FFF) | ((u12_braking & 0x0FFF) << 12);
+        // u32_data = (u12_acceleration & 0x0FFF) | ((u12_braking & 0x0FFF) << 12);
+        u32_data = u32_randomTestData;
+        // u32_data = 0xFFFFFFFF;
+        u32_randomTestData++;
 
         // Split u32_data into bytes and assign to msg.data[]
         msg.data[0] = static_cast<uint8_t>(u32_data & 0xFF);         // Extract the first 8 bits (bits 0-7)
@@ -122,14 +143,22 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.data[2] = static_cast<uint8_t>((u32_data >> 16) & 0xFF); // Extract the next 8 bits (bits 16-23)
 
         CUBE_PRINT("Sent Analog Inputs command\n");
+        CUBE_PRINT("Sent Analog input data : %d\n", u32_data);
         break;
 
     case LIGHTS_STATUS_BASE:
         msg.extendedID = 0x620;
         msg.DLC = 1;
-        u8_data = GPIOTask::Inst().LightStatus();
+        // u8_data = GPIOTask::Inst().LightStatus();
+        // u8_data = 0xFF;
+        u8_data = u8_randomTestData;
+        u8_randomTestData++;
+        if(u8_randomTestData == 255){
+            u8_randomTestData = 0;
+        }
         msg.data[0] = u8_data;
         CUBE_PRINT("Sent Lights Status command\n");
+        CUBE_PRINT("Sent Analog input data : %d\n", u8_data);
         break;
     
     case HEARTBEAT:

@@ -10,7 +10,7 @@
 
 /*----------------------- Macros -----------------------*/
 #define TASK_FREQUENCY 1
-constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY;
+constexpr uint32_t TASK_DELAY = 10 / TASK_FREQUENCY;
 
 /**
  * @brief Constructor for GPIOTask
@@ -432,7 +432,7 @@ void GPIOTask::Run(void *pvParams)
 void GPIOTask::checkCounterTick() {
     // Always send every 50 ms
     CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, DIGITAL_INPUTS));
-    // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
+    CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
 
     if (this->counterTick == 2) { // 100 ms passed send LIGHTS_INPUT
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
