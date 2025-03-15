@@ -10,7 +10,7 @@
 
 /*----------------------- Macros -----------------------*/
 #define TASK_FREQUENCY 1
-constexpr uint32_t TASK_DELAY = 10 / TASK_FREQUENCY;
+constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY;
 
 /**
  * @brief Constructor for GPIOTask
