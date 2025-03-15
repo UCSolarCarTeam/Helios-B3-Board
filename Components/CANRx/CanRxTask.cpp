@@ -65,7 +65,6 @@ void CANRxTask::Run(void *pvParams)
          * 4. Handle buffer
          */
 
-        // TODO: Update TX with new Addresses
 
         //  Wait forever for a command on interrupt
         Command cm;
@@ -89,5 +88,19 @@ void CANRxTask::HandleCommand(Command &cm)
     default:
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
         break;
+    }
+}
+
+// Handle CAN_INT Callback here ?
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    // NOTE: Can Implement Call back on RXBUF0 and RXBUF1 and decode the message accordingly.
+    if (GPIO_Pin == CAN_INT_Pin)
+    {
+        // Handle or Event Flag into CPP Task
+        Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_INTERRUPT_HAPPENED);
+        CANRxTask::Inst()
+            .GetCAN_RX_QUEUE()
+            ->SendFromISR(canInterruptHappenedCommandFlag);
     }
 }
