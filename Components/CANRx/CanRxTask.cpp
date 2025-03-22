@@ -7,8 +7,7 @@
 
 #include "CanRxTask.hpp"
 
-
-//Maybe add a header file
+// Maybe add a header file
 CANPeripheral peripheral2 = {
     .CS_PORT = CS_CAN_N_GPIO_Port,
     .CS_PIN = CS_CAN_N_Pin,
@@ -65,7 +64,6 @@ void CANRxTask::Run(void *pvParams)
          * 4. Handle buffer
          */
 
-
         //  Wait forever for a command on interrupt
         Command cm;
         qEvtQueue->ReceiveWait(cm);
@@ -79,11 +77,24 @@ void CANRxTask::Run(void *pvParams)
 
 void CANRxTask::HandleCommand(Command &cm)
 {
+    uint32_t id = 0;
+    uint8_t dlc = 0;
+    uint8_t data[8] = {0};
 
     switch (static_cast<CAN_RX_COMMANDS>(cm.GetTaskCommand()))
     {
     case CAN_INTERRUPT_HAPPENED:
         CUBE_PRINT("Received a CAN RX Message by interrupt\n");
+        break;
+    case CAN_RX0_INTERRUPT_HAPPENED:
+        receiveCANMessage(0, &id, &dlc, data, &peripheral2);
+        CUBE_PRINT("CAN RX0 Message:\n");
+        CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
+        break;
+    case CAN_RX1_INTERRUPT_HAPPENED:
+        receiveCANMessage(1, &id, &dlc, data, &peripheral2);
+        CUBE_PRINT("CAN RX1 Message:\n");
+        CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
         break;
     default:
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
@@ -102,5 +113,31 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         CANRxTask::Inst()
             .GetCAN_RX_QUEUE()
             ->SendFromISR(canInterruptHappenedCommandFlag);
+    }
+    else if (GPIO_Pin == CAN_RX0BF_Pin)
+    {
+        Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_RX0_INTERRUPT_HAPPENED);
+        CANRxTask::Inst()
+            .GetCAN_RX_QUEUE()
+            ->SendFromISR(canInterruptHappenedCommandFlag);
+    }
+    else if (GPIO_Pin == CAN_RX1BF_Pin)
+    {
+        Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_RX1_INTERRUPT_HAPPENED);
+        CANRxTask::Inst()
+            .GetCAN_RX_QUEUE()
+            ->SendFromISR(canInterruptHappenedCommandFlag);
+    }
+}
+
+//Helper function to print CAN message
+void CUBE_PRINT_CAN_MESSAGE(uint32_t id, uint8_t dlc, uint8_t *data)
+{
+    CUBE_PRINT("  ID: 0x%08X\n", id);
+    CUBE_PRINT("  DLC: %u\n", dlc);
+    CUBE_PRINT("  Data: ");
+    for (uint8_t i = 0; i < dlc; ++i)
+    {
+        CUBE_PRINT("%02X ", data[i]);
     }
 }

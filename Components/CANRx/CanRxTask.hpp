@@ -12,6 +12,8 @@
 
 enum CAN_RX_COMMANDS {
     CAN_INTERRUPT_HAPPENED, //Task specific command queued on CAN_INT ISR
+    CAN_RX0_INTERRUPT_HAPPENED, //Task specific command queued on CAN_RX0BF ISR
+    CAN_RX1_INTERRUPT_HAPPENED, //Task specific command queued on CAN_RX1BF ISR
 };
 class CANRxTask : public Task
 {
@@ -34,3 +36,6 @@ private:
     CANRxTask(const CANRxTask&);                        // Prevent copy-construction
     CANRxTask& operator=(const CANRxTask&);            // Prevent assignment
 };
+
+//Helper function to print CAN message
+void CUBE_PRINT_CAN_MESSAGE(uint32_t id, uint8_t dlc, uint8_t *data);
