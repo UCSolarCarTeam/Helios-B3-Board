@@ -15,7 +15,7 @@
 #include "DebugTask.hpp"
 #include "SPI/SPI_Task.hpp"
 #include "GPIO/GPIOTask.hpp"
-#include "CAN/CANTxTask.hpp"
+#include "CANTx/CANTxTask.hpp"
 
 /* Drivers ------------------------------------------------------------------*/
 namespace Driver {

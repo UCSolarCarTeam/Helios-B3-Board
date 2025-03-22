@@ -9,7 +9,7 @@
 
 #include "Task.hpp"
 #include "SystemDefines.hpp"
-#include "CAN/CANTxTask.hpp"
+#include "CANTx/CANTxTask.hpp"
 #include "Timer.hpp"
 
 /*---------------------------------- Macros/Enums ----------------------------------*/
