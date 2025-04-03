@@ -13,6 +13,10 @@
 #include <cstring>
 
 #include "IOExpander.hpp"
+#include "SPI/SPI_Task.hpp"
+
+#include "CANTx/CANTxTask.hpp"
+#include "CAN.h"
 
 // External Tasks (to send debug commands to)
 
@@ -96,6 +100,12 @@ void DebugTask::HandleDebugMessage(const char* msg)
         // Echo the message (without the 'echo')
         CUBE_PRINT("\n%s", &msg[5]);
     }
+    else if (strncmp(msg, "readAccel ", strlen("readAccel ")) == 0) {
+        // test_SPI_Pedals.readAccelerationPedal();
+    }
+    else if (strncmp(msg, "readBrake ", strlen("readBrake ")) == 0) {
+        // test_SPI_Pedals.readBrakingPedal();
+    }
     else if (strncmp(msg, "iecho ", 6) == 0) {
         // Int echo the message (echo an int parameter)
         int32_t val = Utils::ExtractIntParameter(msg, 6);
@@ -142,6 +152,22 @@ void DebugTask::HandleDebugMessage(const char* msg)
         }
     }
 
+    //-- CAN Commands --
+    else if (strncmp(msg, "can_lights_input ", strlen("can_lights_input ")) == 0) {
+        Command cmd(DATA_COMMAND, LIGHTS_INPUT_BASE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+    }
+    else if (strncmp(msg, "can_driver_base ", strlen("can_driver_base ")) == 0) {
+        Command cmd(DATA_COMMAND, DRIVER_BASE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+    }
+    else if (strncmp(msg, "light_status_base ", strlen("light_status_base ")) == 0) {
+        Command cmd(DATA_COMMAND, LIGHTS_STATUS_BASE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+    }
 
     //-- SYSTEM / CHAR COMMANDS -- (Must be last)
     else if (strncmp(msg, "iox_upd", 7) == 0) {

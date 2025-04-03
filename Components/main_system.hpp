@@ -15,6 +15,7 @@
 #include "stm32l1xx_ll_usart.h"
 #include "stm32l1xx_hal_rcc.h"
 #include "stm32l1xx_ll_dma.h"
+#include "stm32l1xx_hal_spi.h"
 
 
 
@@ -45,11 +46,15 @@ extern CRC_HandleTypeDef hcrc;       // CRC - Hardware CRC System Handle
 
 extern I2C_HandleTypeDef hi2c2;      // I2C - IO Expander System Handle
 
+extern SPI_HandleTypeDef hspi1;     // SPI - SPI 1 System Handler
+
+extern SPI_HandleTypeDef hspi2;     // SPI - SPI 2 System Handler
+
 namespace SystemHandles {
     constexpr CRC_HandleTypeDef* CRC_Handle = &hcrc;
     constexpr I2C_HandleTypeDef* I2C_Expander = &hi2c2;
+    constexpr SPI_HandleTypeDef* SPI1_Handle = &hspi1;
+    constexpr SPI_HandleTypeDef* CAN_SPI = &hspi2;
 }
-
-
 
 #endif /* MAIN_SYSTEM_HPP_ */

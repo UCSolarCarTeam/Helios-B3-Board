@@ -101,12 +101,15 @@ void Error_Handler(void);
 #define SPI_MOSI_CAN_GPIO_Port GPIOB
 #define CAN_RX1BF_Pin GPIO_PIN_6
 #define CAN_RX1BF_GPIO_Port GPIOC
+#define CAN_RX1BF_EXTI_IRQn EXTI9_5_IRQn
 #define CAN_RX0BF_Pin GPIO_PIN_7
 #define CAN_RX0BF_GPIO_Port GPIOC
+#define CAN_RX0BF_EXTI_IRQn EXTI9_5_IRQn
 #define CS_CAN_N_Pin GPIO_PIN_8
 #define CS_CAN_N_GPIO_Port GPIOC
 #define CAN_INT_Pin GPIO_PIN_9
 #define CAN_INT_GPIO_Port GPIOC
+#define CAN_INT_EXTI_IRQn EXTI9_5_IRQn
 #define VBUS_DETECT_Pin GPIO_PIN_8
 #define VBUS_DETECT_GPIO_Port GPIOA
 #define SPI_Data_CS1_Pin GPIO_PIN_10
