@@ -14,15 +14,21 @@
 #include "Timer.hpp"
 
 /*---------------------------------- Macros/Enums ----------------------------------*/
+#define CAN_TX_ADDRESS 0x500
 
+typedef struct {
+    uint32_t ID;
+    uint8_t DLC;
+    uint8_t data[8];
+} CANMessage;
 
 /*---------------------------------- Task Implementation ----------------------------------*/
 class MotorSafetyTask : public Task
 {
 public:
-    static GPIOTask &Inst()
+    static MotorSafetyTask &Inst()
     {
-        static GPIOTask inst;
+        static MotorSafetyTask inst;
         return inst;
     }
 
