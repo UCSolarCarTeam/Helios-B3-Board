@@ -74,4 +74,6 @@ constexpr uint8_t CAN_RX_TASK_PRIORITY = 2;            // Priority of the CAN_RX
 constexpr uint8_t CAN_RX_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the CAN_RX task queue
 constexpr uint16_t CAN_RX_TASK_STACK_DEPTH_WORDS = 512;        // Size of the CAN_RX task stack
 
+// MotorControl Task Macros
+#define UART_BUF_LEN 4096
 #endif // CUBE_MAIN_SYSTEM_DEFINES_H
