@@ -42,7 +42,7 @@ void sendADCValues(UART_HandleTypeDef* huart, DMA_HandleTypeDef* hdma, uint16_t*
         memcpy(adc_vals, dma_adc_buf, 8*sizeof(uint16_t));
 
         char msg[80] = {0};
-        sprintf(msg, "9999 %d %d %d %d %d %d %d %d 8888\r\n", adc_vals[0], adc_vals[1], adc_vals[2], adc_vals[3], adc_vals[4], adc_vals[5], adc_vals[6], adc_vals[7]);
+        CUBE_PRINT(msg, "9999 %d %d %d %d %d %d %d %d 8888\r\n", adc_vals[0], adc_vals[1], adc_vals[2], adc_vals[3], adc_vals[4], adc_vals[5], adc_vals[6], adc_vals[7]);
 
         HAL_UART_DMAStop(huart);
         HAL_UART_Transmit_DMA(huart, (uint8_t*)msg, strlen(msg));
@@ -50,7 +50,7 @@ void sendADCValues(UART_HandleTypeDef* huart, DMA_HandleTypeDef* hdma, uint16_t*
     //     HAL_UART_Transmit_DMA(huart, (uint8_t*)"9999 ", 5);
 
     //     for (int i = 0; i < 8; i++){
-    //        sprintf(msg, "%d: %d ", i, adc_vals[i]);
+    //        CUBE_PRINT(msg, "%d: %d ", i, adc_vals[i]);
     //        HAL_UART_Transmit_DMA(huart, (uint8_t*)msg, strlen(msg));
     //     }
 
