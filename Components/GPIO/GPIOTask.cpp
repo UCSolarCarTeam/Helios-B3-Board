@@ -100,9 +100,6 @@ uint16_t GPIOTask::DigitalInputs()
     output |= (raceModeEnable ? 1 : 0) << 7;  // Bit 7
     output |= (lap ? 1 : 0) << 8;             // Bit 8
 
-    // TODO: What is zoom zoom ? Assumed to be greenLed                     Bit 9
-    output |= (zoomZoom ? 1 : 0) << 9; // Bit 9
-
     return output;
 }
 
