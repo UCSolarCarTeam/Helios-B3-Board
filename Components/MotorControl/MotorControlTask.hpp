@@ -39,11 +39,11 @@ public:
         return inst;
     }
 
-    void InitTask();
+    //void InitTask() override;                  //can use this to runtask instead
 
 
 protected:
-    static void RunTask(void *pvParams) { MotorControlTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
+    static void RunTask(void *pvParams); // Static Task Interface, passes control to the instance Run();
     void Run(void *pvParams);                                               // Main run code
 
 private:

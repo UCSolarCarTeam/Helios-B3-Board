@@ -40,6 +40,7 @@ extern "C" {
 #include "stm32l1xx_ll_dma.h"
 
 #include "stm32l1xx_ll_exti.h"
+#include "MotorControl/MotorControlTask.hpp"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -121,6 +122,9 @@ void Error_Handler(void);
 #define I2C_SCL_Data_GPIO_Port GPIOB
 #define I2C_SDA_Data_Pin GPIO_PIN_7
 #define I2C_SDA_Data_GPIO_Port GPIOB
+
+#define ADC_BUF_LEN 8
+#define UART_BUF_LEN 4096
 
 /* USER CODE BEGIN Private defines */
 

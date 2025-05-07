@@ -54,6 +54,16 @@ void UsageFault_Handler(void);
 void DebugMon_Handler(void);
 void TIM2_IRQHandler(void);
 void USART2_IRQHandler(void);
+//added the below functions for motorsafety task
+void DMA1_Channel1_IRQHandler(void);        // ADC DMA interrupt
+void DMA1_Channel4_IRQHandler(void);        // USART1 TX DMA interrupt
+void DMA1_Channel6_IRQHandler(void);        // USART2 RX DMA interrupt
+void ADC1_IRQHandler(void);                 // ADC interrupt
+void USART1_IRQHandler(void);               // USART1 interrupt
+void USART2_IRQHandler(void);               // USART2 interrupt
+void TIM2_IRQHandler(void);                 // TIM2 interrupt
+void TIM6_IRQHandler(void);                 // TIM6 interrupt
+void TIM7_IRQHandler(void);                 // TIM7 interrupt
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

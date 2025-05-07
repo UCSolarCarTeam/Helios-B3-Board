@@ -17,6 +17,7 @@
 
 
 /*---------------------------------- Task Implementation ----------------------------------*/
+/*
 class MotorSafetyTask : public Task
 {
 public:
@@ -40,6 +41,46 @@ private:
 
     void sendADCValues(UART_HandleTypeDef* huart, DMA_HandleTypeDef* hdma , uint16_t* dma_adc_buf, uint8_t enable);
     uint8_t motorSafetyTask(uint16_t* dma_adc_buf, int16_t *motor_rpm, int16_t *motor_torque, int16_t *inv_peak_cur);
+
+}; */
+
+//changed the class definition
+class MotorSafetyTask : public Task
+{
+public:
+    // Singleton access
+    static MotorSafetyTask &Inst()
+    {
+        static MotorSafetyTask inst;
+        return inst;
+    }
+
+    void InitTask();  // Initialization
+    void sendADCValues(UART_HandleTypeDef* huart, DMA_HandleTypeDef* hdma , uint16_t* dma_adc_buf, uint8_t* dma_uart_buf, uint8_t enable);
+
+    uint8_t checkADCValues(const uint16_t* dma_adc_buf);         //moved to public
+    void receiveCANMessageHandler(uint32_t id, uint8_t dlc, const uint8_t* data);
+
+protected:
+    static void RunTask(void *pvParams) { MotorSafetyTask::Inst().Run(pvParams); }
+    void Run(void *pvParams);
+
+private:
+    MotorSafetyTask();
+    MotorSafetyTask(const MotorSafetyTask &);
+    MotorSafetyTask &operator=(const MotorSafetyTask &);
+
+    struct CANMessage {
+        uint32_t ID;
+        uint8_t DLC;
+        uint8_t data[8];
+    };
+
+    volatile uint8_t canMessageFlag = 0;
+    CANMessage receivedCANMessage;
+
+    double predictDcCurrent(double x, double y, double x_mean, double x_std, double y_mean, double y_std, const double coefficients[23]);
+    uint8_t motorSafetyTask(const uint16_t* dma_adc_buf, int16_t *motor_rpm, int16_t *motor_torque, int16_t *inv_peak_cur);   //moved to private
 
 };
 

@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "RunInterface.hpp"
+#include "MotorSafetyTask.hpp"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +57,28 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern DMA_HandleTypeDef hdma_adc;
+extern ADC_HandleTypeDef hadc;
+extern TIM_HandleTypeDef htim6;
+extern TIM_HandleTypeDef htim7;
+extern DMA_HandleTypeDef hdma_usart1_tx;
+extern DMA_HandleTypeDef hdma_usart2_rx;
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
 extern TIM_HandleTypeDef htim2;
+
+/* USER CODE BEGIN EV */
+extern uint8_t adc_log_en;
+extern uint16_t dma_adc_buf[ADC_BUF_LEN];
+extern uint8_t dma_uart_logging_buf[UART_BUF_LEN];
+
+extern int16_t motor_rpm;
+extern int16_t motor_torque;
+extern int16_t inv_peak_cur;
+
+extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart1;
+extern DMA_HandleTypeDef hdma_memtomem_dma2_channel1;
 
 /* USER CODE BEGIN EV */
 
@@ -186,6 +208,89 @@ void USART2_IRQHandler(void)
   cpp_USART2_IRQHandler();
   /* USER CODE END USART2_IRQn 1 */
 }
+
+void DMA1_Channel1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_adc);
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 1 */
+}
+
+void DMA1_Channel4_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel4_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel4_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart1_tx);
+  /* USER CODE BEGIN DMA1_Channel4_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel4_IRQn 1 */
+}
+
+void DMA1_Channel6_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel6_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel6_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart2_rx);
+  /* USER CODE BEGIN DMA1_Channel6_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel6_IRQn 1 */
+}
+
+void ADC1_IRQHandler(void)
+{
+  /* USER CODE BEGIN ADC1_IRQn 0 */
+
+  /* USER CODE END ADC1_IRQn 0 */
+  HAL_ADC_IRQHandler(&hadc);
+  /* USER CODE BEGIN ADC1_IRQn 1 */
+
+  /* USER CODE END ADC1_IRQn 1 */
+}
+
+void USART1_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART1_IRQn 0 */
+
+  /* USER CODE END USART1_IRQn 0 */
+  HAL_UART_IRQHandler(&huart1);
+  /* USER CODE BEGIN USART1_IRQn 1 */
+
+  /* USER CODE END USART1_IRQn 1 */
+}
+
+void USART2_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART2_IRQn 0 */
+
+  /* USER CODE END USART2_IRQn 0 */
+  HAL_UART_IRQHandler(&huart2);
+  /* USER CODE BEGIN USART2_IRQn 1 */
+
+  /* USER CODE END USART2_IRQn 1 */
+}
+
+void TIM6_IRQHandler(void)
+{
+  HAL_TIM_IRQHandler(&htim6);  // Clear interrupt flags, call callbacks
+
+  // Use global DMA and motor vars
+  MotorSafetyTask::Inst().checkADCValues(dma_adc_buf);
+}
+
+
+void TIM7_IRQHandler(void)
+{
+  HAL_TIM_IRQHandler(&htim7);  // Clear interrupt flags, call callbacks
+
+  MotorSafetyTask::Inst().sendADCValues(&huart1, &hdma_usart1_tx, dma_adc_buf, dma_uart_logging_buf, adc_log_en);
+}
+
 
 /* USER CODE BEGIN 1 */
 

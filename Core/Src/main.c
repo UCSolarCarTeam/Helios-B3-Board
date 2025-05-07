@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "RunInterface.hpp"
+#include "CAN.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,6 +54,12 @@ UART_HandleTypeDef huart1;
 
 PCD_HandleTypeDef hpcd_USB_FS;
 
+CANPeripheral peripheral1 = {
+	.CS_PORT = GPIOB,
+	.CS_PIN = GPIO_PIN_2,
+	.hspi = &hspi2
+};
+
 osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
 
@@ -70,6 +77,27 @@ static void MX_USB_PCD_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_CRC_Init(void);
 void StartDefaultTask(void const * argument);
+
+// Buffers
+uint16_t dma_adc_buf[ADC_BUF_LEN] = {0};
+uint8_t dma_uart_command_buf[UART_BUF_LEN] = {0};
+uint8_t dma_uart_logging_buf[UART_BUF_LEN] = {0};
+
+uint8_t* command_end = &dma_uart_command_buf[0];
+uint8_t last_message[UART_BUF_LEN] = {0};
+
+// Motor Commands
+Motor_cmd motor_cmd;
+Motor_cmd last_motor_cmd;
+
+// Status and Enables
+uint8_t adc_log_en = 0;
+int8_t parse_status = 0;
+
+//motor variablesS
+int16_t motor_rpm;
+int16_t motor_torque;
+int16_t inv_peak_cur;
 
 /* USER CODE BEGIN PFP */
 
