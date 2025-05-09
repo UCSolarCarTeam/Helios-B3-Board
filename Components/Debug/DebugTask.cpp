@@ -13,6 +13,10 @@
 #include <cstring>
 
 #include "IOExpander.hpp"
+#include "SPI/SPI_Task.hpp"
+
+#include "CANTx/CANTxTask.hpp"
+#include "CAN.h"
 
 // External Tasks (to send debug commands to)
 
@@ -96,6 +100,12 @@ void DebugTask::HandleDebugMessage(const char* msg)
         // Echo the message (without the 'echo')
         CUBE_PRINT("\n%s", &msg[5]);
     }
+    else if (strncmp(msg, "readAccel ", 5) == 0) {
+        // test_SPI_Pedals.readAccelerationPedal();
+    }
+    else if (strncmp(msg, "readBrake ", 5) == 0) {
+        // test_SPI_Pedals.readBrakingPedal();
+    }
     else if (strncmp(msg, "iecho ", 6) == 0) {
         // Int echo the message (echo an int parameter)
         int32_t val = Utils::ExtractIntParameter(msg, 6);
@@ -142,6 +152,40 @@ void DebugTask::HandleDebugMessage(const char* msg)
         }
     }
 
+    //-- CAN Commands --
+    else if (strcmp(msg, "can_li") == 0) {
+        Command cmd(DATA_COMMAND, LIGHTS_INPUT);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent CAN Lights INPUT Command");
+        }
+
+    }
+    else if (strcmp(msg, "can_di") == 0) {
+        Command cmd(DATA_COMMAND, DIGITAL_INPUTS);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent CAN Digital INPUT Command");
+        }
+    }
+    else if (strcmp(msg, "can_ai") == 0) {
+        Command cmd(DATA_COMMAND, ANALOG_INPUTS);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent CAN Analog INPUT Command"); 
+        }
+    }
+    else if (strcmp(msg, "can_ls") == 0) {
+        Command cmd(DATA_COMMAND, LIGHTS_STATUS_BASE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent CAN Lights Status Command");
+        }
+    }
 
     //-- SYSTEM / CHAR COMMANDS -- (Must be last)
     else if (strncmp(msg, "iox_upd", 7) == 0) {
