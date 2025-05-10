@@ -43,7 +43,6 @@ constexpr uint8_t WATCHDOG_TASK_RTOS_PRIORITY = 2;            // Priority of the
 constexpr uint8_t WATCHDOG_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the uart task queue
 constexpr uint16_t WATCHDOG_TASK_STACK_DEPTH_WORDS = 512;    // Size of the uart task stack
 
-
 // UART TASK
 constexpr uint8_t UART_TASK_RTOS_PRIORITY = 2;            // Priority of the uart task
 constexpr uint8_t UART_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the uart task queue
@@ -73,5 +72,10 @@ constexpr uint16_t CAN_TX_TASK_STACK_DEPTH_WORDS = 512;        // Size of the CA
 constexpr uint8_t CAN_RX_TASK_PRIORITY = 2;            // Priority of the CAN_RX task
 constexpr uint8_t CAN_RX_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the CAN_RX task queue
 constexpr uint16_t CAN_RX_TASK_STACK_DEPTH_WORDS = 512;        // Size of the CAN_RX task stack
+
+// MOTOR CONTROL TASK
+constexpr uint8_t MOTOR_CONTROL_TASK_PRIORITY = 2;            // Priority of the MOTOR_CONTROL task
+constexpr uint8_t MOTOR_CONTROL_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the MOTOR_CONTROL task queue
+constexpr uint16_t MOTOR_CONTROL_TASK_STACK_DEPTH_WORDS = 512;        // Size of the MOTOR_CONTROL task stack
 
 #endif // CUBE_MAIN_SYSTEM_DEFINES_H
