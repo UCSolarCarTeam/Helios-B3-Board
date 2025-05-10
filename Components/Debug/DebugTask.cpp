@@ -157,16 +157,26 @@ void DebugTask::HandleDebugMessage(const char* msg)
         Command cmd(DATA_COMMAND, LIGHTS_INPUT_BASE);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent CAN Lights INPUT Command");
+        }
+
     }
     else if (strncmp(msg, "can_driver_base ", strlen("can_driver_base ")) == 0) {
         Command cmd(DATA_COMMAND, DRIVER_BASE);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent CAN Digital INPUT Command");
+        }
     }
     else if (strncmp(msg, "light_status_base ", strlen("light_status_base ")) == 0) {
         Command cmd(DATA_COMMAND, LIGHTS_STATUS_BASE);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent CAN Lights Status Command");
+        }
     }
 
     //-- SYSTEM / CHAR COMMANDS -- (Must be last)

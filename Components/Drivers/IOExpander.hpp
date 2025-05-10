@@ -97,7 +97,6 @@ namespace PowerBoard {
     constexpr IOPin HORN_SIGNAL = IOPin::P05;
     constexpr IOPin ORANGE_LED = IOPin::P06;
     constexpr IOPin GREEN_LED = IOPin::P07;
-
     constexpr IOPin P13 = IOPin::P13;
     constexpr IOPin P14 = IOPin::P14;
     constexpr IOPin P15 = IOPin::P15;
