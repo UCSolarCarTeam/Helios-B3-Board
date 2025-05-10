@@ -154,7 +154,7 @@ void DebugTask::HandleDebugMessage(const char* msg)
 
     //-- CAN Commands --
     else if (strncmp(msg, "can_lights_input ", strlen("can_lights_input ")) == 0) {
-        Command cmd(DATA_COMMAND, LIGHTS_INPUT_BASE);
+        Command cmd(DATA_COMMAND, LIGHTS_INPUT);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
         if(res){
@@ -162,8 +162,8 @@ void DebugTask::HandleDebugMessage(const char* msg)
         }
 
     }
-    else if (strncmp(msg, "can_driver_base ", strlen("can_driver_base ")) == 0) {
-        Command cmd(DATA_COMMAND, DRIVER_BASE);
+    else if (strncmp(msg, "can_digital_input ", strlen("can_digital_input ")) == 0) {
+        Command cmd(DATA_COMMAND, DIGITAL_INPUTS);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();
         bool res = evtQ->Send(cmd);
         if(res){
