@@ -7,6 +7,9 @@
 #ifndef HELIOS_MOTOR_CONTROL_TASK_HPP_
 #define HELIOS_MOTOR_CONTROL_TASK_HPP_
 
+#ifndef ELYSIA
+#define ELYSIA
+
 /* Includes ------------------------------------------------------------------*/
 #include "main_system.hpp"
 #include "Task.hpp"
@@ -15,6 +18,8 @@
 
 #include "SystemDefines.hpp"
 #include "CubeDefines.hpp"
+#include "CANTxTask.hpp"
+#include "CAN.h"
 
 extern volatile float accelerationPedalPercent;
 extern volatile float brakingPedalPercent;
@@ -131,17 +136,8 @@ typedef struct DriveCommandsInfo
     uint8_t accelQueueIndex;
 } DriveCommandsInfo;
 
-void sendHeartbeat(uint32_t* prevWakeTimePtr);
-void sendHeartbeatTask(void const* arg);
-
-void sendDriver(uint32_t* prevWakeTimePtr);
-void sendDriverTask(void const* arg);
-
 void sendDriveCommands(uint32_t* prevWakeTimePtr, DriveCommandsInfo* driveCommandsInfo, uint32_t* switching);
 void sendDriveCommandsTask(void const* arg);
-
-void sendCan();
-void sendCanTask(void const* arg);
 
 
 #endif

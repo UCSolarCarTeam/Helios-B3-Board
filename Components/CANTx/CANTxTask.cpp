@@ -84,6 +84,7 @@ void CANTxTask::HandleCommand(Command &cm)
     uint16_t u16_acceleration = 0;
     uint16_t u16_braking = 0;
     uint32_t u32_data = 0;
+    CANMsg motor_msg;
 
     // Handle command based on address/type
     switch (static_cast<CAN_TX_COMMANDS>(cm.GetTaskCommand()))
@@ -139,6 +140,34 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.DLC = 1;
         msg.data[0] = 1;
         CUBE_PRINT("Sent Heartbeat \n");
+        break;
+
+    case MOTOR_DRIVE_INPUT:
+        CUBE_PRINT("MotorControlTask - Motor Drive Input command\n");
+        // Get the drive command from MotorControlTask
+        motor_msg = MotorControlTask::Inst().getDriveCommand();
+        
+        // Parse the drive command into the CAN message
+        msg.extendedID = motor_msg.extendedID;
+        msg.DLC = motor_msg.DLC;
+        msg.data[0] = motor_msg.data[0];
+        msg.data[1] = motor_msg.data[1];
+
+        CUBE_PRINT("Sent Motor Drive Input command\n");
+        break;
+
+    case MOTOR_POWER_INPUT:
+        CUBE_PRINT("MotorControlTask - Motor Drive Input command\n");
+        // Get the power command from MotorControlTask
+        motor_msg = MotorControlTask::Inst().getPowerCommand();
+
+        // Parse the power command into the CAN message
+        msg.extendedID = motor_msg.extendedID;
+        msg.DLC = motor_msg.DLC;
+        msg.data[0] = motor_msg.data[0];
+        msg.data[1] = motor_msg.data[1];
+
+        CUBE_PRINT("Sent Motor Power Input command\n");
         break;
 
     default:
