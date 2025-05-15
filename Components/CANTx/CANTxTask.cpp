@@ -170,6 +170,16 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("Sent Motor Power Input command\n");
         break;
 
+    case MOTOR_RESET_INPUT:
+        CUBE_PRINT("MotorControlTask - Motor Reset\n");
+        // Parse the reset command into the CAN message
+        // msg.extendedID = IDK WHAT IT IS WE ARE GONNA HAVE TO ASK ELECTRICAL;
+
+        
+
+        CUBE_PRINT("Sent Motor Reset Input command\n");
+        break;
+
     default:
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
         break;

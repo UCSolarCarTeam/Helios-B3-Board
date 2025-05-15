@@ -57,22 +57,6 @@ private:
 
 #define BUS_CURRENT_OUT 1.0f // Percentage 0 -1 always 100%
 
-#define HEARTBEAT_CAN_FREQ 1000
-#define HEARTBEAT_STDID 0x700U
-#define HEARTBEAT_DLC 1
-
-#define LIGHTS_CAN_FREQ 100
-#define LIGHTS_STDID 0x701U
-#define LIGHTS_DLC 1
-
-#define MUSIC_CAN_FREQ 200
-#define MUSIC_STDID 0x702U
-#define MUSIC_DLC 1
-
-#define DRIVER_CAN_FREQ 25
-#define DRIVER_STDID 0x703U
-#define DRIVER_DLC 4
-
 #define DRIVE_COMMANDS_FREQ 10
 #define MOTOR_DRIVE_STDID 0x501U
 #define MOTOR_DRIVE_DLC 8
@@ -83,8 +67,6 @@ private:
 
 #define SWITCHING_CURRENT 0.01f
 
-#define ADC_POLL_TIMEOUT 10
-
 #define MAX_FORWARD_RPM 20000
 #define MAX_REVERSE_RPM -20000
 #define NON_ZERO_THRESHOLD 0.17f
@@ -92,11 +74,6 @@ private:
 #define MAX_ANALOG 4095 // 12bit ADC (2^12)
 #define REGEN_INPUT_SCALING 0.175f
 #define MOTOR_CURRENT_SMOOTHING_FACTOR 0.20f // Smooth current output to prevent big jumps (0-1)
-
-#define AUXBMS_INPUT_STDID 0x721U
-
-#define M0_VELOCITY_INPUT_STDID 0x403U
-#define M1_VELOCITY_INPUT_STDID 0x423U
 
 #define SAFE_VEHICLE_VELOCITY_TO_GO_FORWARD -1.38f // A small negative number to have some room for things like slow turns (metres/s)
 #define SAFE_VEHICLE_VELOCITY_TO_GO_REVERSE 1.38f // A small positive number to have some room for things like slow turns (metres/s)

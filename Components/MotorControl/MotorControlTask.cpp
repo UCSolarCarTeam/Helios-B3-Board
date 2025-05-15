@@ -6,6 +6,7 @@
 
 CANMsg motor_drive_msg;
 CANMsg motor_power_msg;
+
 float regenValuesQueue[REGEN_QUEUE_SIZE] = {0};
 float accelValuesQueue[ACCEL_QUEUE_SIZE] = {0};
 
@@ -18,6 +19,11 @@ CANMsg MotorControlTask::getMotorDrive(){
 CANMsg MotorControlTask::getMotorPower(){
     motor_power_msg.ID = 0;
 	return motor_power_msg;
+}
+
+uint32_t MotorControlTask::getMotorReset(){
+    
+    return motor_reset_msg;
 }
 
 uint32_t MotorControlTask::getAvgRegen()
@@ -315,10 +321,10 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     }
 
     if(driveCommandsInfo->resetStatus == Resetting) {
-        //Allocate new CAN Message, deallocated by sender "sendCanTask()"
-        msg = (CanMsg*)osPoolAlloc(canPool);
-        msg->StdId = MOTOR_RESET_STDID;
-        osMessagePut(canQueue, (uint32_t)msg, osWaitForever);
+
+        motor_reset_msg->extendedID = MOTOR_RESET_STDID;
+        CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_RESET_INPUT));
+
         driveCommandsInfo->resetStatus = NotResetting;
     }
 
