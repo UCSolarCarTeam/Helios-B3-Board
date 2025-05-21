@@ -30,6 +30,7 @@ constexpr uint8_t DEBUG_TASK_PERIOD = 100;
 /* Variables -----------------------------------------------------------------*/
 static IOExpander ioExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1,0,0));
 
+
 /* Prototypes ----------------------------------------------------------------*/
 
 /* Functions -----------------------------------------------------------------*/
@@ -151,6 +152,26 @@ void DebugTask::HandleDebugMessage(const char* msg)
             CUBE_PRINT("\nIO Expander Pin %d State: %d", val, state);
         }
     }
+
+    else if (strncmp(msg, "brake ", 6) == 0) {
+        int32_t val = Utils::ExtractIntParameter(msg, 6);
+        if (val != ERRVAL && val >= 0 && val <= 100) {
+        	brakingPedalPercent = val;
+            CUBE_PRINT("\nBrake pedal percent set to %ld", val);
+        } else {
+            CUBE_PRINT("\nInvalid brake value");
+        }
+    }
+    else if (strncmp(msg, "accel ", 6) == 0) {
+        int32_t val = Utils::ExtractIntParameter(msg, 6);
+        if (val != ERRVAL && val >= 0 && val <= 100) {
+        	accelerationPedalPercent = val;
+            CUBE_PRINT("\nAcceleration pedal percent set to %ld", val);
+        } else {
+            CUBE_PRINT("\nInvalid accel value");
+        }
+    }
+
 
     //-- CAN Commands --
     else if (strncmp(msg, "can_lights_input ", strlen("can_lights_input ")) == 0) {

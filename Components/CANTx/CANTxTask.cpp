@@ -16,6 +16,7 @@
 
 #include "GPIO/GPIOTask.hpp"
 #include "SPI/SPI_Task.hpp"
+#include "MotorControl/MotorControlTask.hpp"
 
 CANPeripheral peripheral1 = {
     .CS_PORT = CS_CAN_N_GPIO_Port,

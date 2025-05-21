@@ -19,6 +19,8 @@ enum DEBUG_TASK_COMMANDS {
 
 /* Macros ------------------------------------------------------------------*/
 constexpr uint16_t DEBUG_RX_BUFFER_SZ_BYTES = 32;
+extern volatile float accelerationPedalPercent;
+extern volatile float brakingPedalPercent;
 
 /* Class ------------------------------------------------------------------*/
 class DebugTask : public Task, public UARTReceiverBase
