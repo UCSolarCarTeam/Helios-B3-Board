@@ -29,6 +29,31 @@ extern volatile float brakingPedalPercent;
 /* Macros ------------------------------------------------------------------*/
 
 /* Class ------------------------------------------------------------------*/
+
+enum MotorStates {
+    Accelerating,
+    RegenBraking,
+    MechanicalBreaking,
+    Off
+};
+
+enum ResetStatus {
+    NotResetting,
+    SettingReset,
+    Resetting
+};
+
+
+typedef struct DriveCommandsInfo
+{
+    float motorCurrentOut;
+    enum MotorStates motorState;
+    uint8_t prevResetStatus;
+    enum ResetStatus resetStatus;
+    uint8_t regenQueueIndex;
+    uint8_t accelQueueIndex;
+} DriveCommandsInfo;
+
 class MotorControlTask : public Task
 {
 public:
@@ -40,17 +65,37 @@ public:
 
     void InitTask();
 
+    CANMsg getMotorDrive();
+    CANMsg getMotorPower();
+    uint32_t getMotorReset();
+
+    uint32_t getAvgRegen();
+    uint32_t getAvgAccel();
+    CANMsg getDriveCommand();
+    CANMsg getPowerCommand();
+
+    float calculateMotorCurrent(float accelPercentage);
+    float lowPassFilter(float presentMotorCurrent, float prevMotorCurrent);
+    float calculateAccelMotorCurrent(float accelPercentage, float prevMotorCurrent);
+    float calculateRegenMotorCurrent(float regenPercentage, float prevMotorCurrent);
+    void sendDriveCommands(uint32_t* prevWakeTimePtr, DriveCommandsInfo* driveCommandsInfo, uint32_t* switching);
+    void sendDriveCommandsTask(void const* arg);                                              //added these functions as members
+
+    uint8_t vehicleVelocitySafeToGoForward();
+    uint8_t vehicleVelocitySafeToGoReverse();
+    uint8_t isNewDirectionSafe(uint8_t forward, uint8_t reverse);
+
 protected:
-    static void RunTask(void *pvParams) { MotorControlTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
-    void Run(void *pvParams);                                                // Main run code
+    static void RunTask(void *pvParams) { MotorControlTask::Inst().Run(pvParams); }   // Static Task Interface, passes control to the instance Run();
+    void Run(void *pvParams);                                                         // Main run code
     void HandleCommand(Command &cm);
 
 private:
-    // Private Functions
-    MotorControlTask();                             // Private constructor
-    MotorControlTask(const MotorControlTask &);            // Prevent copy-construction
-    MotorControlTask &operator=(const MotorControlTask &); // Prevent assignment
+    MotorControlTask();                                                          // Private constructor
+    MotorControlTask(const MotorControlTask &);                                 // Prevent copy-construction
+    MotorControlTask &operator=(const MotorControlTask &);                     // Prevent assignmen
 };
+
 
 #define REGEN_QUEUE_SIZE 5
 #define ACCEL_QUEUE_SIZE 5
@@ -87,34 +132,11 @@ extern uint8_t auxBmsInputs[3];
 extern float   motor0VehicleVelocityInput;
 extern float   motor1VehicleVelocityInput;
 
-extern float accelerationPedalPercent
-extern float brakingPedalPercent
-
-enum MotorStates {
-    Accelerating,
-    RegenBraking,
-    MechanicalBreaking,
-    Off
-};
-
-enum ResetStatus {
-    NotResetting,
-    SettingReset,
-    Resetting
-};
-
-typedef struct DriveCommandsInfo
-{
-    float motorCurrentOut;
-    enum MotorStates motorState;
-    uint8_t prevResetStatus;
-    enum ResetStatus resetStatus;
-    uint8_t regenQueueIndex;
-    uint8_t accelQueueIndex;
-} DriveCommandsInfo;
-
-void sendDriveCommands(uint32_t* prevWakeTimePtr, DriveCommandsInfo* driveCommandsInfo, uint32_t* switching);
-void sendDriveCommandsTask(void const* arg);
 
 
+
+//void sendDriveCommands(uint32_t* prevWakeTimePtr, DriveCommandsInfo* driveCommandsInfo, uint32_t* switching);     are used now as class members
+//void sendDriveCommandsTask(void const* arg);
+
+#endif    //ELYSIA
 #endif

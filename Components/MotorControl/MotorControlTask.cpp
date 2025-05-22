@@ -128,20 +128,19 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     regenValuesQueue[driveCommandsInfo->regenQueueIndex++] = brakingPedalPercent;
     accelValuesQueue[driveCommandsInfo->accelQueueIndex++] = accelerationPedalPercent;
-
-#ifndef ELYSIA
-    // Read analog inputs
+#else
+    // Read analog inputs (ADC)
     if (HAL_ADC_PollForConversion(&hadc1, ADC_POLL_TIMEOUT) == HAL_OK)
     {
-        newRegen = (((float)HAL_ADC_GetValue(&hadc1)) / ((float)MAX_ANALOG)) * 100.0; // Convert to full value for reporting
+        newRegen = (((float)HAL_ADC_GetValue(&hadc1)) / ((float)MAX_ANALOG)) * 100.0;
     }    
 
     if (HAL_ADC_PollForConversion(&hadc2, ADC_POLL_TIMEOUT) == HAL_OK)
     {
         newAccel = (((float)HAL_ADC_GetValue(&hadc2)) / ((float)MAX_ANALOG)) * 100.0;   
     }
-
 #endif
+
 
     driveCommandsInfo->accelQueueIndex %= REGEN_QUEUE_SIZE;
     driveCommandsInfo->regenQueueIndex %= ACCEL_QUEUE_SIZE;
@@ -339,8 +338,8 @@ void MotorControlTask::sendDriveCommandsTask(void const* arg)
     {
         .motorCurrentOut = 0.0f,
         .motorState = Off,
-        .resetStatus = NotResetting,
         .prevResetStatus = 0,
+        .resetStatus = NotResetting,
         .regenQueueIndex = 0,
         .accelQueueIndex = 0,
     };
