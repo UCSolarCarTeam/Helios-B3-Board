@@ -10,18 +10,6 @@ CANMsg motor_power_msg;
 float regenValuesQueue[REGEN_QUEUE_SIZE] = {0};
 float accelValuesQueue[ACCEL_QUEUE_SIZE] = {0};
 
-
-CANMsg MotorControlTask::getDriveCommand()
-{
-    return motor_drive_msg;
-}
-
-CANMsg MotorControlTask::getPowerCommand()
-{
-    return motor_power_msg;
-}
-
-
 CANMsg MotorControlTask::getMotorDrive(){
     motor_drive_msg.ID = 0;
 	return motor_drive_msg;

@@ -146,7 +146,7 @@ void CANTxTask::HandleCommand(Command &cm)
     case MOTOR_DRIVE_INPUT:
         CUBE_PRINT("MotorControlTask - Motor Drive Input command\n");
         // Get the drive command from MotorControlTask
-        motor_msg = MotorControlTask::Inst().getDriveCommand();
+        motor_msg = MotorControlTask::Inst().getMotorDrive();
         
         // Parse the drive command into the CAN message
         msg.extendedID = motor_msg.extendedID;
@@ -160,7 +160,7 @@ void CANTxTask::HandleCommand(Command &cm)
     case MOTOR_POWER_INPUT:
         CUBE_PRINT("MotorControlTask - Motor Drive Input command\n");
         // Get the power command from MotorControlTask
-        motor_msg = MotorControlTask::Inst().getPowerCommand();
+        motor_msg = MotorControlTask::Inst().getMotorPower();
 
         // Parse the power command into the CAN message
         msg.extendedID = motor_msg.extendedID;
