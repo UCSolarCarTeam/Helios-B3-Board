@@ -102,7 +102,7 @@ void UBX_Transmit(uint8_t *buffer, uint16_t buflen) {
 	if (hal != HAL_OK) {
 		//printf("HAL Status: %d | I2C Error: %d | Class and ID: %#X %#X\r\n", hal, hi2c1.ErrorCode, buffer[2], buffer[3]);
 	}else{
-		printf("[ ✓ ]UBX Transmit Successful");
+		printf("[ ^ ]UBX Transmit Successful");
 	}
 }
 
@@ -111,7 +111,7 @@ void UBX_Receive(uint8_t *buffer, uint16_t buflen) {
 		if (hal != HAL_OK) {
 			//printf("HAL Status: %d | I2C Error: %\r\n", hal, hi2c1.ErrorCode);
 	}else{
-		printf("[ ✓ ]UBX Receive Successful");
+		printf("[ ^ ]UBX Receive Successful");
 	}
 }
 
@@ -215,7 +215,7 @@ uint16_t UBX_GET_LENGTH() {
 void GPS_Initialization(void) {
 	HAL_StatusTypeDef hal;
 
-	// Poll till hal is nolonger busy
+	// Poll till hal is no longer busy
 	do {
 	    // Repeat without any code in here
 	} while (hal == HAL_BUSY);
