@@ -126,8 +126,6 @@ private:
 #define LAP_PIN CONTEXT_Pin
 #define LAP_GPIO_PORT CONTEXT_GPIO_Port
 
-extern ADC_HandleTypeDef hadc1;
-extern ADC_HandleTypeDef hadc2;
 extern uint8_t auxBmsInputs[3];
 extern float   motor0VehicleVelocityInput;
 extern float   motor1VehicleVelocityInput;

@@ -32,11 +32,6 @@ CANMsg MotorControlTask::getMotorPower(){
 	return motor_power_msg;
 }
 
-uint32_t MotorControlTask::getMotorReset(){
-    
-    return motor_reset_msg;
-}
-
 uint32_t MotorControlTask::getAvgRegen()
 {
     float sum = 0;
@@ -132,14 +127,17 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 {
     osDelayUntil(prevWakeTimePtr, DRIVE_COMMANDS_FREQ);
 
-    float newRegen = 0;
-    float newAccel = 0;
+
 
 #ifdef ELYSIA
 
     regenValuesQueue[driveCommandsInfo->regenQueueIndex++] = brakingPedalPercent;
     accelValuesQueue[driveCommandsInfo->accelQueueIndex++] = accelerationPedalPercent;
+
 #else
+    float newRegen = 0;
+    float newAccel = 0;
+
     // Read analog inputs (ADC)
     if (HAL_ADC_PollForConversion(&hadc1, ADC_POLL_TIMEOUT) == HAL_OK)
     {
@@ -161,9 +159,10 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     float accelPercentage = (float)getAvgAccel() / 100.0;
 
     // Determine drive commands
-    uint8_t forward = !HAL_GPIO_ReadPin(FORWARD_GPIO_Port, FORWARD_Pin); // `!` for active low
-    uint8_t reverse = !HAL_GPIO_ReadPin(REVERSE_GPIO_Port, REVERSE_Pin);
-    uint8_t brake = !HAL_GPIO_ReadPin(BRAKES_GPIO_Port, BRAKES_Pin);
+    // `!` for active low
+    uint8_t forward = !HAL_GPIO_ReadPin(FORWARD_GPIO_Port, FORWARD_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
+    uint8_t reverse = !HAL_GPIO_ReadPin(REVERSE_GPIO_Port, REVERSE_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
+    uint8_t brake = !HAL_GPIO_ReadPin(BRAKES_GPIO_Port, BRAKES_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
 
     // Read AuxBMS messages
     char allowCharge = auxBmsInputs[1] & 0x02;
@@ -304,26 +303,27 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // Transmit Motor Drive command
     float dataToSendFloat[2];
     // ADD EXTENDED ID HERE IF NEEDED
-    motor_drive_msg->extendedID = MOTOR_DRIVE_STDID;
-    motor_drive_msg->DLC = MOTOR_DRIVE_DLC;
+    motor_drive_msg.extendedID = MOTOR_DRIVE_STDID;
+    motor_drive_msg.DLC = MOTOR_DRIVE_DLC;
     dataToSendFloat[0] = motorVelocityOut;
     dataToSendFloat[1] = driveCommandsInfo->motorCurrentOut;
-    memcpy(motor_drive_msg->Data, dataToSendFloat, sizeof(float) * 2);
+    memcpy(motor_drive_msg.data, dataToSendFloat, sizeof(float) * 2);
     
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_DRIVE_INPUT));
 
     //Transmit Motor Power command
     // ADD EXTENDED ID HERE IF NEEDED
-    motor_power_msg->extendedID = MOTOR_POWER_STDID;
-    motor_power_msg->DLC = MOTOR_POWER_DLC;
+    motor_power_msg.extendedID = MOTOR_POWER_STDID;
+    motor_power_msg.DLC = MOTOR_POWER_DLC;
     dataToSendFloat[0] = 0.0f; // Reserved (defined by WaveSculptor datasheet)
     dataToSendFloat[1] = BUS_CURRENT_OUT;
-    memcpy(motor_power_msg->Data, dataToSendFloat, sizeof(float) * 2);
+    memcpy(motor_power_msg.data, dataToSendFloat, sizeof(float) * 2);
 
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_POWER_INPUT));
 
     // Transmit Motor Reset command if button switch went from off to on
-    uint8_t reset = !HAL_GPIO_ReadPin(RESET_GPIO_Port, RESET_Pin); // `!` for active low
+    // `!` for active low
+    uint8_t reset = !HAL_GPIO_ReadPin(RESET_GPIO_Port, RESET_Pin); // ELECTRICAL WANTS TO CHANGE IT, ASSUME IT EXISTS
 
     if (!driveCommandsInfo->prevResetStatus && reset) /// off -> on
     {
@@ -332,7 +332,6 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     if(driveCommandsInfo->resetStatus == Resetting) {
 
-        motor_reset_msg->extendedID = MOTOR_RESET_STDID;
         CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_RESET_INPUT));
 
         driveCommandsInfo->resetStatus = NotResetting;
