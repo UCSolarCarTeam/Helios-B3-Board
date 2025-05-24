@@ -17,6 +17,8 @@
 #include "GPIO/GPIOTask.hpp"
 #include "SPI/SPI_Task.hpp"
 
+uint8_t count = 0;
+
 CANPeripheral peripheral1 = {
     .CS_PORT = CS_CAN_N_GPIO_Port,
     .CS_PIN = CS_CAN_N_Pin,
@@ -110,18 +112,26 @@ void CANTxTask::HandleCommand(Command &cm)
 
     case ANALOG_INPUTS:
         msg.extendedID = 0x612;
-        msg.DLC = 3;
+        msg.DLC = 2;
 
-        u16_acceleration = SPI_Task::Inst().getAccelerationReading_P() & 0x0FFF; // Mask to ensure 12 bits
-        u16_braking = SPI_Task::Inst().getBrakingReading_P() & 0x0FFF;           // Mask to ensure 12 bits
-
-        // Pack the 12-bit acceleration and 12-bit braking into a 24-bit structure
-        u32_data = (u16_acceleration & 0x0FFF) | ((u16_braking & 0x0FFF) << 12);
+//        u16_acceleration = SPI_Task::Inst().getAccelerationReading_P() & 0x0FFF; // Mask to ensure 12 bits
+//        u16_braking = SPI_Task::Inst().getBrakingReading_P() & 0x0FFF;           // Mask to ensure 12 bits
+//
+//        // Pack the 12-bit acceleration and 12-bit braking into a 24-bit structure
+//        u32_data = (u16_acceleration & 0x0FFF) | ((u16_braking & 0x0FFF) << 12);
 
         // Split u32_data into bytes and assign to msg.data[]
-        msg.data[0] = static_cast<uint8_t>(u32_data & 0xFF);         // Extract the first 8 bits (bits 0-7)
-        msg.data[1] = static_cast<uint8_t>((u32_data >> 8) & 0xFF);  // Extract the next 8 bits (bits 8-15)
-        msg.data[2] = static_cast<uint8_t>((u32_data >> 16) & 0xFF); // Extract the next 8 bits (bits 16-23)
+//        msg.data[0] = static_cast<uint8_t>(u32_data & 0xFF);         // Extract the first 8 bits (bits 0-7)
+//        msg.data[1] = static_cast<uint8_t>((u32_data >> 8) & 0xFF);  // Extract the next 8 bits (bits 8-15)
+//        msg.data[2] = static_cast<uint8_t>((u32_data >> 16) & 0xFF); // Extract the next 8 bits (bits 16-23)
+
+        msg.data[0] = msg.data[1] = count;
+
+        count++;
+
+        if(count >= 101){
+        	count = 0;
+        }
 
         CUBE_PRINT("Sent Analog Inputs command\n");
         break;

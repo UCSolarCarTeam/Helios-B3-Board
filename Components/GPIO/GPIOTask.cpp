@@ -9,7 +9,7 @@
 #include "IOExpander.hpp"
 
 /*----------------------- Macros -----------------------*/
-#define TASK_FREQUENCY_HZ 1
+#define TASK_FREQUENCY_HZ 10
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
 /**
@@ -440,7 +440,8 @@ void GPIOTask::checkCounterTick() {
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
     }
     if(this->counterTick == 20){
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,HEARTBEAT));
+    	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, HEARTBEAT));
         this->counterTick = 0; // Reset the counter for the next cycle
     }
 
