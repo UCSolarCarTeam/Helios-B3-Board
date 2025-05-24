@@ -10,6 +10,52 @@ CANMsg motor_power_msg;
 float regenValuesQueue[REGEN_QUEUE_SIZE] = {0};
 float accelValuesQueue[ACCEL_QUEUE_SIZE] = {0};
 
+uint8_t auxBmsInputs[3];
+float motor0VehicleVelocityInput;
+float motor1VehicleVelocityInput;
+
+MotorControlTask::MotorControlTask() : Task(MOTOR_CONTROL_TASK_QUEUE_DEPTH_OBJS){}
+
+void MotorControlTask::InitTask()
+{
+    // Make sure the task is not already initialized
+    CUBE_ASSERT(rtTaskHandle == nullptr, "Cannot initialize Motor Control task twice");
+
+    BaseType_t rtValue =
+        xTaskCreate((TaskFunction_t)MotorControlTask::RunTask,
+                    (const char *)"MotorControlTask",
+                    (uint16_t)MOTOR_CONTROL_TASK_STACK_DEPTH_WORDS,
+                    (void *)this,
+                    (UBaseType_t)MOTOR_CONTROL_TASK_PRIORITY,
+                    (TaskHandle_t *)&rtTaskHandle);
+
+    CUBE_ASSERT(rtValue == pdPASS, "MotorControlTask::InitTask() - xTaskCreate() failed");
+}
+
+void MotorControlTask::Run(void *pvParams)
+{
+    uint32_t prevWakeTime = osKernelSysTick();
+
+    DriveCommandsInfo driveCommandsInfo =
+    {
+        .motorCurrentOut = 0.0f,
+        .motorState = Off,
+        .prevResetStatus = 0,
+        .resetStatus = NotResetting,
+        .regenQueueIndex = 0,
+        .accelQueueIndex = 0,
+    };
+
+    uint32_t switching = 0;
+
+    for (;;)
+    {
+        sendDriveCommands(&prevWakeTime, &driveCommandsInfo, &switching);
+    }
+}
+
+// -----------------------------------------
+
 CANMsg MotorControlTask::getMotorDrive(){
     motor_drive_msg.ID = 0;
 	return motor_drive_msg;
@@ -148,9 +194,13 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     // Determine drive commands
     // `!` for active low
-    uint8_t forward = !HAL_GPIO_ReadPin(FORWARD_GPIO_Port, FORWARD_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
-    uint8_t reverse = !HAL_GPIO_ReadPin(REVERSE_GPIO_Port, REVERSE_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
-    uint8_t brake = !HAL_GPIO_ReadPin(BRAKES_GPIO_Port, BRAKES_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
+    // uint8_t forward = !HAL_GPIO_ReadPin(FORWARD_GPIO_Port, FORWARD_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
+    // uint8_t reverse = !HAL_GPIO_ReadPin(REVERSE_GPIO_Port, REVERSE_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
+    // uint8_t brake = !HAL_GPIO_ReadPin(BRAKES_GPIO_Port, BRAKES_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
+
+    uint8_t forward = forward_temp_GPIO;
+    uint8_t reverse = reverse_temp_GPIO;
+    uint8_t brake = brake_temp_GPIO;
 
     // Read AuxBMS messages
     char allowCharge = auxBmsInputs[1] & 0x02;
@@ -311,7 +361,8 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     // Transmit Motor Reset command if button switch went from off to on
     // `!` for active low
-    uint8_t reset = !HAL_GPIO_ReadPin(RESET_GPIO_Port, RESET_Pin); // ELECTRICAL WANTS TO CHANGE IT, ASSUME IT EXISTS
+    // uint8_t reset = !HAL_GPIO_ReadPin(RESET_GPIO_Port, RESET_Pin); // ELECTRICAL WANTS TO CHANGE IT, ASSUME IT EXISTS
+    uint8_t reset = reset_temp_GPIO;
 
     if (!driveCommandsInfo->prevResetStatus && reset) /// off -> on
     {
@@ -328,24 +379,3 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     driveCommandsInfo->prevResetStatus = reset;
 }
 
-void MotorControlTask::sendDriveCommandsTask(void const* arg)
-{
-    uint32_t prevWakeTime = osKernelSysTick();
-
-    DriveCommandsInfo driveCommandsInfo =
-    {
-        .motorCurrentOut = 0.0f,
-        .motorState = Off,
-        .prevResetStatus = 0,
-        .resetStatus = NotResetting,
-        .regenQueueIndex = 0,
-        .accelQueueIndex = 0,
-    };
-
-    uint32_t switching = 0;
-
-    for (;;)
-    {
-        sendDriveCommands(&prevWakeTime, &driveCommandsInfo, &switching);
-    }
-}

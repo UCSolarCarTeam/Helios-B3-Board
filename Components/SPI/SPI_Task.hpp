@@ -19,9 +19,6 @@
 #define ADC_MAX 921 // Corresponds to 90% of V_in
 #define SPI_TASK_DELAY 1000 / SPI_TASK_FREQUENCY
 
-volatile float accelerationPedalPercent;
-volatile float brakingPedalPercent;
-
 enum SPI_COMMANDS
 {
     SPI_NONE = 0, /** TODO: Add commands */

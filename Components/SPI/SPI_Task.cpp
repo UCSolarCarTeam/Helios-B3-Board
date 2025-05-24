@@ -9,6 +9,9 @@
 #include "GPIO.hpp"
 #include "SystemDefines.hpp"
 
+volatile float accelerationPedalPercent;
+volatile float brakingPedalPercent;
+
 /**
  * @brief Constructor for SPI Task
  */

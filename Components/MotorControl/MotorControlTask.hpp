@@ -24,6 +24,11 @@
 extern volatile float accelerationPedalPercent;
 extern volatile float brakingPedalPercent;
 
+extern volatile uint8_t forward_temp_GPIO;
+extern volatile uint8_t reverse_temp_GPIO;
+extern volatile uint8_t brake_temp_GPIO;
+extern volatile uint8_t reset_temp_GPIO;
+
 /* Enums ------------------------------------------------------------------*/
 
 /* Macros ------------------------------------------------------------------*/
@@ -124,13 +129,6 @@ private:
 
 #define LAP_PIN CONTEXT_Pin
 #define LAP_GPIO_PORT CONTEXT_GPIO_Port
-
-extern uint8_t auxBmsInputs[3];
-extern float   motor0VehicleVelocityInput;
-extern float   motor1VehicleVelocityInput;
-
-
-
 
 //void sendDriveCommands(uint32_t* prevWakeTimePtr, DriveCommandsInfo* driveCommandsInfo, uint32_t* switching);     are used now as class members
 //void sendDriveCommandsTask(void const* arg);

@@ -8,6 +8,11 @@
 #include "GPIOTask.hpp"
 #include "IOExpander.hpp"
 
+volatile uint8_t forward_temp_GPIO;
+volatile uint8_t reverse_temp_GPIO;
+volatile uint8_t brake_temp_GPIO;
+volatile uint8_t reset_temp_GPIO;
+
 /*----------------------- Macros -----------------------*/
 #define TASK_FREQUENCY_HZ 1
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
@@ -156,38 +161,44 @@ void GPIOTask::Run(void *pvParams)
             switch (static_cast<IOPin>(i))
             {
             case DriverControls::FORWARD_NEUTRAL_REVERSE_H:
-                CUBE_PRINT("    - P00 (Forward/Neutral/Reverse Combo High): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P00 (Forward): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
-                    powerBoardExpander.SetPin(PowerBoard::P13, IOState::HIGH);
+                    // powerBoardExpander.SetPin(PowerBoard::P13, IOState::HIGH);
+                    forward_temp_GPIO = 1;
                 }
                 else if (driverControlState[i] == IOState::LOW)
                 {
-                    powerBoardExpander.SetPin(PowerBoard::P13, IOState::LOW);
+                    // powerBoardExpander.SetPin(PowerBoard::P13, IOState::LOW);
+                    forward_temp_GPIO = 0;
                 }
                 else if (driverControlState[i] == IOState::ERROR)
                 {
                 }
                 break;
             case DriverControls::FORWARD_NEUTRAL_REVERSE_L:
-                CUBE_PRINT("    - P01 (Forward/Neutral/Reverse Combo Low): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P01 (Reverse): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
+                    reverse_temp_GPIO = 1;
                 }
                 else if (driverControlState[i] == IOState::LOW)
                 {
+                    reverse_temp_GPIO = 0;
                 }
                 else if (driverControlState[i] == IOState::ERROR)
                 {
                 }
                 break;
             case DriverControls::ARRAYS_DISCONNECT:
-                CUBE_PRINT("    - P02 (Array Disconnect): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P02 (Brake): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
+                    brake_temp_GPIO = 1;
                 }
                 else if (driverControlState[i] == IOState::LOW)
                 {
+                    brake_temp_GPIO = 0;
                 }
                 else if (driverControlState[i] == IOState::ERROR)
                 {
@@ -323,9 +334,11 @@ void GPIOTask::Run(void *pvParams)
                 CUBE_PRINT("    - P14 (Motor Reset): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
+                    reset_temp_GPIO = 1;
                 }
                 else if (driverControlState[i - 2] == IOState::LOW)
                 {
+                    reset_temp_GPIO = 0;
                 }
                 else if (driverControlState[i - 2] == IOState::ERROR)
                 {
