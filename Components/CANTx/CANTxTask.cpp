@@ -158,7 +158,7 @@ void CANTxTask::HandleCommand(Command &cm)
         break;
 
     case MOTOR_POWER_INPUT:
-        CUBE_PRINT("MotorControlTask - Motor Drive Input command\n");
+        CUBE_PRINT("MotorControlTask - Motor Power Input command\n");
         // Get the power command from MotorControlTask
         motor_msg = MotorControlTask::Inst().getMotorPower();
 

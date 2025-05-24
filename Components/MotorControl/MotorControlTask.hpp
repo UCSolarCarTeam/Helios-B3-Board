@@ -43,7 +43,6 @@ enum ResetStatus {
     Resetting
 };
 
-
 typedef struct DriveCommandsInfo
 {
     float motorCurrentOut;
@@ -65,21 +64,21 @@ public:
 
     void InitTask();
 
+    // Getters for CANTx Task
     CANMsg getMotorDrive();
     CANMsg getMotorPower();
-    uint32_t getMotorReset();
 
+    // Helper functions
     uint32_t getAvgRegen();
     uint32_t getAvgAccel();
-    CANMsg getDriveCommand();
-    CANMsg getPowerCommand();
-
     float calculateMotorCurrent(float accelPercentage);
     float lowPassFilter(float presentMotorCurrent, float prevMotorCurrent);
     float calculateAccelMotorCurrent(float accelPercentage, float prevMotorCurrent);
     float calculateRegenMotorCurrent(float regenPercentage, float prevMotorCurrent);
+
+    // Task functions
     void sendDriveCommands(uint32_t* prevWakeTimePtr, DriveCommandsInfo* driveCommandsInfo, uint32_t* switching);
-    void sendDriveCommandsTask(void const* arg);                                              //added these functions as members
+    void sendDriveCommandsTask(void const* arg);
 
     uint8_t vehicleVelocitySafeToGoForward();
     uint8_t vehicleVelocitySafeToGoReverse();
