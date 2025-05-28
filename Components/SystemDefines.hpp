@@ -43,6 +43,11 @@ constexpr uint8_t WATCHDOG_TASK_RTOS_PRIORITY = 2;            // Priority of the
 constexpr uint8_t WATCHDOG_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the uart task queue
 constexpr uint16_t WATCHDOG_TASK_STACK_DEPTH_WORDS = 512;    // Size of the uart task stack
 
+//I2C TASK - GPS
+constexpr uint8_t I2C_TASK_PRIORITY = 2;            // Priority of the I2C task
+constexpr uint8_t I2C_TASK_QUEUE_DEPTH_OBJS = 10;        // Size of the I2C task queue
+constexpr uint16_t I2C_TASK_STACK_DEPTH_WORDS = 512;    // Size of the I2C task stack
+
 
 // UART TASK
 constexpr uint8_t UART_TASK_RTOS_PRIORITY = 2;            // Priority of the uart task

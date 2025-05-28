@@ -44,6 +44,8 @@ namespace UART {
 /* System Handles ------------------------------------------------------------------*/
 extern CRC_HandleTypeDef hcrc;       // CRC - Hardware CRC System Handle
 
+extern I2C_HandleTypeDef hi2c1;      // I2C - Telemetry Peripherals
+
 extern I2C_HandleTypeDef hi2c2;      // I2C - IO Expander System Handle
 
 extern SPI_HandleTypeDef hspi1;     // SPI - SPI 1 System Handler
@@ -51,6 +53,7 @@ extern SPI_HandleTypeDef hspi1;     // SPI - SPI 1 System Handler
 extern SPI_HandleTypeDef hspi2;     // SPI - SPI 2 System Handler
 
 namespace SystemHandles {
+	constexpr I2C_HandleTypeDef* I2C_Telemetry = &hi2c1;
     constexpr CRC_HandleTypeDef* CRC_Handle = &hcrc;
     constexpr I2C_HandleTypeDef* I2C_Expander = &hi2c2;
     constexpr SPI_HandleTypeDef* SPI1_Handle = &hspi1;

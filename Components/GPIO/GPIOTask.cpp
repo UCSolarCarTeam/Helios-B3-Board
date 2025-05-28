@@ -5,7 +5,7 @@
  ******************************************************************************
  */
 #include "SystemDefines.hpp"
-#include "GPIOTask.hpp"
+#include "GPIO/GPIOTask.hpp"
 #include "IOExpander.hpp"
 
 /*----------------------- Macros -----------------------*/
@@ -428,7 +428,7 @@ void GPIOTask::Run(void *pvParams)
  */
 void GPIOTask::checkCounterTick() {
     // Always send every 50 ms
-    //NOTE: Currently not sending to queue 
+    //NOTE: Currently not sending to queue
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, DIGITAL_INPUTS));
     // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
 
