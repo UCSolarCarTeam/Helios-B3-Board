@@ -349,7 +349,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_DRIVE_INPUT));
 
-    //Transmit Motor Power command
+    // Transmit Motor Power command
     // ADD EXTENDED ID HERE IF NEEDED
     motor_power_msg.extendedID = MOTOR_POWER_STDID;
     motor_power_msg.DLC = MOTOR_POWER_DLC;
