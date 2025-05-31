@@ -9,6 +9,8 @@
         "algorithm": "cpp",
         "list": "cpp",
         "xutility": "cpp",
-        "runinterface.hpp": "c"
+        "runinterface.hpp": "c",
+        "string": "cpp",
+        "string_view": "cpp"
     }
 }

@@ -429,18 +429,29 @@ void GPIOTask::Run(void *pvParams)
 void GPIOTask::checkCounterTick() {
     // Always send every 50 ms
     //NOTE: Currently not sending to queue 
-    CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, DIGITAL_INPUTS));
+    //CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, DIGITAL_INPUTS));
     // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
 
     if (this->counterTick == 2) { // 100 ms passed send LIGHTS_INPUT
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
+        //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_HEARTBEAT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_HEARTBEAT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_HEARTBEAT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_HEARTBEAT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_HEARTBEAT));
+        
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_STATUS));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_STATUS));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_STATUS));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_STATUS));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_STATUS));
     }
     if (this->counterTick == 4) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
+        //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
+        //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
     }
     if(this->counterTick == 20){
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,HEARTBEAT));
+        //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,HEARTBEAT));
         this->counterTick = 0; // Reset the counter for the next cycle
     }
 

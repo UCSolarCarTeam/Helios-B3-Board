@@ -17,6 +17,16 @@
 #include "SystemDefines.hpp"
 #include "CubeDefines.hpp"
 
+typedef enum
+{
+    COMMON = 0,
+    MOTOR,
+    ARRAY,
+    LV,
+    CHARGE
+} te_contactor;
+
+
 /* Enums ------------------------------------------------------------------*/
 enum CAN_TX_COMMANDS
 {
@@ -25,6 +35,16 @@ enum CAN_TX_COMMANDS
     ANALOG_INPUTS,     // Command for driver data
     LIGHTS_STATUS_BASE, // Command for lights status
     HEARTBEAT,
+    COMMON_BOARD_HEARTBEAT,
+    MOTOR_BOARD_HEARTBEAT,
+    ARRAY_BOARD_HEARTBEAT,
+    LV_BOARD_HEARTBEAT,
+    CHARGE_BOARD_HEARTBEAT,
+    COMMON_BOARD_STATUS,
+    MOTOR_BOARD_STATUS,
+    ARRAY_BOARD_STATUS,
+    LV_BOARD_STATUS,
+    CHARGE_BOARD_STATUS,
 };
 
 /* Macros ------------------------------------------------------------------*/

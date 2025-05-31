@@ -17,6 +17,46 @@
 #include "GPIO/GPIOTask.hpp"
 #include "SPI/SPI_Task.hpp"
 
+typedef struct {
+    uint16_t heartbeat;
+    uint8_t precharger_closed;
+    uint8_t precharger_closing;
+    uint8_t precharger_error;
+    uint8_t contactor_closed;
+    uint8_t contactor_closing;
+    uint8_t contactor_error;
+    uint16_t line_current;
+    uint16_t charge_current;
+} ts_contactor_state;
+
+ts_contactor_state contactor_array[5] = {{0}, {0}, {0}, {0}, {0}};
+
+void contactorHeartbeatCANPopulate(CANMsg* msg, te_contactor contactor)
+{
+    contactor_array->heartbeat++;
+    msg->extendedID = 0x200 + contactor;
+    msg->DLC = 2;
+    msg->data[0] = (contactor_array[contactor].heartbeat >> 0) & 0xFF;
+    msg->data[1] = (contactor_array[contactor].heartbeat >> 8) & 0xFF;
+}
+
+void contactorStatusCANPopulate(CANMsg* msg, te_contactor contactor)
+{
+    msg->extendedID = 0x210 + contactor;
+    msg->DLC = 4;
+    msg->data[0]   = contactor_array[contactor].precharger_closed  ? 0x01 : 0x0;
+    msg->data[0]  |= contactor_array[contactor].precharger_closing ? 0x02 : 0x0;
+    msg->data[0]  |= contactor_array[contactor].precharger_error   ? 0x04 : 0x0;
+    msg->data[0]  |= contactor_array[contactor].contactor_closed   ? 0x08 : 0x0;
+    msg->data[0]  |= contactor_array[contactor].contactor_closing  ? 0x10 : 0x0;
+    msg->data[0]  |= contactor_array[contactor].contactor_error    ? 0x20 : 0x0;
+    msg->data[0]  |= (contactor_array[contactor].line_current & 0x003) << 6;
+    msg->data[1]  =  (contactor_array[contactor].line_current & 0x3FC) >> 2;
+    msg->data[2]  =  (contactor_array[contactor].line_current & 0xC00) >> 10;
+    msg->data[2]  |= (contactor_array[contactor].charge_current & 0x03F) >> 0;
+    msg->data[3]  = (contactor_array[contactor].charge_current & 0xFC0) >> 6;
+}  
+
 CANPeripheral peripheral1 = {
     .CS_PORT = CS_CAN_N_GPIO_Port,
     .CS_PIN = CS_CAN_N_Pin,
@@ -139,6 +179,46 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.DLC = 1;
         msg.data[0] = 1;
         CUBE_PRINT("Sent Heartbeat \n");
+        break;
+    case COMMON_BOARD_HEARTBEAT:
+        contactorHeartbeatCANPopulate(&msg, COMMON);
+        CUBE_PRINT("Sent Common Heartbeat \n");
+        break;
+    case MOTOR_BOARD_HEARTBEAT:
+        contactorHeartbeatCANPopulate(&msg, MOTOR);
+        CUBE_PRINT("Sent Motor Heartbeat \n");
+        break;
+    case ARRAY_BOARD_HEARTBEAT:
+        contactorHeartbeatCANPopulate(&msg, ARRAY);
+        CUBE_PRINT("Sent Array Heartbeat \n");
+        break;
+    case LV_BOARD_HEARTBEAT:
+        contactorHeartbeatCANPopulate(&msg, LV);
+        CUBE_PRINT("Sent LV Heartbeat \n");
+        break;
+    case CHARGE_BOARD_HEARTBEAT:
+        contactorHeartbeatCANPopulate(&msg, CHARGE);
+        CUBE_PRINT("Sent Charge Heartbeat \n");
+        break;
+    case COMMON_BOARD_STATUS:
+        contactorStatusCANPopulate(&msg, COMMON);
+        CUBE_PRINT("Sent Common Status \n");
+        break;
+    case MOTOR_BOARD_STATUS:
+        contactorStatusCANPopulate(&msg, MOTOR);
+        CUBE_PRINT("Sent Motor Status \n");
+        break;
+    case ARRAY_BOARD_STATUS:
+        contactorStatusCANPopulate(&msg, ARRAY);
+        CUBE_PRINT("Sent Array Status \n");
+        break;
+    case LV_BOARD_STATUS:
+        contactorStatusCANPopulate(&msg, LV);
+        CUBE_PRINT("Sent LV Status \n");
+        break;
+    case CHARGE_BOARD_STATUS:
+        contactorStatusCANPopulate(&msg, CHARGE);
+        CUBE_PRINT("Sent Charge Status \n");
         break;
 
     default:
