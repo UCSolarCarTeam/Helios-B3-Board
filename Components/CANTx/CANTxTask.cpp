@@ -23,7 +23,7 @@ ts_orion_info orion_info = {0};
 
 void contactorHeartbeatCANPopulate(CANMsg* msg, te_contactor contactor)
 {
-    contactor_array->heartbeat++;
+    contactor_array[contactor].heartbeat++;
     msg->extendedID = 0x200 + contactor;
     msg->DLC = 2;
     msg->data[0] = (contactor_array[contactor].heartbeat >> 0) & 0xFF;

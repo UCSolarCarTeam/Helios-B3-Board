@@ -9,7 +9,7 @@
 #include "IOExpander.hpp"
 
 /*----------------------- Macros -----------------------*/
-#define TASK_FREQUENCY_HZ 1
+#define TASK_FREQUENCY_HZ 20
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
 /**
@@ -144,6 +144,7 @@ void GPIOTask::Run(void *pvParams)
 
     while (1)
     {
+#if 0
         // Poll GPIO State of driver controls
         // Note on IOState array: index 0-7 are pins 0-7, index 8-15 are pins 10-17
         std::array<IOState, 16> driverControlState = driverControlExpander.GetExpanderStateNow();
@@ -398,6 +399,7 @@ void GPIOTask::Run(void *pvParams)
 
         // Commit changes to Power board
         powerBoardExpander.Commit();
+#endif
 
         checkCounterTick();
         this->counterTick++;
@@ -431,22 +433,16 @@ void GPIOTask::checkCounterTick() {
     //NOTE: Currently not sending to queue 
     //CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, DIGITAL_INPUTS));
     // CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
-
-    if (this->counterTick == 2) { // 100 ms passed send LIGHTS_INPUT
+    
+    if ((this->counterTick & 0x1) == 0) { // 100 ms passed send LIGHTS_INPUT
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_HEARTBEAT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_HEARTBEAT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_HEARTBEAT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_HEARTBEAT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_HEARTBEAT));
-        
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_STATUS));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_STATUS));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_STATUS));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_STATUS));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_STATUS));
     }
-    if (this->counterTick == 4) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
+    if ((this->counterTick & 0x3) == 0) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,TEMPERATURE_INFO));
@@ -455,7 +451,13 @@ void GPIOTask::checkCounterTick() {
     if(this->counterTick == 20){
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,HEARTBEAT));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,PACK_INFO));
-
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_HEARTBEAT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_HEARTBEAT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_HEARTBEAT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_HEARTBEAT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_HEARTBEAT));
+        
+        
         this->counterTick = 0; // Reset the counter for the next cycle
     }
 
