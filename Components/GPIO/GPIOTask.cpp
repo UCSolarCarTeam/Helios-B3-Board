@@ -449,9 +449,13 @@ void GPIOTask::checkCounterTick() {
     if (this->counterTick == 4) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,TEMPERATURE_INFO));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,CELL_VOLTAGES));
     }
     if(this->counterTick == 20){
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,HEARTBEAT));
+        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,PACK_INFO));
+
         this->counterTick = 0; // Reset the counter for the next cycle
     }
 

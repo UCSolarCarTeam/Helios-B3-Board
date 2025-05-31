@@ -26,6 +26,38 @@ typedef enum
     CHARGE
 } te_contactor;
 
+typedef struct {
+    uint16_t heartbeat;
+    uint8_t precharger_closed;
+    uint8_t precharger_closing;
+    uint8_t precharger_error;
+    uint8_t contactor_closed;
+    uint8_t contactor_closing;
+    uint8_t contactor_error;
+    uint16_t line_current;
+    uint16_t charge_current;
+} ts_contactor_state;
+
+typedef struct {
+    uint16_t packCurrent; /* 0.1A */
+    uint16_t packVoltage; /* 0.1V */
+    uint8_t packStateOfCharge; /* 0.5% */
+    uint16_t packAmphours; /* 0.1Ah */
+    uint8_t packDepthOfDischarge; /* 0.5% */
+    uint8_t highTemperature; /* 1C */
+    uint8_t highThermistorID; /* # */
+    uint8_t lowTemperature; /* 1C */
+    uint8_t lowThermistorID; /* # */
+    uint8_t AverageTemperature; /* 1C */
+    uint8_t internalTemperature; /* 1C */
+    uint8_t fanSpeed; /* # */
+    uint8_t requestedFanSpeed; /* # */
+    uint16_t lowCellVoltage; /* 0.1mV */
+    uint16_t lowCellVoltageID; /* # */
+    uint16_t highCellVoltage; /* 0.1mV */
+    uint16_t highCellVoltageID; /* # */
+    uint16_t averageCellVoltage; /* 0.1mV */
+} ts_orion_info;
 
 /* Enums ------------------------------------------------------------------*/
 enum CAN_TX_COMMANDS
@@ -45,6 +77,9 @@ enum CAN_TX_COMMANDS
     ARRAY_BOARD_STATUS,
     LV_BOARD_STATUS,
     CHARGE_BOARD_STATUS,
+    PACK_INFO,
+    TEMPERATURE_INFO,
+    CELL_VOLTAGES
 };
 
 /* Macros ------------------------------------------------------------------*/

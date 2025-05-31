@@ -17,19 +17,9 @@
 #include "GPIO/GPIOTask.hpp"
 #include "SPI/SPI_Task.hpp"
 
-typedef struct {
-    uint16_t heartbeat;
-    uint8_t precharger_closed;
-    uint8_t precharger_closing;
-    uint8_t precharger_error;
-    uint8_t contactor_closed;
-    uint8_t contactor_closing;
-    uint8_t contactor_error;
-    uint16_t line_current;
-    uint16_t charge_current;
-} ts_contactor_state;
 
 ts_contactor_state contactor_array[5] = {{0}, {0}, {0}, {0}, {0}};
+ts_orion_info orion_info = {0};
 
 void contactorHeartbeatCANPopulate(CANMsg* msg, te_contactor contactor)
 {
@@ -56,6 +46,48 @@ void contactorStatusCANPopulate(CANMsg* msg, te_contactor contactor)
     msg->data[2]  |= (contactor_array[contactor].charge_current & 0x03F) >> 0;
     msg->data[3]  = (contactor_array[contactor].charge_current & 0xFC0) >> 6;
 }  
+
+void orionPackInfoCANPopulate(CANMsg* msg)
+{
+    msg->extendedID = 0x302;
+    msg->DLC = 8;
+    msg->data[0] = (orion_info.packCurrent >> 0) & 0xFF;
+    msg->data[1] = (orion_info.packCurrent >> 8) & 0xFF;
+    msg->data[2] = (orion_info.packVoltage >> 0) & 0xFF;
+    msg->data[3] = (orion_info.packVoltage >> 8) & 0xFF;
+    msg->data[4] = (orion_info.packStateOfCharge >> 0) & 0xFF;
+    msg->data[5] = (orion_info.packAmphours >> 0) & 0xFF;
+    msg->data[6] = (orion_info.packAmphours >> 8) & 0xFF;
+    msg->data[7] = (orion_info.packDepthOfDischarge >> 0) & 0xFF;
+}
+
+void orionTempInfoCANPopulate(CANMsg* msg)
+{
+    msg->extendedID = 0x304;
+    msg->DLC = 8;
+    msg->data[0] = orion_info.highTemperature & 0xFF;
+    msg->data[1] = orion_info.highThermistorID & 0xFF;
+    msg->data[2] = orion_info.lowTemperature & 0xFF;
+    msg->data[3] = orion_info.lowThermistorID & 0xFF;
+    msg->data[4] = orion_info.AverageTemperature & 0xFF;
+    msg->data[5] = orion_info.internalTemperature & 0xFF;
+    msg->data[6] = orion_info.fanSpeed & 0xFF;
+    msg->data[7] = orion_info.requestedFanSpeed& 0xFF;
+}
+
+void orionCellVoltagesCANPopulate(CANMsg* msg)
+{
+    msg->extendedID = 0x305;
+    msg->DLC = 8;
+    msg->data[0] = (orion_info.lowCellVoltage >> 0) & 0xFF;
+    msg->data[1] = (orion_info.lowCellVoltage >> 8) & 0xFF;
+    msg->data[2] = (orion_info.lowCellVoltageID >> 0) & 0xFF;
+    msg->data[3] = (orion_info.highCellVoltage >> 0) & 0xFF;
+    msg->data[4] = (orion_info.highCellVoltage >> 8) & 0xFF;
+    msg->data[5] = (orion_info.highCellVoltageID >> 0) & 0xFF;
+    msg->data[6] = (orion_info.averageCellVoltage >> 0) & 0xFF;
+    msg->data[7] = (orion_info.averageCellVoltage >> 8) & 0xFF;
+}
 
 CANPeripheral peripheral1 = {
     .CS_PORT = CS_CAN_N_GPIO_Port,
@@ -219,6 +251,18 @@ void CANTxTask::HandleCommand(Command &cm)
     case CHARGE_BOARD_STATUS:
         contactorStatusCANPopulate(&msg, CHARGE);
         CUBE_PRINT("Sent Charge Status \n");
+        break;
+    case PACK_INFO:
+        orionPackInfoCANPopulate(&msg);
+        CUBE_PRINT("Sent Pack Info \n");
+        break;
+    case TEMPERATURE_INFO:
+        orionTempInfoCANPopulate(&msg);
+        CUBE_PRINT("Sent Temp Info \n");
+        break;
+    case CELL_VOLTAGES:
+        orionCellVoltagesCANPopulate(&msg);
+        CUBE_PRINT("Sent Cell Voltages \n");
         break;
 
     default:
