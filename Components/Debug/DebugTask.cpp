@@ -28,6 +28,8 @@
 constexpr uint8_t DEBUG_TASK_PERIOD = 100;
 
 /* Variables -----------------------------------------------------------------*/
+extern ts_contactor_state contactor_array[5];
+extern ts_orion_info orion_info;
 static IOExpander ioExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1,0,0));
 
 /* Prototypes ----------------------------------------------------------------*/

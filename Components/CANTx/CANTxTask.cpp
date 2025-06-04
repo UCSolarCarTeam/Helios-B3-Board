@@ -49,6 +49,8 @@ void contactorStatusCANPopulate(CANMsg* msg, te_contactor contactor)
 
 void orionPackInfoCANPopulate(CANMsg* msg)
 {
+    orion_info.packCurrent = 0;
+    orion_info.packVoltage = 1100;
     msg->extendedID = 0x302;
     msg->DLC = 8;
     msg->data[0] = (orion_info.packCurrent >> 0) & 0xFF;
@@ -63,6 +65,10 @@ void orionPackInfoCANPopulate(CANMsg* msg)
 
 void orionTempInfoCANPopulate(CANMsg* msg)
 {
+    orion_info.highTemperature = 30;
+    orion_info.lowTemperature = 30;
+    orion_info.AverageTemperature = 30;
+    orion_info.internalTemperature = 30;
     msg->extendedID = 0x304;
     msg->DLC = 8;
     msg->data[0] = orion_info.highTemperature & 0xFF;
@@ -77,6 +83,9 @@ void orionTempInfoCANPopulate(CANMsg* msg)
 
 void orionCellVoltagesCANPopulate(CANMsg* msg)
 {
+    orion_info.lowCellVoltage = 39000; /**/
+    orion_info.highCellVoltage = 40000;
+    orion_info.averageCellVoltage = 39500;
     msg->extendedID = 0x305;
     msg->DLC = 8;
     msg->data[0] = (orion_info.lowCellVoltage >> 0) & 0xFF;
