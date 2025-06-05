@@ -179,7 +179,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     float accelPercentage = (float)getAvgAccel() / 100.0f;
 
     /* TODO: Add getter function for GPIO Forward, Reverse Brake pins */
-    /* TODO: Add motor reset pin */
+    /* TODO: Add motor reset pin and getter */
     // Determine drive commands (NOTE: ACTIVE LOW)
     uint8_t forward = forward_temp_GPIO;
     uint8_t reverse = reverse_temp_GPIO;
