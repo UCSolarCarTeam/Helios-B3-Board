@@ -7,9 +7,6 @@
 #ifndef HELIOS_MOTOR_CONTROL_TASK_HPP_
 #define HELIOS_MOTOR_CONTROL_TASK_HPP_
 
-#ifndef ELYSIA
-#define ELYSIA
-
 /* Includes ------------------------------------------------------------------*/
 #include "main_system.hpp"
 #include "Task.hpp"
@@ -26,7 +23,7 @@ extern volatile float brakingPedalPercent;
 
 extern volatile uint8_t forward_temp_GPIO;
 extern volatile uint8_t reverse_temp_GPIO;
-extern volatile uint8_t brake_temp_GPIO;
+extern volatile uint8_t brake_temp_GPIO; // Mechanical Brake
 extern volatile uint8_t reset_temp_GPIO;
 
 /* Enums ------------------------------------------------------------------*/
@@ -48,8 +45,7 @@ enum ResetStatus {
     Resetting
 };
 
-typedef struct DriveCommandsInfo
-{
+typedef struct DriveCommandsInfo {
     float motorCurrentOut;
     enum MotorStates motorState;
     uint8_t prevResetStatus;
@@ -58,8 +54,7 @@ typedef struct DriveCommandsInfo
     uint8_t accelQueueIndex;
 } DriveCommandsInfo;
 
-class MotorControlTask : public Task
-{
+class MotorControlTask : public Task {
 public:
     static MotorControlTask &Inst()
     {
@@ -104,13 +99,16 @@ private:
 #define REGEN_QUEUE_SIZE 5
 #define ACCEL_QUEUE_SIZE 5
 
-#define BUS_CURRENT_OUT 1.0f // Percentage 0 -1 always 100%
+#define BUS_CURRENT_OUT 1.0f // Percentage 0 to 1 (always 100%)
 
 #define DRIVE_COMMANDS_FREQ 10
+
 #define MOTOR_DRIVE_STDID 0x501U
 #define MOTOR_DRIVE_DLC 8
+
 #define MOTOR_POWER_STDID 0x502U
 #define MOTOR_POWER_DLC 8
+
 #define MOTOR_RESET_STDID 0x503U
 #define MOTOR_PERCENTAGE_REDUCER 1.0f
 

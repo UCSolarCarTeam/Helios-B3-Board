@@ -35,7 +35,7 @@ void run_main() {
     DebugTask::Inst().InitTask();
     // SPI_Task::Inst().InitTask();
     // GPIOTask::Inst().InitTask();
-    CANRxTask::Inst().InitTask();
+//    CANRxTask::Inst().InitTask();
     GPIOTask::Inst().InitTask();
     CANTxTask::Inst().InitTask();
     MotorControlTask::Inst().InitTask();

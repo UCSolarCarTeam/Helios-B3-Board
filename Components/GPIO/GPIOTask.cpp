@@ -8,10 +8,10 @@
 #include "GPIOTask.hpp"
 #include "IOExpander.hpp"
 
-volatile uint8_t forward_temp_GPIO;
-volatile uint8_t reverse_temp_GPIO;
-volatile uint8_t brake_temp_GPIO;
-volatile uint8_t reset_temp_GPIO;
+volatile uint8_t forward_temp_GPIO = 0;
+volatile uint8_t reverse_temp_GPIO = 1;
+volatile uint8_t brake_temp_GPIO = 1; // Regen Brake 
+volatile uint8_t reset_temp_GPIO = 1;
 
 /*----------------------- Macros -----------------------*/
 #define TASK_FREQUENCY_HZ 1
@@ -160,62 +160,62 @@ void GPIOTask::Run(void *pvParams)
         {
             switch (static_cast<IOPin>(i))
             {
-            case DriverControls::FORWARD_NEUTRAL_REVERSE_H:
-                CUBE_PRINT("    - P00 (Forward): %d\n", driverControlState[i]);
-                if (driverControlState[i] == IOState::HIGH)
-                {
-                    // powerBoardExpander.SetPin(PowerBoard::P13, IOState::HIGH);
-                    forward_temp_GPIO = 1;
-                }
-                else if (driverControlState[i] == IOState::LOW)
-                {
-                    // powerBoardExpander.SetPin(PowerBoard::P13, IOState::LOW);
-                    forward_temp_GPIO = 0;
-                }
-                else if (driverControlState[i] == IOState::ERROR)
-                {
-                }
-                break;
-            case DriverControls::FORWARD_NEUTRAL_REVERSE_L:
-                CUBE_PRINT("    - P01 (Reverse): %d\n", driverControlState[i]);
-                if (driverControlState[i] == IOState::HIGH)
-                {
-                    reverse_temp_GPIO = 1;
-                }
-                else if (driverControlState[i] == IOState::LOW)
-                {
-                    reverse_temp_GPIO = 0;
-                }
-                else if (driverControlState[i] == IOState::ERROR)
-                {
-                }
-                break;
-            case DriverControls::ARRAYS_DISCONNECT:
-                CUBE_PRINT("    - P02 (Brake): %d\n", driverControlState[i]);
-                if (driverControlState[i] == IOState::HIGH)
-                {
-                    brake_temp_GPIO = 1;
-                }
-                else if (driverControlState[i] == IOState::LOW)
-                {
-                    brake_temp_GPIO = 0;
-                }
-                else if (driverControlState[i] == IOState::ERROR)
-                {
-                }
-                break;
-            case DriverControls::RACE_MODE_ENABLE:
-                CUBE_PRINT("    - P03 (Race Mode Enable): %d\n", driverControlState[i]);
-                if (driverControlState[i] == IOState::HIGH)
-                {
-                }
-                else if (driverControlState[i] == IOState::LOW)
-                {
-                }
-                else if (driverControlState[i] == IOState::ERROR)
-                {
-                }
-                break;
+//            case DriverControls::FORWARD_NEUTRAL_REVERSE_H:
+//                CUBE_PRINT("    - P00 (Forward): %d\n", driverControlState[i]);
+//                if (driverControlState[i] == IOState::HIGH)
+//                {
+//                    // powerBoardExpander.SetPin(PowerBoard::P13, IOState::HIGH);
+//                    forward_temp_GPIO = 1;
+//                }
+//                else if (driverControlState[i] == IOState::LOW)
+//                {
+//                    // powerBoardExpander.SetPin(PowerBoard::P13, IOState::LOW);
+//                    forward_temp_GPIO = 0;
+//                }
+//                else if (driverControlState[i] == IOState::ERROR)
+//                {
+//                }
+//                break;
+//            case DriverControls::FORWARD_NEUTRAL_REVERSE_L:
+//                CUBE_PRINT("    - P01 (Reverse): %d\n", driverControlState[i]);
+//                if (driverControlState[i] == IOState::HIGH)
+//                {
+//                    reverse_temp_GPIO = 1;
+//                }
+//                else if (driverControlState[i] == IOState::LOW)
+//                {
+//                    reverse_temp_GPIO = 0;
+//                }
+//                else if (driverControlState[i] == IOState::ERROR)
+//                {
+//                }
+//                break;
+//            case DriverControls::ARRAYS_DISCONNECT:
+//                CUBE_PRINT("    - P02 (Brake): %d\n", driverControlState[i]);
+//                if (driverControlState[i] == IOState::HIGH)
+//                {
+//                    brake_temp_GPIO = 1;
+//                }
+//                else if (driverControlState[i] == IOState::LOW)
+//                {
+//                    brake_temp_GPIO = 0;
+//                }
+//                else if (driverControlState[i] == IOState::ERROR)
+//                {
+//                }
+//                break;
+//            case DriverControls::RACE_MODE_ENABLE:
+//                CUBE_PRINT("    - P03 (Race Mode Enable): %d\n", driverControlState[i]);
+//                if (driverControlState[i] == IOState::HIGH)
+//                {
+//                }
+//                else if (driverControlState[i] == IOState::LOW)
+//                {
+//                }
+//                else if (driverControlState[i] == IOState::ERROR)
+//                {
+//                }
+//                break;
             case DriverControls::HEADLIGHTS_ENABLE:
                 CUBE_PRINT("    - P04 (Headlights Enable): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)

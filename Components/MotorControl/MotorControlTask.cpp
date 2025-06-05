@@ -11,8 +11,8 @@ float regenValuesQueue[REGEN_QUEUE_SIZE] = {0};
 float accelValuesQueue[ACCEL_QUEUE_SIZE] = {0};
 
 uint8_t auxBmsInputs[3];
-float motor0VehicleVelocityInput;
-float motor1VehicleVelocityInput;
+float motor0VehicleVelocityInput; /* TODO: Add Motor Feedback from CAN Rx Task */
+float motor1VehicleVelocityInput; /* TODO: Add Motor Feedback from CAN Rx Task */
 
 MotorControlTask::MotorControlTask() : Task(MOTOR_CONTROL_TASK_QUEUE_DEPTH_OBJS){}
 
@@ -141,16 +141,16 @@ uint8_t MotorControlTask::vehicleVelocitySafeToGoReverse()
 
 uint8_t MotorControlTask::isNewDirectionSafe(uint8_t forward, uint8_t reverse)
 {
-    if (forward && reverse) // Error state (can't go forward and reverse!)
-    {
+    if (forward && reverse) {
+        // Forward and reverse pressed at the same time, not safe
         return 0;
-    }
-    else if ((forward && vehicleVelocitySafeToGoForward()) || (reverse && vehicleVelocitySafeToGoReverse()))
-    {
+        
+    } else if ((forward && vehicleVelocitySafeToGoForward()) || (reverse && vehicleVelocitySafeToGoReverse())){
+        // Forward or reverse pressed and vehicle velocity is safe to go in that direction
         return 1;
-    }
-    else
-    {
+        
+    } else {
+        // default case, not safe
         return 0;
     }
 }
@@ -159,115 +159,99 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                        DriveCommandsInfo* driveCommandsInfo,
                        uint32_t* switching)
 {
-    osDelayUntil(prevWakeTimePtr, DRIVE_COMMANDS_FREQ);
+    // osDelayUntil(prevWakeTimePtr, DRIVE_COMMANDS_FREQ);
 
-
-
-#ifdef ELYSIA
+    /*
+    ---------- ADC Pedal Sampling ----------
+    1. Read now pedal percentages
+    2. calculate average pedal percentages from the buffer
+    */
 
     regenValuesQueue[driveCommandsInfo->regenQueueIndex++] = brakingPedalPercent;
     accelValuesQueue[driveCommandsInfo->accelQueueIndex++] = accelerationPedalPercent;
 
-#else
-    float newRegen = 0;
-    float newAccel = 0;
-
-    // Read analog inputs (ADC)
-    if (HAL_ADC_PollForConversion(&hadc1, ADC_POLL_TIMEOUT) == HAL_OK)
-    {
-        newRegen = (((float)HAL_ADC_GetValue(&hadc1)) / ((float)MAX_ANALOG)) * 100.0;
-    }    
-
-    if (HAL_ADC_PollForConversion(&hadc2, ADC_POLL_TIMEOUT) == HAL_OK)
-    {
-        newAccel = (((float)HAL_ADC_GetValue(&hadc2)) / ((float)MAX_ANALOG)) * 100.0;   
-    }
-#endif
-
-
+    // Update Queue Indices
     driveCommandsInfo->accelQueueIndex %= REGEN_QUEUE_SIZE;
     driveCommandsInfo->regenQueueIndex %= ACCEL_QUEUE_SIZE;
 
     // Convert values back to floating percentages for motors
-    float regenPercentage = (float)getAvgRegen() / 100.0;
-    float accelPercentage = (float)getAvgAccel() / 100.0;
+    float regenPercentage = (float)getAvgRegen() / 100.0f; // Get value between 0 and 1
+    float accelPercentage = (float)getAvgAccel() / 100.0f;
 
-    // Determine drive commands
-    // `!` for active low
-    // uint8_t forward = !HAL_GPIO_ReadPin(FORWARD_GPIO_Port, FORWARD_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
-    // uint8_t reverse = !HAL_GPIO_ReadPin(REVERSE_GPIO_Port, REVERSE_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
-    // uint8_t brake = !HAL_GPIO_ReadPin(BRAKES_GPIO_Port, BRAKES_Pin); // ELECTRICAL CHANGING THIS, ASSUME IT EXISTS
-
+    /* TODO: Add getter function for GPIO Forward, Reverse Brake pins */
+    /* TODO: Add motor reset pin */
+    // Determine drive commands (NOTE: ACTIVE LOW)
     uint8_t forward = forward_temp_GPIO;
     uint8_t reverse = reverse_temp_GPIO;
-    uint8_t brake = brake_temp_GPIO;
+    uint8_t mech_brake = brake_temp_GPIO; // Mechanical Brake
+    // uint8_t reset = reset_temp_GPIO;
 
+    /* TODO: Add switch case handle for CANRx Task to receive AuxBMS states */
     // Read AuxBMS messages
-    char allowCharge = auxBmsInputs[1] & 0x02;
-    char allowDischarge = auxBmsInputs[1] & 0x08;
+    // NOTE: Hard coding states for now...
+    char allowCharge = 1;
+    char allowDischarge = 1;
 
-    // Determine data to send
+    /*--------------- Determine Data to Send ---------------*/
     float motorVelocityOut; // RPM
-
-    if (!isNewDirectionSafe(forward, reverse)) // If new direction input isn't safe, zero outputs
-    {
+    if (!isNewDirectionSafe(forward, reverse)) {                    
         motorVelocityOut = 0;
         driveCommandsInfo->motorCurrentOut = 0;
-    }
-    else if (driveCommandsInfo->resetStatus == SettingReset)
-    {
-        driveCommandsInfo->motorCurrentOut =
-                    calculateRegenMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
 
-            if(driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
-                driveCommandsInfo->resetStatus = Resetting;
-                driveCommandsInfo->motorCurrentOut = 0;
-            }
-    }
-    else if (regenPercentage > NON_ZERO_THRESHOLD) // Regen state
-    {
+    } else if (driveCommandsInfo->resetStatus == SettingReset) {
+        // If reset button is pressed, set motorState to Off and motorCurrentOut to 0
+        driveCommandsInfo->motorCurrentOut = calculateRegenMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
+
+        if (driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
+            driveCommandsInfo->resetStatus = Resetting;
+            driveCommandsInfo->motorCurrentOut = 0;
+        }
+
+    } else if (regenPercentage > NON_ZERO_THRESHOLD) {
+        // Regen state
         // To stop using regen braking, set motorCurrentOut to desired value and zero motorVelocityOut
         // To stop without regen braking, zero both motorCurrentOut and motorVelocityOut
         // https://tritium.com.au/includes/TRI88.004v4-Users-Manual.pdf - Section 13
 
-        if(driveCommandsInfo->motorState == Accelerating) {
+        if (driveCommandsInfo->motorState == Accelerating) {
             *switching = 1;
         }
 
         driveCommandsInfo->motorState = RegenBraking;
 
-        if(*switching) {
-            driveCommandsInfo->motorCurrentOut =
-                    calculateRegenMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
+        if (*switching) {
+            // If regen to accel, set regen percentage to 0
+            driveCommandsInfo->motorCurrentOut = calculateRegenMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
 
-            if(driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
+            if (driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
+                // reset switching flag after switching
                 *switching = 0;
                 driveCommandsInfo->motorCurrentOut = 0;
             }
             
         } else {
             motorVelocityOut = 0;
+            // Allow regen braking based on input from AuxBMS
+            if (allowCharge) {
+                driveCommandsInfo->motorCurrentOut = calculateRegenMotorCurrent(
+                                                        regenPercentage, 
+                                                        driveCommandsInfo->motorCurrentOut
+                                                    );
 
-            // Alow regen braking based on input from AuxBMS
-            if (allowCharge)
-            {
-                driveCommandsInfo->motorCurrentOut =
-                    calculateRegenMotorCurrent(regenPercentage, driveCommandsInfo->motorCurrentOut);
-            }
-            else
-            {
+            } else {
+                // If AuxBMS does not allow charging, set motorCurrentOut to 0
                 driveCommandsInfo->motorCurrentOut = 0;
             }
         }
-    }
-    else if (brake) // Mechanical Brake Pressed
-    {
+    } else if (mech_brake) {
+        // If mechanical is pressed, set motorState to MechanicalBreaking and motorCurrentOut to 0
         driveCommandsInfo->motorState = MechanicalBreaking;
         motorVelocityOut = 0;
         driveCommandsInfo->motorCurrentOut = 0;
-    }
-    else if (accelPercentage > NON_ZERO_THRESHOLD) // Drive state
-    {
+
+    } else if (accelPercentage > NON_ZERO_THRESHOLD) {
+        // Accel state (drive state)
+
         if(driveCommandsInfo->motorState == RegenBraking) {
             *switching = 1;
         }
@@ -275,41 +259,46 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
         driveCommandsInfo->motorState = Accelerating;
 
         if(*switching) {
-            driveCommandsInfo->motorCurrentOut =
-                    calculateAccelMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
+            // If accel to regen, set accel percentage to 0
+            driveCommandsInfo->motorCurrentOut = calculateAccelMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
 
             if(driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
+                // reset switching flag after switching
                 *switching = 0;
                 driveCommandsInfo->motorCurrentOut = 0;
             }
         
         } else {
-            if (forward && allowDischarge) // Forward state
-            {
-                driveCommandsInfo->motorState = Accelerating;
-                HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
-                motorVelocityOut = MAX_FORWARD_RPM;
-                driveCommandsInfo->motorCurrentOut =
-                calculateAccelMotorCurrent(accelPercentage, driveCommandsInfo->motorCurrentOut);
-            }
-            else if (reverse && allowDischarge) // Reverse State
-            {
+            if (forward && allowDischarge) {
+                // Forward and Discharge is allowed
+                driveCommandsInfo->motorState = Accelerating
+                motorVelocityOut = MAX_FORWARD_RPM; // FAR FUTURE TODO: Based on ADC LOL (needs math, Omar's curve fitting) - Dom
+
+                driveCommandsInfo->motorCurrentOut = CalculateAccelMotorCurrent(
+                                                        accelPercentage, 
+                                                        driveCommandsInfo->motorCurrentOut
+                                                    );
+
+            } else if (reverse && allowDischarge) {
+                // Reverse and Discharge is allowed
                 driveCommandsInfo->motorState = Accelerating;
                 HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-                motorVelocityOut = MAX_REVERSE_RPM;
-                driveCommandsInfo->motorCurrentOut =
-                calculateAccelMotorCurrent(accelPercentage, driveCommandsInfo->motorCurrentOut);
-            }
-            else
-            {
+                motorVelocityOut = MAX_REVERSE_RPM; // FAR FUTURE TODO: Based on ADC - Dom
+
+                driveCommandsInfo->motorCurrentOut = calculateAccelMotorCurrent(
+                                                        accelPercentage, 
+                                                        driveCommandsInfo->motorCurrentOut
+                                                    );
+            } else {
+                // If neither forward nor reverse
+                // If discharge is not allowed, set motorState to Off
                 driveCommandsInfo->motorState = Off;
                 motorVelocityOut = 0;
                 driveCommandsInfo->motorCurrentOut = 0;
             }
         }
-    }
-    else // Off state
-    {
+    } else {
+        // Off state
         if(driveCommandsInfo->motorState == Accelerating) {
             *switching = 1;
         }
@@ -335,8 +324,8 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // Reset input velocities to default
     // This is TEMPORARY. Should be a fix for this that does a better job of determining if the velocities that were received
     // are stale values. i.e. motor controllers haven't transmitted a message in a while
-    motor0VehicleVelocityInput = 0;
-    motor1VehicleVelocityInput = 0;
+    motor0VehicleVelocityInput = 0.0f;
+    motor1VehicleVelocityInput = 0.0f;
 
     // Transmit Motor Drive command
     float dataToSendFloat[2];
@@ -364,7 +353,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // uint8_t reset = !HAL_GPIO_ReadPin(RESET_GPIO_Port, RESET_Pin); // ELECTRICAL WANTS TO CHANGE IT, ASSUME IT EXISTS
     uint8_t reset = reset_temp_GPIO;
 
-    if (!driveCommandsInfo->prevResetStatus && reset) /// off -> on
+    if (!driveCommandsInfo->prevResetStatus && !reset) /// off -> on
     {
         driveCommandsInfo->resetStatus = SettingReset;
     }
