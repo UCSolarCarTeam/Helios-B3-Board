@@ -61,7 +61,7 @@ void I2CTask::Run(void *pvParams)
 	CUBE_PRINT("Configurations complete\r\n");
 
 	while (1){
-		UBX_Transmit(GPS_BUFFER, BUFFER_SIZE);
+		UBX_Transmit(UBX_CFG_MSG, sizeof(BUFFER_SIZE));
 		UBX_Receive(GPS_BUFFER, BUFFER_SIZE);
 
 		int16_t computedChecksum = UBX_M8N_CHECKSUM(GPS_BUFFER, BUFFER_SIZE);
@@ -69,14 +69,21 @@ void I2CTask::Run(void *pvParams)
 
 		if (computedChecksum == expectedChecksum) {
 			UBX_M8N_NAV_POSLLH_Parsing(GPS_BUFFER, &data);					      // parses data
-			CUBE_PRINT("Data, iTOW: %u /n "
+			/*CUBE_PRINT("Data, iTOW: %u /n "
 					"lon: %d /n "
 					"lat: %d /n "
 					"height: %d /n"
 					"hMSL: %d /n"
 					"hAcc: %u /n"
-					"vAcc: %u /n", data.iTOW, data.lon, data.lat, data.height, data.hMSL, data.hAcc, data.vAcc);
+					"vAcc: %u /n", data.iTOW, data.lon, data.lat, data.height, data.hMSL, data.hAcc, data.vAcc); */
 		}
+		CUBE_PRINT("Data, iTOW: %u \n "
+							"lon: %d \n "
+							"lat: %d \n "
+							"height: %d \n"
+							"hMSL: %d \n"
+							"hAcc: %u \n"
+							"vAcc: %u \n", data.iTOW, data.lon, data.lat, data.height, data.hMSL, data.hAcc, data.vAcc);
 		osDelay(500);
 	}
 
