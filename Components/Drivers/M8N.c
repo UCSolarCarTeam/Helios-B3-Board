@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include "CubeDefines.hpp"
 
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
@@ -101,18 +102,18 @@ uint8_t UBX_CFG_NAV_PVT[] = {
 void UBX_Transmit(uint8_t *buffer, uint16_t buflen) {
 	HAL_StatusTypeDef hal = HAL_I2C_Mem_Write(&hi2c1, GPS_DEVICE_ADDRESS, GPS_DATA_REGISTER, 1, buffer, buflen, 100);
 	if (hal != HAL_OK) {
-		//printf("HAL Status: %d | I2C Error: %d | Class and ID: %#X %#X\r\n", hal, hi2c1.ErrorCode, buffer[2], buffer[3]);
+		//CUBE_PRINT("HAL Status: %d | I2C Error: %d | Class and ID: %#X %#X\r\n", hal, hi2c1.ErrorCode, buffer[2], buffer[3]);
 	}else{
-		printf("[ ^ ]UBX Transmit Successful");
+		CUBE_PRINT("[ ^ ]UBX Transmit Successful");
 	}
 }
 
 void UBX_Receive(uint8_t *buffer, uint16_t buflen) {
 	HAL_StatusTypeDef hal = HAL_I2C_Mem_Read(&hi2c1, GPS_DEVICE_ADDRESS, GPS_DATA_REGISTER, 1, buffer, buflen, 100);
 		if (hal != HAL_OK) {
-			//printf("HAL Status: %d | I2C Error: %\r\n", hal, hi2c1.ErrorCode);
+			//CUBE_PRINT("HAL Status: %d | I2C Error: %\r\n", hal, hi2c1.ErrorCode);
 	}else{
-		printf("[ ^ ]UBX Receive Successful");
+		CUBE_PRINT("[ ^ ]UBX Receive Successful");
 	}
 }
 
@@ -177,12 +178,12 @@ void CONFIG_Transmit(uint8_t* buffer, uint16_t buflen) {
 
 
 	if (hal != HAL_OK) {
-		printf("CONFIG transmit went wrong\r\n");
-		printf("	[i]0x%x\r\n", hal);
+		CUBE_PRINT("CONFIG transmit went wrong\r\n");
+		CUBE_PRINT("	[i]0x%x\r\n", hal);
 	}
 	// get the length of the CONFIG message response
 	uint16_t message_length = UBX_GET_LENGTH();
-	printf("Message Length: %d\r\n", message_length);
+	CUBE_PRINT("Message Length: %d\r\n", message_length);
 
 	if (message_length != 0) {
 		// create a buffer of
@@ -192,10 +193,10 @@ void CONFIG_Transmit(uint8_t* buffer, uint16_t buflen) {
 		// Recieve the CONFIG response
 		hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, config_response, message_length, HAL_MAX_DELAY);
 		if (hal != HAL_OK) {
-			printf("CONFIG response went wrong!\r\n");
-			printf("Error code: %08lX\r\n", hi2c1.ErrorCode);
+			CUBE_PRINT("CONFIG response went wrong!\r\n");
+			CUBE_PRINT("Error code: %08lX\r\n", hi2c1.ErrorCode);
 		} else {
-			printf("Length: %d | Headers: %X %X |Class: %X | ID: %X | rest: %X %X %X %X %X %X\r\n", message_length, config_response[0], config_response[1], config_response[2], config_response[3], config_response[4], config_response[5], config_response[6], config_response[7], config_response[8], config_response[9]);
+			CUBE_PRINT("Length: %d | Headers: %X %X |Class: %X | ID: %X | rest: %X %X %X %X %X %X\r\n", message_length, config_response[0], config_response[1], config_response[2], config_response[3], config_response[4], config_response[5], config_response[6], config_response[7], config_response[8], config_response[9]);
 			// see if response was a ACK message
 		}
 	}
@@ -205,10 +206,10 @@ uint16_t UBX_GET_LENGTH() {
 	uint8_t ubx_length[2];
 	HAL_StatusTypeDef hal = HAL_I2C_Mem_Read(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, GPS_DATA_LENGTH_HIGH, 1, ubx_length, sizeof(ubx_length), 100);
 	if (hal != HAL_OK) {
-		printf("Read for length went wrong");
+		CUBE_PRINT("Read for length went wrong");
 	}
 
-	printf("High: %X | Low: %X\r\n",ubx_length[0], ubx_length[1]);
+	CUBE_PRINT("High: %X | Low: %X\r\n",ubx_length[0], ubx_length[1]);
 	// return length as uint16_t
 	return ((ubx_length[0] << 8) | (ubx_length[1]));
 }
@@ -221,28 +222,28 @@ void GPS_Initialization(void) {
 	    // Repeat without any code in here
 	} while (hal == HAL_BUSY);
 
-	printf("Starting MSG\r\n");
+	CUBE_PRINT("Starting MSG\r\n");
 	CONFIG_Transmit(UBX_CFG_MSG, sizeof(UBX_CFG_MSG)/sizeof(UBX_CFG_MSG[0]));
-	HAL_Delay(1000);
+	osDelay(1000);
 
-	printf("Starting PRT\r\n");
+	CUBE_PRINT("Starting PRT\r\n");
 	CONFIG_Transmit(UBX_CFG_PRT, sizeof(UBX_CFG_PRT)/sizeof(UBX_CFG_PRT[0]));
-	HAL_Delay(1000);
+	osDelay(1000);
 
-	printf("Starting RATE\r\n");
+	CUBE_PRINT("Starting RATE\r\n");
 	CONFIG_Transmit(UBX_CFG_RATE, sizeof(UBX_CFG_RATE)/sizeof(UBX_CFG_RATE[0]));
-	HAL_Delay(1000);
+	osDelay(1000);
 
-	printf("Starting NAV\r\n");
+	CUBE_PRINT("Starting NAV\r\n");
 	CONFIG_Transmit(UBX_CFG_NAV_PVT, sizeof(UBX_CFG_NAV_PVT)/sizeof(UBX_CFG_NAV_PVT[0]));
-	HAL_Delay(1000);
+	osDelay(1000);
 
 	//hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, UBX_CFG_CFG, sizeof(UBX_CFG_CFG), HAL_MAX_DELAY);
 	if (hal != HAL_OK) {
 		// something went wrong with transmit (exit)
-		printf("UBX-CFG-CFG went wrong!\r\n");
+		CUBE_PRINT("UBX-CFG-CFG went wrong!\r\n");
 	}
-	HAL_Delay(2000);
+	osDelay(2000);
 }
 
 /*------------------------------- Extra Functions for testing purposes -------------------------------*/

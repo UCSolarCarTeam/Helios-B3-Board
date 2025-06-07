@@ -9,9 +9,6 @@
 extern "C" {
 #endif
 
-#ifndef INC_M8N_H_
-#define INC_M8N_H_
-
 /*-------------- Private Macros --------------*/
 #define GPS_DEVICE_ADDRESS (0x42 << 1)	// GPS device address is 0x42, left-shifted for STM32 uses 7-bit address
 #define GPS_DATA_REGISTER 0xFF		    // register address for GPS data stream
@@ -105,8 +102,6 @@ uint16_t UBX_GET_LENGTH(void);
 void UBX_Transmit(uint8_t *buffer, uint16_t buflen);
 
 void UBX_Receive(uint8_t *buffer, uint16_t buflen);
-
-#endif /* INC_M8N_H_ */
 
 #ifdef __cplusplus
 }
