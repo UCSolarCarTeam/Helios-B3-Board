@@ -153,71 +153,71 @@ void DebugTask::HandleDebugMessage(const char* msg)
         }
     }
 
-    /* DRIVER CONTROL DEBUG */
-    // GPIOs
-    // Forward GPIO
-    else if (strncmp(msg, "forward ", 8) == 0) {
-        int32_t val = Utils::ExtractIntParameter(msg, 8);
-        if (val != ERRVAL && (val == 0 || val == 1)) {
-            forward_temp_GPIO = val;
-            CUBE_PRINT("\nForward GPIO set to %ld\n\n", val);
-        } else {
-            CUBE_PRINT("\nInvalid forward value\n\n");
-        }
-    }
-    // Reverse GPIO
-    else if (strncmp(msg, "reverse ", 8) == 0) {
-        int32_t val = Utils::ExtractIntParameter(msg, 8);
-        if (val != ERRVAL && (val == 0 || val == 1)) {
-            reverse_temp_GPIO = val;
-            CUBE_PRINT("\nReverse GPIO set to %ld\n\n", val);
-        } else {
-            CUBE_PRINT("\nInvalid reverse value\n\n");
-        }
-    }
-    // Mechanical Brake GPIO
-    else if (strncmp(msg, "mech_brake ", 10) == 0) {
-        int32_t val = Utils::ExtractIntParameter(msg, 10);
-        if (val != ERRVAL && (val == 0 || val == 1)) {
-        	brake_temp_GPIO = val;
-            CUBE_PRINT("\n Accel set %ld\n\n", val);
-        } else {
-            CUBE_PRINT("\nInvalid accel value\n\n");
-        }
-    }
-    // Reset GPIO
-    else if (strncmp(msg, "reset ", 6) == 0) {
-        int32_t val = Utils::ExtractIntParameter(msg, 6);
-        if (val != ERRVAL && (val == 0 || val == 1)) {
-            reset_temp_GPIO = val;
-            CUBE_PRINT("\nReset GPIO set to %ld\n\n", val);
-        } else {
-            CUBE_PRINT("\nInvalid reset value\n\n");
-        }
-    }
-
-    // Pedal Values
-    // Regen Percentage
-    else if (strncmp(msg, "regen ", 6) == 0) {
-        int32_t val = Utils::ExtractIntParameter(msg, 6);
-        if (val != ERRVAL && val >= 0 && val <= 100) {
-        	brakingPedalPercent = val;
-            CUBE_PRINT("\n Regen set %ld\n\n", val);
-        } else {
-            CUBE_PRINT("\nInvalid brake value\n\n");
-        }
-    }
-    // Acceleration Percentage
-    else if (strncmp(msg, "accel ", 6) == 0) {
-        // Set acceleration percentage
-        int32_t val = Utils::ExtractIntParameter(msg, 6);
-        if (val != ERRVAL && val >= 0 && val <= 100) {
-            accelerationPedalPercent = val;
-            CUBE_PRINT("\nReset GPIO set to %ld\n\n", val);
-        } else {
-            CUBE_PRINT("\nInvalid reset value\n\n");
-        }
-    }
+    // /* DRIVER CONTROL DEBUG */
+    // // GPIOs
+    // // Forward GPIO
+    // else if (strncmp(msg, "forward ", 8) == 0) {
+    //     int32_t val = Utils::ExtractIntParameter(msg, 8);
+    //     if (val != ERRVAL && (val == 0 || val == 1)) {
+    //         forward_temp_GPIO = val;
+    //         CUBE_PRINT("\nForward GPIO set to %ld\n\n", val);
+    //     } else {
+    //         CUBE_PRINT("\nInvalid forward value\n\n");
+    //     }
+    // }
+    // // Reverse GPIO
+    // else if (strncmp(msg, "reverse ", 8) == 0) {
+    //     int32_t val = Utils::ExtractIntParameter(msg, 8);
+    //     if (val != ERRVAL && (val == 0 || val == 1)) {
+    //         reverse_temp_GPIO = val;
+    //         CUBE_PRINT("\nReverse GPIO set to %ld\n\n", val);
+    //     } else {
+    //         CUBE_PRINT("\nInvalid reverse value\n\n");
+    //     }
+    // }
+    // // Mechanical Brake GPIO
+    // else if (strncmp(msg, "mech_brake ", 10) == 0) {
+    //     int32_t val = Utils::ExtractIntParameter(msg, 10);
+    //     if (val != ERRVAL && (val == 0 || val == 1)) {
+    //     	brake_temp_GPIO = val;
+    //         CUBE_PRINT("\n Accel set %ld\n\n", val);
+    //     } else {
+    //         CUBE_PRINT("\nInvalid accel value\n\n");
+    //     }
+    // }
+    // // Reset GPIO
+    // else if (strncmp(msg, "reset ", 6) == 0) {
+    //     int32_t val = Utils::ExtractIntParameter(msg, 6);
+    //     if (val != ERRVAL && (val == 0 || val == 1)) {
+    //         reset_temp_GPIO = val;
+    //         CUBE_PRINT("\nReset GPIO set to %ld\n\n", val);
+    //     } else {
+    //         CUBE_PRINT("\nInvalid reset value\n\n");
+    //     }
+    // }
+    // 
+    // // Pedal Values
+    // // Regen Percentage
+    // else if (strncmp(msg, "regen ", 6) == 0) {
+    //     int32_t val = Utils::ExtractIntParameter(msg, 6);
+    //     if (val != ERRVAL && val >= 0 && val <= 100) {
+    //     	brakingPedalPercent = val;
+    //         CUBE_PRINT("\n Regen set %ld\n\n", val);
+    //     } else {
+    //         CUBE_PRINT("\nInvalid brake value\n\n");
+    //     }
+    // }
+    // // Acceleration Percentage
+    // else if (strncmp(msg, "accel ", 6) == 0) {
+    //     // Set acceleration percentage
+    //     int32_t val = Utils::ExtractIntParameter(msg, 6);
+    //     if (val != ERRVAL && val >= 0 && val <= 100) {
+    //         accelerationPedalPercent = val;
+    //         CUBE_PRINT("\nReset GPIO set to %ld\n\n", val);
+    //     } else {
+    //         CUBE_PRINT("\nInvalid reset value\n\n");
+    //     }
+    // }
 
     //-- CAN Commands --
     else if (strncmp(msg, "can_lights_input ", strlen("can_lights_input ")) == 0) {

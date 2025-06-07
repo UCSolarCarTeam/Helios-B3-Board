@@ -11,7 +11,41 @@
 CANPeripheral peripheral2 = {
     .CS_PORT = CS_CAN_N_GPIO_Port,
     .CS_PIN = CS_CAN_N_Pin,
-    .hspi = SystemHandles::CAN_SPI};
+    .hspi = SystemHandles::CAN_SPI
+};
+
+enum CAN_RX_COMMANDS {
+    CAN_INTERRUPT_HAPPENED, //Task specific command queued on CAN_INT ISR
+    CAN_RX0_INTERRUPT_HAPPENED, //Task specific command queued on CAN_RX0BF ISR
+    CAN_RX1_INTERRUPT_HAPPENED, //Task specific command queued on CAN_RX1BF ISR
+};
+
+enum CAN_RX_ADDRESSES{
+    // BMS
+    MBMS_MESSAGE = 0x102,
+
+    // Motor Controller Addresses
+    MOTOR_CONTROLLER_BASE = 0x420,
+    MOTOR_STATUS = 0x421,
+    MOTOR_BUS_MEASUREMENT= 0x422,
+    MOTOR_VELOCITY = 0x423,
+    MOTOR_PHASE_CURRENT = 0x424,
+    MOTOR_VOLTAGE_VECTOR = 0x425,
+    MOTOR_CURRENT_VECTOR = 0x426,
+    MOTOR_BACK_EMF_PRED = 0x427,
+    MOTOR_RAIL_15V = 0x428,
+    MOTOR_RAIL_3V3_V9 = 0x429,
+    MOTOR_HEATSINK_TEMP = 0x42B,
+    MOTOR_BOARD_DSP_TEMP = 0x42C,
+    MOTOR_ODOMETER_BUS = 0x42E,
+    MOTOR_SLIP_SPEED = 0x437,
+};
+
+
+uint32_t vehicleVelocity = 0;
+uint32_t motorVelocity = 0;
+uint8_t allowCharge = 0;
+uint8_t allowDischarge = 0;
 
 /**
  * @brief Constructor for CANTxTask
@@ -42,7 +76,7 @@ void CANRxTask::InitTask()
 void CANRxTask::Run(void *pvParams)
 {
     ConfigureCANSPI(&peripheral2);
-
+    
     while (1)
     {
         /***
@@ -70,6 +104,7 @@ void CANRxTask::Run(void *pvParams)
 
         // Process the command
         HandleCommand(cm);
+
 
         cm.Reset();
     }
@@ -135,88 +170,88 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data){
         case MBMS_MESSAGE: // MBMS Status ID: CHANGE THIS TO THE ACTUAL DEFINE LATER
             // Bit 6 = nChargeEnable
             // Bit 8 = nDischargeEnable
-            uint8_t allowDischarge = (data[0] & 0x40) ? 0 : 1;  // Byte 0, Bit 6
-            uint8_t allowCharge = (data[1] & 0x1) ? 0 : 1;      // Byte 1, Bit 0
+            allowDischarge = (data[0] & 0x40) ? 0 : 1;  // Byte 0, Bit 6
+            allowCharge = (data[1] & 0x1) ? 0 : 1;      // Byte 1, Bit 0
             CUBE_PRINT("MBMS Status: allowCharge = %d, allowDischarge = %d\n", allowCharge, allowDischarge);
             break;
 
         // TODO: add case motor feedback ID 0x402
         // extract the vehicle velocity input from the data
-        case MOTOR_CONTROLLER_BASE:
-            // IDinfo ID: 0x420
-            // Name         | Bytes |   Bits
-            // ProhelionID	    4	    31-0
-            // SerialNumber	4	    63-32
-
-            // extract the Tritium ID
-            uint32_t prohelionID = 0;
-            for (uint8_t i = 0; i < 4; ++i) {
-                prohelionID |= (data[i] << (i * 8));
-            }
-
-            uint32_t serialNumber = 0;
-            for (uint8_t i = 4; i < 8; ++i) {
-                serialNumber |= (data[i] << ((i - 4) * 8));
-            }
-
-            break;
-
-        case MOTOR_STATUS:
-            // Status ID: 0x421
-            // Name         | Bytes |   Bits
-            // LimitFlags	    2	    15-0
-            // ErrorFlags	    2	    31-16
-            // ActiveMotor	    2	    47-32
-            // TxErrorCount	    1	    55-48
-            // RxErrorCount	    1       63-56
-
-            uint16_t limitFlags = 0;
-            for (uint8_t i = 0; i < 4; ++i) {
-                limitFlags |= (data[i] << (i * 8));
-            }
-
-            uint16_t errorFlags = 0;
-            for (uint8_t i = 2; i < 4; ++i) {
-                errorFlags |= (data[i] << ((i - 2) * 8));
-            }
-
-            uint16_t activeMotor = 0;
-            for (uint8_t i = 4; i < 6; ++i) {
-                activeMotor |= (data[i] << ((i - 4) * 8));
-            }
-            uint8_t txErrorCount = data[6];
-
-            uint8_t rxErrorCount = data[7];
-
-            break;
-
-        case MOTOR_BUS_MEASUREMENT
-            // Name         | Bytes |   Bits
-            //BusVoltage	    4	    31-0
-            //BusCurrent	    4	    63-32
-
-            uint32_t busVoltage = 0.0f;
-            for(uint8_t i = 0; i < 4; ++i) {
-                busVoltage |= (data[i] << (i * 8));
-            }
-            uint32_t busCurrent = 0.0f;
-            for(uint8_t i = 4; i < 8; ++i) {
-                busCurrent |= (data[i] << ((i - 4) * 8));
-            }
-
-            break;
+//        case MOTOR_CONTROLLER_BASE:
+//            // IDinfo ID: 0x420
+//            // Name         | Bytes |   Bits
+//            // ProhelionID	    4	    31-0
+//            // SerialNumber	4	    63-32
+//
+//            // extract the Tritium ID
+//            uint32_t prohelionID = 0;
+//            for (uint8_t i = 0; i < 4; ++i) {
+//                prohelionID |= (data[i] << (i * 8));
+//            }
+//
+//            uint32_t serialNumber = 0;
+//            for (uint8_t i = 4; i < 8; ++i) {
+//                serialNumber |= (data[i] << ((i - 4) * 8));
+//            }
+//
+//            break;
+//
+//        case MOTOR_STATUS:
+//            // Status ID: 0x421
+//            // Name         | Bytes |   Bits
+//            // LimitFlags	    2	    15-0
+//            // ErrorFlags	    2	    31-16
+//            // ActiveMotor	    2	    47-32
+//            // TxErrorCount	    1	    55-48
+//            // RxErrorCount	    1       63-56
+//
+//            uint16_t limitFlags = 0;
+//            for (uint8_t i = 0; i < 4; ++i) {
+//                limitFlags |= (data[i] << (i * 8));
+//            }
+//
+//            uint16_t errorFlags = 0;
+//            for (uint8_t i = 2; i < 4; ++i) {
+//                errorFlags |= (data[i] << ((i - 2) * 8));
+//            }
+//
+//            uint16_t activeMotor = 0;
+//            for (uint8_t i = 4; i < 6; ++i) {
+//                activeMotor |= (data[i] << ((i - 4) * 8));
+//            }
+//            uint8_t txErrorCount = data[6];
+//
+//            uint8_t rxErrorCount = data[7];
+//
+//            break;
+//
+//        case MOTOR_BUS_MEASUREMENT:
+//            // Name         | Bytes |   Bits
+//            //BusVoltage	    4	    31-0
+//            //BusCurrent	    4	    63-32
+//
+//            uint32_t busVoltage = 0.0f;
+//            for(uint8_t i = 0; i < 4; ++i) {
+//                busVoltage |= (data[i] << (i * 8));
+//            }
+//            uint32_t busCurrent = 0.0f;
+//            for(uint8_t i = 4; i < 8; ++i) {
+//                busCurrent |= (data[i] << ((i - 4) * 8));
+//            }
+//
+//            break;
 
         case MOTOR_VELOCITY:
             // Name         | Bytes |   Bits
             // MotorVelocity	4	    31-0
             // VehicleVelocity	4	    63-32
 
-            uint32_t motorVelocity = 0.0f;
+            motorVelocity = 0.0f;
             for(uint8_t i = 0; i < 4; ++i) {
                 motorVelocity |= (data[i] << (i * 8));
             }
 
-            uint32_t vehicleVelocity = 0.0f;
+            vehicleVelocity = 0.0f;
             for(uint8_t i = 4; i < 8; ++i) {
                 vehicleVelocity |= (data[i] << ((i - 4) * 8));
             }
@@ -227,6 +262,30 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data){
             CUBE_PRINT("CANRxTask - Received unsupported CAN message with ID: 0x%08X\n", id);
             break;        
     }
+}
+
+uint32_t CANRxTask::getMotorVehicleVelocityInput()
+{
+    // This function should return the vehicle velocity input from the motor controller
+    return vehicleVelocity; // Placeholder for actual vehicle velocity input
+}
+
+uint32_t CANRxTask::getMotorVelocityInput()
+{
+    // This function should return the motor velocity from the motor controller
+    return motorVelocity; // Placeholder for actual motor velocity
+}
+
+uint8_t CANRxTask::getAllowCharge()
+{
+    // This function should return the allow charge status
+    return allowCharge; // Placeholder for actual allow charge status
+}
+
+uint8_t CANRxTask::getAllowDischarge()
+{
+    // This function should return the allow discharge status
+    return allowDischarge; // Placeholder for actual allow discharge status
 }
 
 //Helper function to print CAN message

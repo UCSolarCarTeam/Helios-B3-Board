@@ -8,11 +8,6 @@
 #include "GPIOTask.hpp"
 #include "IOExpander.hpp"
 
-volatile uint8_t forward_temp_GPIO = 0;
-volatile uint8_t reverse_temp_GPIO = 1;
-volatile uint8_t brake_temp_GPIO = 1; // Regen Brake 
-volatile uint8_t reset_temp_GPIO = 1;
-
 /*----------------------- Macros -----------------------*/
 #define TASK_FREQUENCY_HZ 1
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
@@ -81,12 +76,12 @@ uint16_t GPIOTask::DigitalInputs()
     uint8_t mechanicalBreak = driverControlState[static_cast<int>(DriverControls::MECHANICAL_BRAKE)] == IOState::LOW;
     uint8_t zoomZoom = driverControlState[static_cast<int>(DriverControls::GREEN_LED)] == IOState::LOW;
 
-    uint8_t forward = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
-
-    uint8_t reverse = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::HIGH;
-
-    uint8_t neutral = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::LOW // Assumption
-                      && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
+    uint8_t forward = driverControlState[static_cast<int>(DriverControls::FORWARD)] == IOState::LOW;
+    uint8_t reverse = driverControlState[static_cast<int>(DriverControls::REVERSE)] == IOState::LOW;
+//    uint8_t forward = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
+//    uint8_t reverse = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::HIGH && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::HIGH;
+//    uint8_t neutral = driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_H)] == IOState::LOW // Assumption
+//                      && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
 
     /**Forward and Reverse Encoding from Electrical Team */
     /* 10 forward
@@ -96,7 +91,7 @@ uint16_t GPIOTask::DigitalInputs()
      */
 
     output |= (forward ? 1 : 0) << 0;         // Bit 0
-    output |= (neutral ? 1 : 0) << 1;         // Bit 1
+//    output |= (neutral ? 1 : 0) << 1;         // Bit 1
     output |= (reverse ? 1 : 0) << 2;         // Bit 2
     output |= (hornSwitch ? 1 : 0) << 3;      // Bit 3
     output |= (mechanicalBreak ? 1 : 0) << 4; // Bit 4
@@ -133,19 +128,27 @@ uint8_t GPIOTask::LightStatus()
     return output;
 }
 
-uint8_t GPIOTask::getForwardGPIO(){
-    return IOExpander::GetPinStateNow(DriverControls::FORWARD);
+IOState GPIOTask::getForwardGPIO(void){
+    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+
+    return static_cast<uint8_t>(DriverControls::FORWARD);
 }
 
-uint8_t GPIOTask::getReverseGPIO(){
+IOState GPIOTask::getReverseGPIO(void){
+    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+
     return IOExpander::GetPinStateNow(DriverControls::REVERSE);
 }
 
-uint8_t GPIOTask::getBrakeGPIO(){
+IOState GPIOTask::getBrakeGPIO(void){
+    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+
     return IOExpander::GetPinStateNow(DriverControls::MECHANICAL_BRAKE);
 }
 
-uint8_t GPIOTask::getResetGPIO(){
+IOState GPIOTask::getResetGPIO(void){
+    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+
     return IOExpander::GetPinStateNow(DriverControls::MOTOR_RESET);
 }
 
@@ -350,11 +353,11 @@ void GPIOTask::Run(void *pvParams)
                 CUBE_PRINT("    - P14 (Motor Reset): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
-                    reset_temp_GPIO = 1;
+                    powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::HIGH);
                 }
                 else if (driverControlState[i - 2] == IOState::LOW)
                 {
-                    reset_temp_GPIO = 0;
+                    powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::HIGH);
                 }
                 else if (driverControlState[i - 2] == IOState::ERROR)
                 {

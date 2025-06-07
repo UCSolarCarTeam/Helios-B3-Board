@@ -16,15 +16,12 @@
 #include "SystemDefines.hpp"
 #include "CubeDefines.hpp"
 #include "CANTxTask.hpp"
+#include "CANRxTask.hpp"
 #include "CAN.h"
+#include "GPIOTask.hpp"
 
 extern volatile float accelerationPedalPercent;
 extern volatile float brakingPedalPercent;
-
-extern volatile uint8_t forward_temp_GPIO;
-extern volatile uint8_t reverse_temp_GPIO;
-extern volatile uint8_t brake_temp_GPIO; // Mechanical Brake
-extern volatile uint8_t reset_temp_GPIO;
 
 /* Enums ------------------------------------------------------------------*/
 
@@ -131,5 +128,4 @@ private:
 //void sendDriveCommands(uint32_t* prevWakeTimePtr, DriveCommandsInfo* driveCommandsInfo, uint32_t* switching);     are used now as class members
 //void sendDriveCommandsTask(void const* arg);
 
-#endif    //ELYSIA
 #endif

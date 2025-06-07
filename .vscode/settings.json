@@ -17,6 +17,9 @@
         "xlocmon": "cpp",
         "xlocnum": "cpp",
         "xloctime": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "format": "cpp",
+        "memory": "cpp",
+        "type_traits": "cpp"
     }
 }

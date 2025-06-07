@@ -10,9 +10,7 @@ CANMsg motor_power_msg;
 float regenValuesQueue[REGEN_QUEUE_SIZE] = {0};
 float accelValuesQueue[ACCEL_QUEUE_SIZE] = {0};
 
-uint8_t auxBmsInputs[3];
-float motor0VehicleVelocityInput; /* TODO: Add Motor Feedback from CAN Rx Task */
-float motor1VehicleVelocityInput; /* TODO: Add Motor Feedback from CAN Rx Task */
+uint32_t motorVehicleVelocityInput;
 
 MotorControlTask::MotorControlTask() : Task(MOTOR_CONTROL_TASK_QUEUE_DEPTH_OBJS){}
 
@@ -131,12 +129,14 @@ float MotorControlTask::calculateRegenMotorCurrent(float regenPercentage, float 
 
 uint8_t MotorControlTask::vehicleVelocitySafeToGoForward()
 {
-    return (motor0VehicleVelocityInput >= SAFE_VEHICLE_VELOCITY_TO_GO_FORWARD && motor1VehicleVelocityInput >= SAFE_VEHICLE_VELOCITY_TO_GO_FORWARD);
+    // return (motor0VehicleVelocityInput >= SAFE_VEHICLE_VELOCITY_TO_GO_FORWARD && motor1VehicleVelocityInput >= SAFE_VEHICLE_VELOCITY_TO_GO_FORWARD);
+    return (CANRxTask::Inst().getMotorVehicleVelocityInput() >= SAFE_VEHICLE_VELOCITY_TO_GO_FORWARD);
 }
 
 uint8_t MotorControlTask::vehicleVelocitySafeToGoReverse()
 {
-    return (motor0VehicleVelocityInput <= SAFE_VEHICLE_VELOCITY_TO_GO_REVERSE && motor1VehicleVelocityInput <= SAFE_VEHICLE_VELOCITY_TO_GO_REVERSE);
+    // return (motor0VehicleVelocityInput <= SAFE_VEHICLE_VELOCITY_TO_GO_REVERSE && motor1VehicleVelocityInput <= SAFE_VEHICLE_VELOCITY_TO_GO_REVERSE);
+    return (CANRxTask::Inst().getMotorVehicleVelocityInput() <= SAFE_VEHICLE_VELOCITY_TO_GO_REVERSE);
 }
 
 uint8_t MotorControlTask::isNewDirectionSafe(uint8_t forward, uint8_t reverse)
@@ -192,8 +192,8 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     /* TODO: Add switch case handle for CANRx Task to receive AuxBMS states */
     // Read AuxBMS messages
     // NOTE: Hard coding states for now...
-    char allowCharge = 1;
-    char allowDischarge = 1;
+    uint8_t allowCharge = CANRxTask::Inst().getAllowCharge();
+    uint8_t allowDischarge = CANRxTask::Inst().getAllowDischarge();
 
     /*--------------- Determine Data to Send ---------------*/
     float motorVelocityOut; // RPM
@@ -272,17 +272,17 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
             }
         
         } else {
-            if (forward && allowDischarge) {
+            if (forward && (allowDischarge)) {
                 // Forward and Discharge is allowed
-                driveCommandsInfo->motorState = Accelerating
+                driveCommandsInfo->motorState = Accelerating;
                 motorVelocityOut = MAX_FORWARD_RPM; // FAR FUTURE TODO: Based on ADC LOL (needs math, Omar's curve fitting) - Dom
 
-                driveCommandsInfo->motorCurrentOut = CalculateAccelMotorCurrent(
+                driveCommandsInfo->motorCurrentOut = calculateAccelMotorCurrent(
                                                         accelPercentage, 
                                                         driveCommandsInfo->motorCurrentOut
                                                     );
 
-            } else if (reverse && allowDischarge) {
+            } else if (reverse && (allowDischarge)) {
                 // Reverse and Discharge is allowed
                 driveCommandsInfo->motorState = Accelerating;
                 HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
@@ -327,8 +327,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // Reset input velocities to default
     // This is TEMPORARY. Should be a fix for this that does a better job of determining if the velocities that were received
     // are stale values. i.e. motor controllers haven't transmitted a message in a while
-    motor0VehicleVelocityInput = 0.0f;
-    motor1VehicleVelocityInput = 0.0f;
+    motorVehicleVelocityInput = 0.0f;
 
     // Transmit Motor Drive command
     float dataToSendFloat[2];
@@ -353,10 +352,9 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     // Transmit Motor Reset command if button switch went from off to on
     // `!` for active low
-    // uint8_t reset = !HAL_GPIO_ReadPin(RESET_GPIO_Port, RESET_Pin); // ELECTRICAL WANTS TO CHANGE IT, ASSUME IT EXISTS
-    uint8_t reset = reset_temp_GPIO;
+    IOState reset = GPIOTask::Inst().getResetGPIO();
 
-    if (!driveCommandsInfo->prevResetStatus && !reset) /// off -> on
+    if (!driveCommandsInfo->prevResetStatus && (reset == IOState::LOW)) /// off -> on
     {
         driveCommandsInfo->resetStatus = SettingReset;
     }
@@ -368,6 +366,6 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
         driveCommandsInfo->resetStatus = NotResetting;
     }
 
-    driveCommandsInfo->prevResetStatus = reset;
+    driveCommandsInfo->prevResetStatus = (reset == IOState::HIGH);
 }
 
