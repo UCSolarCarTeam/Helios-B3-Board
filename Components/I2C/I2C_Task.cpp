@@ -12,6 +12,10 @@
 #define TASK_FREQUENCY_HZ 1
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
+uint8_t GPS_BUFFER[36];
+#define BUFFER_SIZE 36
+NavData data;
+
 /**
  * @brief Constructor for I2CTask
  */
@@ -57,7 +61,23 @@ void I2CTask::Run(void *pvParams)
 	CUBE_PRINT("Configurations complete\r\n");
 
 	while (1){
+		UBX_Transmit(GPS_BUFFER, BUFFER_SIZE);
+		UBX_Receive(GPS_BUFFER, BUFFER_SIZE);
 
+		int16_t computedChecksum = UBX_M8N_CHECKSUM(GPS_BUFFER, BUFFER_SIZE);
+		uint16_t expectedChecksum = (GPS_BUFFER[BUFFER_SIZE - 2]<<8) | GPS_BUFFER[BUFFER_SIZE - 1];
+
+		if (computedChecksum == expectedChecksum) {
+			UBX_M8N_NAV_POSLLH_Parsing(GPS_BUFFER, &data);					      // parses data
+			CUBE_PRINT("Data, iTOW: %u /n "
+					"lon: %d /n "
+					"lat: %d /n "
+					"height: %d /n"
+					"hMSL: %d /n"
+					"hAcc: %u /n"
+					"vAcc: %u /n", data.iTOW, data.lon, data.lat, data.height, data.hMSL, data.hAcc, data.vAcc);
+		}
+		osDelay(500);
 	}
 
 }
