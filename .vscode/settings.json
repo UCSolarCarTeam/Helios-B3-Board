@@ -9,6 +9,14 @@
         "algorithm": "cpp",
         "list": "cpp",
         "xutility": "cpp",
-        "runinterface.hpp": "c"
+        "runinterface.hpp": "c",
+        "locale": "cpp",
+        "thread": "cpp",
+        "xlocale": "cpp",
+        "xlocmes": "cpp",
+        "xlocmon": "cpp",
+        "xlocnum": "cpp",
+        "xloctime": "cpp",
+        "vector": "cpp"
     }
 }

@@ -133,6 +133,22 @@ uint8_t GPIOTask::LightStatus()
     return output;
 }
 
+uint8_t GPIOTask::getForwardGPIO(){
+    return IOExpander::GetPinStateNow(DriverControls::FORWARD);
+}
+
+uint8_t GPIOTask::getReverseGPIO(){
+    return IOExpander::GetPinStateNow(DriverControls::REVERSE);
+}
+
+uint8_t GPIOTask::getBrakeGPIO(){
+    return IOExpander::GetPinStateNow(DriverControls::MECHANICAL_BRAKE);
+}
+
+uint8_t GPIOTask::getResetGPIO(){
+    return IOExpander::GetPinStateNow(DriverControls::MOTOR_RESET);
+}
+
 /**
  * @brief Instance Run loop for the GPIO Task, runs on scheduler start as long as the task is initialized.
  * @param pvParams RTOS Passed void parameters, contains a pointer to the object instance, should not be used

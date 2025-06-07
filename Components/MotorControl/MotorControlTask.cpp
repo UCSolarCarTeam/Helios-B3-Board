@@ -163,7 +163,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     /*
     ---------- ADC Pedal Sampling ----------
-    1. Read now pedal percentages
+    1. Read pedal percentages
     2. calculate average pedal percentages from the buffer
     */
 
@@ -178,13 +178,16 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     float regenPercentage = (float)getAvgRegen() / 100.0f; // Get value between 0 and 1
     float accelPercentage = (float)getAvgAccel() / 100.0f;
 
-    /* TODO: Add getter function for GPIO Forward, Reverse Brake pins */
-    /* TODO: Add motor reset pin and getter */
-    // Determine drive commands (NOTE: ACTIVE LOW)
-    uint8_t forward = forward_temp_GPIO;
-    uint8_t reverse = reverse_temp_GPIO;
-    uint8_t mech_brake = brake_temp_GPIO; // Mechanical Brake
-    // uint8_t reset = reset_temp_GPIO;
+    // Determine drive commands (ACTIVE LOW)
+    // uint8_t forward = GPIOTask::Inst().getForwardGPIO();
+    // uint8_t reverse = GPIOTask::Inst().getReverseGPIO();
+    // uint8_t mech_brake = GPIOTask::Inst().getBrakeGPIO();
+    // uint8_t reset = GPIOTask::Inst().getResetGPIO();
+    
+    // NOTE: Hard coding GPIO values for now
+    uint8_t forward = 0;
+    uint8_t reverse = 1;
+    uint8_t mech_brake = 1; // Mechanical Brake
 
     /* TODO: Add switch case handle for CANRx Task to receive AuxBMS states */
     // Read AuxBMS messages

@@ -70,8 +70,8 @@ enum class IOState {
 
 /* ------------------------------- Namespace for Alternative IOPin names -------------------------------*/
 namespace DriverControls {
-    constexpr IOPin FORWARD_NEUTRAL_REVERSE_H = IOPin::P00;
-    constexpr IOPin FORWARD_NEUTRAL_REVERSE_L = IOPin::P01;
+    constexpr IOPin FORWARD = IOPin::P00;
+    constexpr IOPin REVERSE = IOPin::P01;
     constexpr IOPin ARRAYS_DISCONNECT = IOPin::P02;
     constexpr IOPin RACE_MODE_ENABLE = IOPin::P03;
     constexpr IOPin HEADLIGHTS_ENABLE = IOPin::P04;
