@@ -21,6 +21,14 @@ enum GPIO_COMMANDS
     GPIO_RESET
 };
 
+struct DriverGPIOStates {
+            IOState forward;
+            IOState reverse;
+            IOState brake;
+            IOState reset;
+        };
+
+
 /*---------------------------------- Task Implementation ----------------------------------*/
 class GPIOTask : public Task
 {
@@ -43,6 +51,8 @@ public:
     IOState getReverseGPIO();
     IOState getBrakeGPIO();
     IOState getResetGPIO();
+    DriverGPIOStates getAllDriverGPIOStates();
+
 
 protected:
     static void RunTask(void *pvParams) { GPIOTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();

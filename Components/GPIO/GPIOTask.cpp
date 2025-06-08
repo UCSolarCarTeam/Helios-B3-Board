@@ -128,29 +128,65 @@ uint8_t GPIOTask::LightStatus()
     return output;
 }
 
+//IOState GPIOTask::getForwardGPIO(void){
+//    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+//
+//    return static_cast<uint8_t>(DriverControls::FORWARD);
+//}
+//
+//IOState GPIOTask::getReverseGPIO(void){
+//    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+//
+//    return IOExpander::GetPinStateNow(DriverControls::REVERSE);
+//}
+//
+//IOState GPIOTask::getBrakeGPIO(void){
+//    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+//
+//    return IOExpander::GetPinStateNow(DriverControls::MECHANICAL_BRAKE);
+//}
+//
+//IOState GPIOTask::getResetGPIO(void){
+//    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+//
+//    return IOExpander::GetPinStateNow(DriverControls::MOTOR_RESET);
+//}
+
+
 IOState GPIOTask::getForwardGPIO(void){
     IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
-
-    return static_cast<uint8_t>(DriverControls::FORWARD);
+    return driverControlExpander.GetPinStateNow(DriverControls::FORWARD);
 }
 
 IOState GPIOTask::getReverseGPIO(void){
     IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
-
-    return IOExpander::GetPinStateNow(DriverControls::REVERSE);
+    return driverControlExpander.GetPinStateNow(DriverControls::REVERSE);
 }
 
 IOState GPIOTask::getBrakeGPIO(void){
     IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
-
-    return IOExpander::GetPinStateNow(DriverControls::MECHANICAL_BRAKE);
+    return driverControlExpander.GetPinStateNow(DriverControls::MECHANICAL_BRAKE);
 }
 
 IOState GPIOTask::getResetGPIO(void){
     IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
-
-    return IOExpander::GetPinStateNow(DriverControls::MOTOR_RESET);
+    return driverControlExpander.GetPinStateNow(DriverControls::MOTOR_RESET);
 }
+
+
+//ALTERNATIVE IMPLEMENTATION
+DriverGPIOStates GPIOTask::getAllDriverGPIOStates() {
+    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+
+    DriverGPIOStates states;
+    states.forward = driverControlExpander.GetPinStateNow(DriverControls::FORWARD);
+    states.reverse = driverControlExpander.GetPinStateNow(DriverControls::REVERSE);
+    states.brake   = driverControlExpander.GetPinStateNow(DriverControls::MECHANICAL_BRAKE);
+    states.reset   = driverControlExpander.GetPinStateNow(DriverControls::MOTOR_RESET);
+
+    return states;
+}
+
 
 /**
  * @brief Instance Run loop for the GPIO Task, runs on scheduler start as long as the task is initialized.

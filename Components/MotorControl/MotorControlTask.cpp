@@ -178,6 +178,8 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     float regenPercentage = (float)getAvgRegen() / 100.0f; // Get value between 0 and 1
     float accelPercentage = (float)getAvgAccel() / 100.0f;
 
+
+    //MAKE SURE TO USE THESE
     // Determine drive commands (ACTIVE LOW)
     // uint8_t forward = GPIOTask::Inst().getForwardGPIO();
     // uint8_t reverse = GPIOTask::Inst().getReverseGPIO();
