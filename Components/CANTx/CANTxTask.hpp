@@ -79,7 +79,16 @@ enum CAN_TX_COMMANDS
     CHARGE_BOARD_STATUS,
     PACK_INFO,
     TEMPERATURE_INFO,
-    CELL_VOLTAGES
+    CELL_VOLTAGES,
+
+	DEAD_COMMON_HEARTBEAT,
+	DEAD_MOTOR_HEARTBEAT,
+
+	HARD_MAX_TEMP,
+	SOFT_MAX_TEMP,
+	HARD_MIN_TEMP,
+	SOFT_MIN_TEMP
+
 };
 
 /* Macros ------------------------------------------------------------------*/

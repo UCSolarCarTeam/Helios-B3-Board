@@ -30,6 +30,15 @@ void contactorHeartbeatCANPopulate(CANMsg* msg, te_contactor contactor)
     msg->data[1] = (contactor_array[contactor].heartbeat >> 8) & 0xFF;
 }
 
+void contactorDeadHeartbeatCANPopulate(CANMsg* msg, te_contactor contactor)
+{
+    contactor_array[contactor].heartbeat = 0;
+    msg->extendedID = 0x200 + contactor;
+    msg->DLC = 2;
+    msg->data[0] = (contactor_array[contactor].heartbeat >> 0) & 0xFF;
+    msg->data[1] = (contactor_array[contactor].heartbeat >> 8) & 0xFF;
+}
+
 void contactorStatusCANPopulate(CANMsg* msg, te_contactor contactor)
 {
     msg->extendedID = 0x210 + contactor;
@@ -65,10 +74,10 @@ void orionPackInfoCANPopulate(CANMsg* msg)
 
 void orionTempInfoCANPopulate(CANMsg* msg)
 {
-    orion_info.highTemperature = 30;
-    orion_info.lowTemperature = 30;
-    orion_info.AverageTemperature = 30;
-    orion_info.internalTemperature = 30;
+//    orion_info.highTemperature = 30;
+//    orion_info.lowTemperature = 30;
+//    orion_info.AverageTemperature = 30;
+//    orion_info.internalTemperature = 30;
     msg->extendedID = 0x304;
     msg->DLC = 8;
     msg->data[0] = orion_info.highTemperature & 0xFF;
@@ -266,6 +275,10 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("Sent Pack Info \n");
         break;
     case TEMPERATURE_INFO:
+        orion_info.highTemperature = 30;
+        orion_info.lowTemperature = 30;
+        orion_info.AverageTemperature = 30;
+        orion_info.internalTemperature = 30;
         orionTempInfoCANPopulate(&msg);
         CUBE_PRINT("Sent Temp Info \n");
         break;
@@ -273,6 +286,49 @@ void CANTxTask::HandleCommand(Command &cm)
         orionCellVoltagesCANPopulate(&msg);
         CUBE_PRINT("Sent Cell Voltages \n");
         break;
+    case DEAD_COMMON_HEARTBEAT:
+        contactorDeadHeartbeatCANPopulate(&msg, COMMON);
+        CUBE_PRINT("Sent Dead COmmon Heartbeat \n");
+        break;
+    case DEAD_MOTOR_HEARTBEAT:
+        contactorDeadHeartbeatCANPopulate(&msg, MOTOR);
+        CUBE_PRINT("Sent Dead Motor Heartbeat \n");
+        break;
+    case HARD_MAX_TEMP:
+        orion_info.highTemperature = 46;
+        orion_info.lowTemperature = 30;
+        orion_info.AverageTemperature = 30;
+        orion_info.internalTemperature = 30;
+        orionTempInfoCANPopulate(&msg);
+        CUBE_PRINT("Sent Hard Max Temp \n");
+        break;
+    case SOFT_MAX_TEMP:
+        orion_info.highTemperature = 42;
+        orion_info.lowTemperature = 30;
+        orion_info.AverageTemperature = 30;
+        orion_info.internalTemperature = 30;
+        orionTempInfoCANPopulate(&msg);
+        CUBE_PRINT("Sent Soft Max Temp \n");
+        break;
+    case HARD_MIN_TEMP:
+        orion_info.highTemperature = 30;
+        orion_info.lowTemperature = -3;
+        orion_info.AverageTemperature = 30;
+        orion_info.internalTemperature = 30;
+        orionTempInfoCANPopulate(&msg);
+        CUBE_PRINT("Sent Hard Min Temp \n");
+        break;
+    case SOFT_MIN_TEMP:
+        orion_info.highTemperature =30;
+        orion_info.lowTemperature = 4;
+        orion_info.AverageTemperature = 30;
+        orion_info.internalTemperature = 30;
+        orionTempInfoCANPopulate(&msg);
+        CUBE_PRINT("Sent Soft Min Temp \n");
+        break;
+
+
+
 
     default:
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());

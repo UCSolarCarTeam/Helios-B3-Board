@@ -181,6 +181,55 @@ void DebugTask::HandleDebugMessage(const char* msg)
         }
     }
 
+    //
+    else if (strncmp(msg, "dead_common_heartbeat ", strlen("dead_common_heartbeat ")) == 0) {
+        Command cmd(DATA_COMMAND, DEAD_COMMON_HEARTBEAT);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent dead common heartbeat Command");
+        }
+    }
+    else if (strncmp(msg, "dead_motor_heartbeat ", strlen("dead_motor_heartbeat ")) == 0) {
+        Command cmd(DATA_COMMAND, DEAD_MOTOR_HEARTBEAT);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent dead motor heartbeat Command");
+        }
+    }
+    else if (strncmp(msg, "hard_max_temp ", strlen("hard_max_temp ")) == 0) {
+        Command cmd(DATA_COMMAND, HARD_MAX_TEMP);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent hard max temp Command");
+        }
+    }
+    else if (strncmp(msg, "soft_max_temp ", strlen("soft_max_temp ")) == 0) {
+        Command cmd(DATA_COMMAND, SOFT_MAX_TEMP);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent soft max temp Command");
+        }
+    }
+    else if (strncmp(msg, "hard_min_temp ", strlen("hard_min_temp ")) == 0) {
+        Command cmd(DATA_COMMAND, HARD_MIN_TEMP);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent hard min temp Command");
+        }
+    }
+    else if (strncmp(msg, "soft_min_temp ", strlen("soft_min_temp ")) == 0) {
+        Command cmd(DATA_COMMAND, SOFT_MIN_TEMP);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent soft min temp Command");
+        }
+    }
     //-- SYSTEM / CHAR COMMANDS -- (Must be last)
     else if (strncmp(msg, "iox_upd", 7) == 0) {
         // Update IO Expander
