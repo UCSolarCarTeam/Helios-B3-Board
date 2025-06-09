@@ -38,7 +38,7 @@ void MotorControlTask::Run(void *pvParams)
     {
         .motorCurrentOut = 0.0f,
         .motorState = Off,
-        .prevResetStatus = 0,
+        .prevResetInput = 1,
         .resetStatus = NotResetting,
         .regenQueueIndex = 0,
         .accelQueueIndex = 0,
@@ -178,9 +178,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     float regenPercentage = (float)getAvgRegen() / 100.0f; // Get value between 0 and 1
     float accelPercentage = (float)getAvgAccel() / 100.0f;
 
-
-    //MAKE SURE TO USE THESE
-    // Determine drive commands (ACTIVE LOW)
+    // // Determine drive commands (ACTIVE LOW)
     // uint8_t forward = GPIOTask::Inst().getForwardGPIO();
     // uint8_t reverse = GPIOTask::Inst().getReverseGPIO();
     // uint8_t mech_brake = GPIOTask::Inst().getBrakeGPIO();
@@ -190,6 +188,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     uint8_t forward = 0;
     uint8_t reverse = 1;
     uint8_t mech_brake = 1; // Mechanical Brake
+    uint8_t reset = 1; // Reset Button
 
     /* TODO: Add switch case handle for CANRx Task to receive AuxBMS states */
     // Read AuxBMS messages
@@ -274,7 +273,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
             }
         
         } else {
-            if (forward && (allowDischarge)) {
+            if (forward && allowDischarge) {
                 // Forward and Discharge is allowed
                 driveCommandsInfo->motorState = Accelerating;
                 motorVelocityOut = MAX_FORWARD_RPM; // FAR FUTURE TODO: Based on ADC LOL (needs math, Omar's curve fitting) - Dom
@@ -284,7 +283,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                                                         driveCommandsInfo->motorCurrentOut
                                                     );
 
-            } else if (reverse && (allowDischarge)) {
+            } else if (reverse && allowDischarge) {
                 // Reverse and Discharge is allowed
                 driveCommandsInfo->motorState = Accelerating;
                 HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
@@ -354,20 +353,21 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     // Transmit Motor Reset command if button switch went from off to on
     // `!` for active low
-    IOState reset = GPIOTask::Inst().getResetGPIO();
 
-    if (!driveCommandsInfo->prevResetStatus && (reset == IOState::LOW)) /// off -> on
+    // reset = GPIOTask::Inst().getResetGPIO();
+    if (driveCommandsInfo->prevResetInput && !reset) 
     {
         driveCommandsInfo->resetStatus = SettingReset;
     }
 
-    if(driveCommandsInfo->resetStatus == Resetting) {
-
+    if (driveCommandsInfo->resetStatus == Resetting)
+    {
         CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_RESET_INPUT));
-
         driveCommandsInfo->resetStatus = NotResetting;
     }
 
-    driveCommandsInfo->prevResetStatus = (reset == IOState::HIGH);
+    // Update previous state (save current for next frame)
+    driveCommandsInfo->prevResetInput = reset;
+
 }
 
