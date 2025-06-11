@@ -33,7 +33,7 @@ uint8_t UBX_CFG_PRT[] = {
 uint8_t UBX_CFG_MSG[] = {
     0xB5, 0x62,     // Sync Chars
     0x06, 0x01,     // Class and Message ID for Message Configuration
-    0x08, 0x00,     // Length (8 bytes)
+    0x02, 0x00,     // Length (8 bytes)
     0x01, 0x02,     // Class and Message ID to configure (NAV-POSLLH)
     0x01, 0x00,     // Rate (1 = every navigation solution)
     0x00, 0x00, 0x00, 0x00,  // Reserved

@@ -24,7 +24,7 @@ void UBX_Transmit(uint8_t *buffer, uint16_t buflen) {
 	if (hal != HAL_OK) {
 		//CUBE_PRINT("HAL Status: %d | I2C Error: %d | Class and ID: %#X %#X\r\n", hal, hi2c1.ErrorCode, buffer[2], buffer[3]);
 	}else{
-		CUBE_PRINT("[ ^ ]UBX Transmit Successful");
+		CUBE_PRINT("[ ^ ]UBX Transmit Successful\n");
 	}
 }
 
@@ -33,7 +33,7 @@ void UBX_Receive(uint8_t *buffer, uint16_t buflen) {
 		if (hal != HAL_OK) {
 			//CUBE_PRINT("HAL Status: %d | I2C Error: %\r\n", hal, hi2c1.ErrorCode);
 	}else{
-		CUBE_PRINT("[ ^ ]UBX Receive Successful");
+		CUBE_PRINT("[ ^ ]UBX Receive Successful\n");
 	}
 }
 
@@ -68,7 +68,7 @@ uint16_t UBX_M8N_CHECKSUM(uint8_t* buffer, uint8_t buflen) {
 	// return ((CK_A == buffer[buflen - 2]) && (CK_B == buffer[buflen - 1]));
 
 	// return 2 byte checksum
-	return ((CK_A<<8) | CK_B);
+	return ((CK_A << 8) | CK_B);
 }
 
 /* This function parses the payload from a NAV_POSLLH message
