@@ -32,6 +32,7 @@ extern ts_contactor_state contactor_array[5];
 extern ts_orion_info orion_info;
 static IOExpander ioExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1,0,0));
 
+
 /* Prototypes ----------------------------------------------------------------*/
 
 /* Functions -----------------------------------------------------------------*/
@@ -198,6 +199,162 @@ void DebugTask::HandleDebugMessage(const char* msg)
            CUBE_PRINT("Sent dead motor heartbeat Command");
         }
     }
+    else if (strncmp(msg, "dead_array_heartbeat ", strlen("dead_array_heartbeat ")) == 0) {
+        Command cmd(DATA_COMMAND, DEAD_ARRAY_HEARTBEAT);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent dead array heartbeat Command");
+        }
+    }
+    else if (strncmp(msg, "dead_lv_heartbeat ", strlen("dead_lv_heartbeat ")) == 0) {
+        Command cmd(DATA_COMMAND, DEAD_LV_HEARTBEAT);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent dead lv heartbeat Command");
+        }
+    }
+    else if (strncmp(msg, "dead_charge_heartbeat ", strlen("dead_charge_heartbeat ")) == 0) {
+        Command cmd(DATA_COMMAND, DEAD_CHARGE_HEARTBEAT);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent dead charge heartbeat Command");
+        }
+    }
+
+    else if (strncmp(msg, "hard_high_cell ", strlen("hard_high_cell ")) == 0) {
+        Command cmd(DATA_COMMAND, HARD_HIGH_CELL);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent hard high cell voltage Command");
+        }
+    }
+
+    else if (strncmp(msg, "soft_high_cell ", strlen("soft_high_cell ")) == 0) {
+        Command cmd(DATA_COMMAND, SOFT_HIGH_CELL);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent soft high cell voltage Command");
+        }
+    }
+
+    else if (strncmp(msg, "hard_low_cell ", strlen("hard_low_cell ")) == 0) {
+        Command cmd(DATA_COMMAND, HARD_LOW_CELL);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent hard low cell voltage Command");
+        }
+    }
+
+    else if (strncmp(msg, "soft_low_cell ", strlen("soft_low_cell ")) == 0) {
+            Command cmd(DATA_COMMAND, SOFT_LOW_CELL);
+            Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+            bool res = evtQ->Send(cmd);
+            if(res){
+               CUBE_PRINT("Sent soft low cell voltage Command");
+            }
+        }
+    /* bad currents */
+
+    else if (strncmp(msg, "hard_high_common ", strlen("hard_high_common ")) == 0) {
+        Command cmd(DATA_COMMAND, HARD_HIGH_COMMON);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent hard high common Command");
+        }
+    }
+
+    else if (strncmp(msg, "soft_high_common ", strlen("soft_high_common ")) == 0) {
+        Command cmd(DATA_COMMAND, SOFT_HIGH_COMMON);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent soft high common Command");
+        }
+    }
+
+    else if (strncmp(msg, "hard_high_motor ", strlen("hard_high_motor ")) == 0) {
+        Command cmd(DATA_COMMAND, HARD_HIGH_MOTOR);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent hard high motor Command");
+        }
+    }
+
+    else if (strncmp(msg, "soft_high_motor ", strlen("soft_high_motor ")) == 0) {
+        Command cmd(DATA_COMMAND, SOFT_HIGH_MOTOR);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent soft high motor Command");
+        }
+    }
+
+    else if (strncmp(msg, "hard_high_array ", strlen("hard_high_array ")) == 0) {
+        Command cmd(DATA_COMMAND, HARD_HIGH_ARRAY);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent hard high array Command");
+        }
+    }
+
+    else if (strncmp(msg, "soft_high_array ", strlen("soft_high_array ")) == 0) {
+        Command cmd(DATA_COMMAND, SOFT_HIGH_ARRAY);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent soft high array Command");
+        }
+    }
+
+    else if (strncmp(msg, "hard_high_lv ", strlen("hard_high_lv ")) == 0) {
+        Command cmd(DATA_COMMAND, HARD_HIGH_LV);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent hard high lv Command");
+        }
+    }
+
+
+    else if (strncmp(msg, "soft_high_lv ", strlen("soft_high_lv ")) == 0) {
+        Command cmd(DATA_COMMAND, SOFT_HIGH_LV);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent soft high lv Command");
+        }
+    }
+
+
+    else if (strncmp(msg, "hard_high_charge ", strlen("hard_high_charge ")) == 0) {
+        Command cmd(DATA_COMMAND, HARD_HIGH_CHARGE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent hard high charge Command");
+        }
+    }
+
+    else if (strncmp(msg, "soft_high_charge ", strlen("soft_high_charge ")) == 0) {
+        Command cmd(DATA_COMMAND, SOFT_HIGH_CHARGE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent soft high charge Command");
+        }
+    }
+
+    /* bad temperatures */
+
     else if (strncmp(msg, "hard_max_temp ", strlen("hard_max_temp ")) == 0) {
         Command cmd(DATA_COMMAND, HARD_MAX_TEMP);
         Queue* evtQ = CANTxTask::Inst().GetEventQueue();

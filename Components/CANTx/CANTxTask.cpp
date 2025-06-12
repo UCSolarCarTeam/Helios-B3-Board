@@ -17,6 +17,24 @@
 #include "GPIO/GPIOTask.hpp"
 #include "SPI/SPI_Task.hpp"
 
+uint8_t dead_common_heartbeat = 0;
+uint8_t dead_motor_heartbeat = 0;
+uint8_t dead_array_heartbeat = 0;
+uint8_t dead_lv_heartbeat = 0;
+uint8_t dead_charge_heartbeat = 0;
+
+uint8_t hard_high_common = 0;
+uint8_t hard_high_motor = 0;
+uint8_t hard_high_array = 0;
+uint8_t hard_high_lv = 0;
+uint8_t hard_high_charge = 0;
+
+uint8_t soft_high_common = 0;
+uint8_t soft_high_motor = 0;
+uint8_t soft_high_array = 0;
+uint8_t soft_high_lv = 0;
+uint8_t soft_high_charge = 0;
+
 
 ts_contactor_state contactor_array[5] = {{0}, {0}, {0}, {0}, {0}};
 ts_orion_info orion_info = {0};
@@ -58,8 +76,8 @@ void contactorStatusCANPopulate(CANMsg* msg, te_contactor contactor)
 
 void orionPackInfoCANPopulate(CANMsg* msg)
 {
-    orion_info.packCurrent = 0;
-    orion_info.packVoltage = 1100;
+//    orion_info.packCurrent = 0;
+//    orion_info.packVoltage = 1100;
     msg->extendedID = 0x302;
     msg->DLC = 8;
     msg->data[0] = (orion_info.packCurrent >> 0) & 0xFF;
@@ -92,9 +110,9 @@ void orionTempInfoCANPopulate(CANMsg* msg)
 
 void orionCellVoltagesCANPopulate(CANMsg* msg)
 {
-    orion_info.lowCellVoltage = 39000; /**/
-    orion_info.highCellVoltage = 40000;
-    orion_info.averageCellVoltage = 39500;
+//    orion_info.lowCellVoltage = 39000; /**/
+//    orion_info.highCellVoltage = 40000;
+//    orion_info.averageCellVoltage = 39500;
     msg->extendedID = 0x305;
     msg->DLC = 8;
     msg->data[0] = (orion_info.lowCellVoltage >> 0) & 0xFF;
@@ -271,6 +289,8 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("Sent Charge Status \n");
         break;
     case PACK_INFO:
+        orion_info.packCurrent = 0;
+        orion_info.packVoltage = 1100;
         orionPackInfoCANPopulate(&msg);
         CUBE_PRINT("Sent Pack Info \n");
         break;
@@ -283,17 +303,147 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("Sent Temp Info \n");
         break;
     case CELL_VOLTAGES:
+        orion_info.lowCellVoltage = 39000; /**/
+        orion_info.highCellVoltage = 40000;
+        orion_info.averageCellVoltage = 39500;
         orionCellVoltagesCANPopulate(&msg);
         CUBE_PRINT("Sent Cell Voltages \n");
         break;
+
+        /* dead contactor heartbeat */
     case DEAD_COMMON_HEARTBEAT:
+    	dead_common_heartbeat = 1;
         contactorDeadHeartbeatCANPopulate(&msg, COMMON);
         CUBE_PRINT("Sent Dead COmmon Heartbeat \n");
         break;
     case DEAD_MOTOR_HEARTBEAT:
+    	dead_motor_heartbeat = 1;
         contactorDeadHeartbeatCANPopulate(&msg, MOTOR);
         CUBE_PRINT("Sent Dead Motor Heartbeat \n");
         break;
+    case DEAD_ARRAY_HEARTBEAT:
+    	dead_array_heartbeat = 1;
+        contactorDeadHeartbeatCANPopulate(&msg, ARRAY);
+        CUBE_PRINT("Sent Dead Array Heartbeat \n");
+        break;
+    case DEAD_LV_HEARTBEAT:
+    	dead_lv_heartbeat = 1;
+        contactorDeadHeartbeatCANPopulate(&msg, LV);
+        CUBE_PRINT("Sent Dead LV Heartbeat \n");
+        break;
+    case DEAD_CHARGE_HEARTBEAT:
+    	dead_charge_heartbeat = 1;
+        contactorDeadHeartbeatCANPopulate(&msg, CHARGE);
+        CUBE_PRINT("Sent Dead Motor Heartbeat \n");
+        break;
+
+        /* bad cell voltages */
+    case HARD_HIGH_CELL:
+        orion_info.lowCellVoltage = 39000; /**/
+        orion_info.highCellVoltage = 46000;
+        orion_info.averageCellVoltage = 39500;
+
+    	orionCellVoltagesCANPopulate(&msg);
+    	CUBE_PRINT("Sent hard high Cell Voltages \n");
+    	break;
+
+    case SOFT_HIGH_CELL:
+        orion_info.lowCellVoltage = 39000; /**/
+        orion_info.highCellVoltage = 43000;
+        orion_info.averageCellVoltage = 39500;
+
+    	orionCellVoltagesCANPopulate(&msg);
+    	CUBE_PRINT("Sent soft high Cell Voltages \n");
+    	break;
+
+    case HARD_LOW_CELL:
+		orion_info.lowCellVoltage = 30000; /**/
+		orion_info.highCellVoltage = 40000;
+		orion_info.averageCellVoltage = 39500;
+
+		orionCellVoltagesCANPopulate(&msg);
+		CUBE_PRINT("Sent hard low Cell Voltages \n");
+		break;
+
+	case SOFT_LOW_CELL:
+		orion_info.lowCellVoltage = 36000; /**/
+		orion_info.highCellVoltage = 40000;
+		orion_info.averageCellVoltage = 39500;
+
+		orionCellVoltagesCANPopulate(&msg);
+		CUBE_PRINT("Sent soft low Cell Voltages \n");
+		break;
+
+
+		/* bad currents */
+	case HARD_HIGH_COMMON:
+		hard_high_common = 1;
+        orion_info.packCurrent = 3200;
+        orion_info.packVoltage = 1100;
+        orionPackInfoCANPopulate(&msg);
+        CUBE_PRINT("Sent hard high common Info \n");
+        break;
+
+	case SOFT_HIGH_COMMON:
+		soft_high_common = 1;
+        orion_info.packCurrent = 2950;
+        orion_info.packVoltage = 1100;
+        orionPackInfoCANPopulate(&msg);
+        CUBE_PRINT("Sent soft high common Info \n");
+        break;
+
+	case HARD_HIGH_MOTOR:
+		hard_high_motor = 1;
+		contactor_array[MOTOR].line_current = 3200;
+        contactorStatusCANPopulate(&msg, MOTOR);
+        CUBE_PRINT("Sent hard high Motor Status \n");
+        break;
+
+	case SOFT_HIGH_MOTOR:
+		soft_high_motor = 1;
+		contactor_array[MOTOR].line_current = 2950;
+        contactorStatusCANPopulate(&msg, MOTOR);
+        CUBE_PRINT("Sent soft high Motor Status \n");
+        break;
+
+	case HARD_HIGH_ARRAY:
+		contactor_array[ARRAY].line_current = 3200;
+        contactorStatusCANPopulate(&msg, ARRAY);
+        CUBE_PRINT("Sent hard high array Status \n");
+        break;
+
+	case SOFT_HIGH_ARRAY:
+		contactor_array[ARRAY].line_current = 2950;
+        contactorStatusCANPopulate(&msg, ARRAY);
+        CUBE_PRINT("Sent soft high Array Status \n");
+        break;
+
+	case HARD_HIGH_LV:
+		contactor_array[LV].line_current = 3200;
+        contactorStatusCANPopulate(&msg, LV);
+        CUBE_PRINT("Sent hard high LV Status \n");
+        break;
+
+	case SOFT_HIGH_LV:
+		contactor_array[LV].line_current = 2950;
+        contactorStatusCANPopulate(&msg, LV);
+        CUBE_PRINT("Sent soft high LV Status \n");
+        break;
+
+	case HARD_HIGH_CHARGE:
+		contactor_array[CHARGE].line_current = 3200;
+        contactorStatusCANPopulate(&msg, CHARGE);
+        CUBE_PRINT("Sent hard high charge Status \n");
+        break;
+
+	case SOFT_HIGH_CHARGE:
+		contactor_array[CHARGE].line_current = 2950;
+        contactorStatusCANPopulate(&msg, CHARGE);
+        CUBE_PRINT("Sent soft high Charge Status \n");
+        break;
+
+
+        /* bad temps */
     case HARD_MAX_TEMP:
         orion_info.highTemperature = 46;
         orion_info.lowTemperature = 30;
@@ -302,6 +452,7 @@ void CANTxTask::HandleCommand(Command &cm)
         orionTempInfoCANPopulate(&msg);
         CUBE_PRINT("Sent Hard Max Temp \n");
         break;
+
     case SOFT_MAX_TEMP:
         orion_info.highTemperature = 42;
         orion_info.lowTemperature = 30;
@@ -310,6 +461,7 @@ void CANTxTask::HandleCommand(Command &cm)
         orionTempInfoCANPopulate(&msg);
         CUBE_PRINT("Sent Soft Max Temp \n");
         break;
+
     case HARD_MIN_TEMP:
         orion_info.highTemperature = 30;
         orion_info.lowTemperature = -3;
@@ -318,6 +470,7 @@ void CANTxTask::HandleCommand(Command &cm)
         orionTempInfoCANPopulate(&msg);
         CUBE_PRINT("Sent Hard Min Temp \n");
         break;
+
     case SOFT_MIN_TEMP:
         orion_info.highTemperature =30;
         orion_info.lowTemperature = 4;

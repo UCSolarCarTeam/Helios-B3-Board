@@ -12,6 +12,25 @@
 #define TASK_FREQUENCY_HZ 20
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
+
+extern uint8_t dead_common_heartbeat;
+extern uint8_t dead_motor_heartbeat;
+extern uint8_t dead_array_heartbeat;
+extern uint8_t dead_lv_heartbeat;
+extern uint8_t dead_charge_heartbeat;
+
+extern uint8_t hard_high_common;
+extern uint8_t hard_high_motor;
+extern uint8_t hard_high_array;
+extern uint8_t hard_high_lv;
+extern uint8_t hard_high_charge;
+
+extern uint8_t soft_high_common;
+extern uint8_t soft_high_motor;
+extern uint8_t soft_high_array;
+extern uint8_t soft_high_lv;
+extern uint8_t soft_high_charge;
+
 /**
  * @brief Constructor for GPIOTask
  */
@@ -436,8 +455,27 @@ void GPIOTask::checkCounterTick() {
     
     if ((this->counterTick & 0x1) == 0) { // 100 ms passed send LIGHTS_INPUT
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_STATUS));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_STATUS));
+    	if(hard_high_common) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, HARD_HIGH_COMMON));
+    	}
+    	else if(soft_high_common) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, SOFT_HIGH_COMMON));
+    	}
+    	else {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_STATUS));
+    	}
+
+    	if(hard_high_motor) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, HARD_HIGH_MOTOR));
+    	}
+    	else if(soft_high_motor) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, SOFT_HIGH_MOTOR));
+    	}
+    	else {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_STATUS));
+    	}
+
+
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_STATUS));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_STATUS));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_STATUS));
@@ -451,12 +489,39 @@ void GPIOTask::checkCounterTick() {
     if(this->counterTick == 20){
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,HEARTBEAT));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,PACK_INFO));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_HEARTBEAT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_HEARTBEAT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_HEARTBEAT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_HEARTBEAT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_HEARTBEAT));
         
+        if(!dead_common_heartbeat) {
+        	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_HEARTBEAT));
+        }
+        else {
+        	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, DEAD_COMMON_HEARTBEAT));
+        }
+        if(!dead_motor_heartbeat) {
+        	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_HEARTBEAT));
+        }
+        else {
+        	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, DEAD_MOTOR_HEARTBEAT));
+        }
+
+        if(!dead_array_heartbeat) {
+        	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_HEARTBEAT));
+        }
+        else {
+        	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, DEAD_ARRAY_HEARTBEAT));
+        }
+
+        if(!dead_lv_heartbeat) {
+        	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_HEARTBEAT));
+        }
+        else {
+        	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, DEAD_LV_HEARTBEAT));
+        }
+        if(!dead_charge_heartbeat) {
+        	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_HEARTBEAT));
+        }
+        else {
+        	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, DEAD_CHARGE_HEARTBEAT));
+        }
         
         this->counterTick = 0; // Reset the counter for the next cycle
     }
