@@ -64,44 +64,51 @@ enum class IOState {
     HIGH = 1,
     HI = HIGH,
 
-    INPUT = 2,
-    ERROR = 3
+    INPUT = 1,
+    ERROR = 2
 };
 
 /* ------------------------------- Namespace for Alternative IOPin names -------------------------------*/
 namespace DriverControls {
-    constexpr IOPin FORWARD = IOPin::P00;
-    constexpr IOPin REVERSE = IOPin::P01;
-    constexpr IOPin ARRAYS_DISCONNECT = IOPin::P02;
-    constexpr IOPin RACE_MODE_ENABLE = IOPin::P03;
-    constexpr IOPin HEADLIGHTS_ENABLE = IOPin::P04;
-    constexpr IOPin DISPLAY_SCREEN_ROTATE = IOPin::P05;
-    constexpr IOPin PROXIMITY_SENSOR_ENABLE = IOPin::P06;
-    constexpr IOPin LAP_BUTTON = IOPin::P07;
-    constexpr IOPin HORN_ENABLE = IOPin::P10;
-    constexpr IOPin LEFT_SIGNAL_ENABLE = IOPin::P11;
-    constexpr IOPin RIGHT_SIGNAL_ENABLE = IOPin::P12;
-    constexpr IOPin EMERGENCY_HAZARD = IOPin::P13;
-    constexpr IOPin MOTOR_RESET = IOPin::P14;
-    constexpr IOPin PARKING_BRAKE_DETECT = IOPin::P15;
-    constexpr IOPin MECHANICAL_BRAKE = IOPin::P16;
-    constexpr IOPin GREEN_LED = IOPin::P17;
+    // P2
+    constexpr IOPin FNR_STATE_HIGH          = IOPin::P00;
+    constexpr IOPin FNR_STATE_LOW           = IOPin::P01;
+    constexpr IOPin LAP_BUTTON              = IOPin::P02;
+    constexpr IOPin SPARE_CC                = IOPin::P03;
+
+    // P5
+    constexpr IOPin HEADLIGHTS_ENABLE       = IOPin::P04;
+    constexpr IOPin HAZARD_LIGHT_ENABLE     = IOPin::P05;
+    constexpr IOPin RACE_MODE_ENABLE        = IOPin::P06;
+    constexpr IOPin P07                     = IOPin::P07;   // Unused
+
+    // P6
+    constexpr IOPin HORN_ENABLE             = IOPin::P10;
+    constexpr IOPin RIGHT_SIGNAL_ENABLE     = IOPin::P11;
+    constexpr IOPin LEFT_SIGNAL_ENABLE      = IOPin::P12;
+    constexpr IOPin MOTOR_RESET             = IOPin::P13;
+
+    // P7
+    constexpr IOPin MECHANICAL_BRAKE        = IOPin::P14;
+    constexpr IOPin P15                     = IOPin::P15;   // Unused
+    constexpr IOPin P16                     = IOPin::P16;   // Unused
+    constexpr IOPin P17                     = IOPin::P17;   // Unused
 }
 
 namespace PowerBoard {
-    constexpr IOPin RIGHT_TURN_LIGHT_SIGNAL = IOPin::P00;
-    constexpr IOPin LEFT_TURN_LIGHT_SIGNAL = IOPin::P01;
-    constexpr IOPin DAYTIME_RUNNING_LIGHT_SIGNAL = IOPin::P02;
-    constexpr IOPin HEADLIGHT_SIGNAL = IOPin::P03;
-    constexpr IOPin BRAKE_LIGHT_SIGNAL = IOPin::P04;
-    constexpr IOPin HORN_SIGNAL = IOPin::P05;
-    constexpr IOPin ORANGE_LED = IOPin::P06;
-    constexpr IOPin GREEN_LED = IOPin::P07;
-    constexpr IOPin P13 = IOPin::P13;
-    constexpr IOPin P14 = IOPin::P14;
-    constexpr IOPin P15 = IOPin::P15;
-    constexpr IOPin P16 = IOPin::P16;
-    constexpr IOPin P17 = IOPin::P17;
+    constexpr IOPin RIGHT_TURN_LIGHT_SIGNAL         = IOPin::P00;
+    constexpr IOPin LEFT_TURN_LIGHT_SIGNAL          = IOPin::P01;
+    constexpr IOPin DAYTIME_RUNNING_LIGHT_SIGNAL    = IOPin::P02;
+    constexpr IOPin HEADLIGHT_SIGNAL                = IOPin::P03;
+    constexpr IOPin BRAKE_LIGHT_SIGNAL              = IOPin::P04;
+    constexpr IOPin HORN_SIGNAL                     = IOPin::P05;
+    constexpr IOPin ORANGE_LED                      = IOPin::P06;
+    constexpr IOPin GREEN_LED                       = IOPin::P07;
+    constexpr IOPin P13                             = IOPin::P13;
+    constexpr IOPin P14                             = IOPin::P14;
+    constexpr IOPin P15                             = IOPin::P15;
+    constexpr IOPin P16                             = IOPin::P16;
+    constexpr IOPin P17                             = IOPin::P17;
 }
 
 // -- Typedefs ------------------------------------------------------------------

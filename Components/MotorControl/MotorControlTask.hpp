@@ -16,7 +16,7 @@
 #include "SystemDefines.hpp"
 #include "CubeDefines.hpp"
 #include "CANTxTask.hpp"
-#include "CANRxTask.hpp"
+#include "CanRxTask.hpp"
 #include "CAN.h"
 #include "GPIOTask.hpp"
 
