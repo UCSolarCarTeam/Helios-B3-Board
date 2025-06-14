@@ -137,7 +137,7 @@ public:
     bool Update(); // Update IO Expander Read State
     IOState GetPinState(IOPin pin); // Get pin state (note. last read state)
     IOState GetPinStateNow(IOPin pin); // Get pin state with update
-    std::array<IOState, 16> GetExpanderState(); // Get exapnder state
+    std::array<IOState, 16> GetExpanderState(); // Get expander state
     std::array<IOState, 16> GetExpanderStateNow(); // Get expander state with update
 
     // -- Getter Functions ------------------------------------------------------

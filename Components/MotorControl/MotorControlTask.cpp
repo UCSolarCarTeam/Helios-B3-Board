@@ -179,20 +179,20 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     float accelPercentage = (float)getAvgAccel() / 100.0f;
 
     // // Determine drive commands (ACTIVE LOW)
-    // uint8_t forward = GPIOTask::Inst().getForwardGPIO();
-    // uint8_t reverse = GPIOTask::Inst().getReverseGPIO();
-    // uint8_t mech_brake = GPIOTask::Inst().getBrakeGPIO();
-    // uint8_t reset = GPIOTask::Inst().getResetGPIO();
+    uint8_t motor_gpio_state = GPIOTask::Inst().getMotorControl();
+    uint8_t forward = (motor_gpio_state & 0x03) == 0b10; // 0b10 ASSUMTION! MAY CHANGE
+    uint8_t reverse = (motor_gpio_state & 0x03) == 0b00; // 0b00 ASSUMTION! MAY CHANGE
+    uint8_t mech_brake = motor_gpio_state & 0x04; 	// active low
+    uint8_t reset = motor_gpio_state & 0x08;		// active low
     
-    // NOTE: Hard coding GPIO values for now
-    uint8_t forward = 0;
-    uint8_t reverse = 1;
-    uint8_t mech_brake = 1; // Mechanical Brake
-    uint8_t reset = 1; // Reset Button
+//    // NOTE: Hard coding GPIO values for now
+//    uint8_t forward = 0;
+//    uint8_t reverse = 1;
+//    uint8_t mech_brake = 1; // Mechanical Brake
+//    uint8_t reset = 1; // Reset Button
 
     /* TODO: Add switch case handle for CANRx Task to receive AuxBMS states */
     // Read AuxBMS messages
-    // NOTE: Hard coding states for now...
     uint8_t allowCharge = CANRxTask::Inst().getAllowCharge();
     uint8_t allowDischarge = CANRxTask::Inst().getAllowDischarge();
 
@@ -247,7 +247,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                 driveCommandsInfo->motorCurrentOut = 0;
             }
         }
-    } else if (mech_brake) {
+    } else if (!mech_brake) {
         // If mechanical is pressed, set motorState to MechanicalBreaking and motorCurrentOut to 0
         driveCommandsInfo->motorState = MechanicalBreaking;
         motorVelocityOut = 0;
@@ -367,7 +367,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     }
 
     // Update previous state (save current for next frame)
-    driveCommandsInfo->prevResetInput = reset;
+    driveCommandsInfo->prevResetInput = !reset;
 
 }
 

@@ -84,21 +84,21 @@ uint16_t GPIOTask::DigitalInputs()
 //                      && driverControlState[static_cast<int>(DriverControls::FORWARD_NEUTRAL_REVERSE_L)] == IOState::LOW;
 
     /**Forward and Reverse Encoding from Electrical Team */
-    /* 10 forward
-     * 11 reverse
-     * 00 TODO: CHECK ASSUMPTION THIS IS NEUTRAL
-     * 01 not implemented
+    /* 00 reverse
+     * 01 neutral
+     * 10 forward
+     * 11 not implemented
      */
 
 //    output |= (forward ? 1 : 0) << 0;         // Bit 0
-////    output |= (neutral ? 1 : 0) << 1;         // Bit 1
+//    output |= (neutral ? 1 : 0) << 1;         // Bit 1
 //    output |= (reverse ? 1 : 0) << 2;         // Bit 2
-//    output |= (hornSwitch ? 1 : 0) << 3;      // Bit 3
+    output |= (hornSwitch ? 1 : 0) << 3;      // Bit 3
 //    output |= (mechanicalBreak ? 1 : 0) << 4; // Bit 4
 //    output |= (parkingBrake ? 1 : 0) << 5;    // Bit 5
-//    output |= (motorReset ? 1 : 0) << 6;      // Bit 6
-//    output |= (raceModeEnable ? 1 : 0) << 7;  // Bit 7
-//    output |= (lap ? 1 : 0) << 8;             // Bit 8
+    output |= (motorReset ? 1 : 0) << 6;      // Bit 6
+    output |= (raceModeEnable ? 1 : 0) << 7;  // Bit 7
+    output |= (lap ? 1 : 0) << 8;             // Bit 8
 
     return output;
 }
@@ -131,75 +131,30 @@ uint8_t GPIOTask::LightStatus()
 /**
  * @brief Get the state of all GPIO pins needed for motor control
  * @return a uint8_t representing the state of the motor control GPIO pins.
- * Bit 0 = Forward,
- * Bit 1 = Reverse,
+ * Bit 0 = FNR Low bit,
+ * Bit 1 = FNR High bit,
  * Bit 2 = Mechanical Brake,
  * Bit 3 = Motor Reset,
+ *
+ * FNR (MAY CHANGE)
+ * 00 reverse
+ * 01 neutral
+ * 10 forward
+ * 11 not implemented
  */
-uint8_t GPIOTask::getMotorControlGPIO(void) {
+uint8_t GPIOTask::getMotorControl(void) {
 
     IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+    uint8_t motor_control = 0;
 
-    uint8_t output = 0;
-    // output |= (driverControlExpander.GetPinStateNow(DriverControls::FORWARD) == IOState::LOW) << 0;             // Bit 0
-    // output |= (driverControlExpander.GetPinStateNow(DriverControls::REVERSE) == IOState::LOW) << 1;             // Bit 1
-    output |= (driverControlExpander.GetPinStateNow(DriverControls::MECHANICAL_BRAKE) == IOState::LOW) << 2;    // Bit 2
-    output |= (driverControlExpander.GetPinStateNow(DriverControls::MOTOR_RESET) == IOState::LOW) << 3;         // Bit 3
+    driverControlExpander.Update();
 
-    return output;
-}
+    motor_control |= (driverControlExpander.GetPinState(DriverControls::FNR_STATE_LOW) == IOState::LOW) << 0;       // Bit 0
+    motor_control |= (driverControlExpander.GetPinState(DriverControls::FNR_STATE_HIGH) == IOState::LOW) << 1;      // Bit 1
+    motor_control |= (driverControlExpander.GetPinState(DriverControls::MECHANICAL_BRAKE) == IOState::LOW) << 2;    // Bit 2
+    motor_control |= (driverControlExpander.GetPinState(DriverControls::MOTOR_RESET) == IOState::LOW) << 3;         // Bit 3
 
-/**
- * @brief Get the state of the Forward GPIO pin (active low)
- * @return 0 if LOW, 1 if HIGH 
- */
-uint8_t GPIOTask::getForwardGPIO(void){
-    // Get the state of the Forward GPIO pin
-
-    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
-    uint8_t forward_gpio;// = driverControlExpander.GetPinStateNow(DriverControls::FORWARD) == IOState::LOW;
-
-    return forward_gpio;
-}
-
-/**
- * @brief Get the state of the Reverse GPIO pin (active low)
- * @return 0 if LOW, 1 if HIGH
- */
-uint8_t GPIOTask::getReverseGPIO(void){
-    // Get the state of the Reverse GPIO pin
-
-    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
-    uint8_t reverse_gpio;//  = driverControlExpander.GetPinStateNow(DriverControls::REVERSE) == IOState::LOW;
-
-    return reverse_gpio;
-    
-}
-
-/**
- * @brief Get the state of the Brake GPIO pin (active low)
- * @return 0 if LOW, 1 if HIGH
- */
-uint8_t GPIOTask::getBrakeGPIO(void){
-    // Get the state of the Brake GPIO pin
-
-    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
-    uint8_t brake_gpio = driverControlExpander.GetPinStateNow(DriverControls::MECHANICAL_BRAKE) == IOState::LOW;
-
-    return brake_gpio;
-}
-
-/**
- * @brief Get the state of the Reset GPIO pin (active low)
- * @return 0 if LOW, 1 if HIGH
- */
-uint8_t GPIOTask::getResetGPIO(void){
-    // Get the state of the Reset GPIO pin
-
-    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
-    uint8_t reset_gpio = driverControlExpander.GetPinStateNow(DriverControls::MOTOR_RESET) == IOState::LOW;
-
-    return reset_gpio;
+    return motor_control;
 }
 
 /**

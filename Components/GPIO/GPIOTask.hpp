@@ -37,13 +37,7 @@ public:
     uint8_t LightsInputs();
     uint16_t DigitalInputs();
     uint8_t LightStatus();
-
-    /* Getters for Motor Command GPIO */
-    uint8_t getForwardGPIO();
-    uint8_t getReverseGPIO();
-    uint8_t getBrakeGPIO();
-    uint8_t getResetGPIO();
-    uint8_t getMotorControlGPIO();
+    uint8_t getMotorControl();
 
 protected:
     static void RunTask(void *pvParams) { GPIOTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
