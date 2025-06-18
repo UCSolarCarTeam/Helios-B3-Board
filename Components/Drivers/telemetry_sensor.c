@@ -61,11 +61,6 @@ void Accelerometer_Write_Byte(uint8_t address, uint8_t value) {
 /*
  * Initializes the accelerometer Sensor with desired configurations
  */
-//understand accelerometer and gyroscope specifications well read bout it (read the datasheet as much as possible --> understand it) -- add the accelerometer configs (the accelerometer has both power and accel config)
-//there are some low power mode and normal stuff for both gyro and accelerometor stuff --> pretty cool
-//add some of the changing dps and ranges (think in terms of an actual car)--> (comment which one is which)
-//rename the init and file .c to telemnetery.c and add the gyroconfig to the orginal accelerometer stuff after renameing, cause file is for all three (accelerometer, gyro, and temp)
-
 
 void telemetry_sensor_Init() {
 	//Accel configuration
@@ -183,6 +178,7 @@ void LP_read(uint8_t address, uint8_t mode_value, uint8_t cfg_value) {
 }
 
 void wake_on_motion() {
+	//From page 24 of datasheet
     Accelerometer_Write_Byte(0x6B, 0x00);
     Accelerometer_Write_Byte(0x6C, 0x3F);
     Accelerometer_Write_Byte(0x1D, 0x09);
