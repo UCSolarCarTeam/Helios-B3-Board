@@ -33,8 +33,9 @@ public:
 
     /**Getters for CAN formatting */
     uint8_t GPSData();
-    uint8_t PollData();
+    uint8_t* PollData();
     uint8_t CheckSum();
+
     //uint8_t LightsInputs();
     //uint16_t DigitalInputs();
     //uint8_t LightStatus();

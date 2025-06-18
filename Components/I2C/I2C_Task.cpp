@@ -5,12 +5,20 @@
  ******************************************************************************
  */
 #include "SystemDefines.hpp"
+#include "CANTx/CANTxTask.hpp"
 #include "I2C_Task.hpp"
 #include "IOExpander.hpp"
+#include "CubeUtils.hpp"
+#include "CubeDefines.hpp"
+#include <stdio.h>
+#include <telemetry_sensor.h>
 
 /*----------------------- Macros -----------------------*/
 #define TASK_FREQUENCY_HZ 1
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
+//static uint8_t data[6];
+int16_t testArray[3];
+int16_t gyro_data[3];
 
 /**
  * @brief Constructor for I2CTask
@@ -39,27 +47,100 @@ void I2CTask::InitTask()
     CUBE_ASSERT(rtValue == pdPASS, "I2CTask::InitTask() - xTaskCreate() failed");
 }
 
-uint8_t I2CTask::PollData()
+uint8_t* I2CTask::PollData()
 {
 
 }
-
 
 
 /**
  * @brief Instance Run loop for the I2C Task, runs on scheduler start as long as the task is initialized.
  * @param pvParams RTOS Passed void parameters, contains a pointer to the object instance, should not be used
  */
+
 void I2CTask::Run(void *pvParams)
 {
 	CUBE_PRINT("Starting configurations\r\n");
 	GPS_Initialization();
 	CUBE_PRINT("Configurations complete\r\n");
 
-	while (1){
+	int16_t x, y, z;
+	int16_t gyro_x, gyro_y, gyro_z;
+	int16_t temp;
 
-	}
+	telemetry_sensor_Init();
 
+	Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+
+	while (1) {
+		int32_t sum_of_ax = 0, sum_of_ay = 0, sum_of_az = 0;
+		int32_t sum_of_gx = 0, sum_of_gy = 0, sum_of_gz = 0;
+		int16_t sum_of_t = 0;
+		int16_t n = 10;
+
+		//Calculating average accelerometer values
+		for (int16_t a = 0; a<n; a++) {
+			Accelerometer_Poll_Data(&x, &y, &z);
+			sum_of_ax += x;
+			sum_of_ay += y;
+			sum_of_az += z;
+		}
+
+		int16_t avg_accel_x = sum_of_ax / n;
+		int16_t avg_accel_y = sum_of_ay / n;
+		int16_t avg_accel_z = sum_of_az / n;
+
+		testArray[0] = (int16_t)(avg_accel_x);
+		testArray[1] = (int16_t)(avg_accel_y);
+		testArray[2] = (int16_t)(avg_accel_z);
+
+		//Calculating average gyroscope values
+		for (int16_t g = 0; g<n; g++) {
+			gyroscope_data(&gyro_x, &gyro_y, &gyro_z);
+			sum_of_gx += gyro_x;
+			sum_of_gy += gyro_y;
+			sum_of_gz += gyro_z;
+		}
+
+		int16_t avg_gyro_x = sum_of_gx / n;
+		int16_t avg_gyro_y = sum_of_gy / n;
+		int16_t avg_gyro_z = sum_of_gz / n;
+
+		gyro_data[0] = (int16_t)(avg_gyro_x);
+		gyro_data[1] = (int16_t)(avg_gyro_y);
+		gyro_data[2] = (int16_t)(avg_gyro_z);
+
+		//Calculating average temperature values
+		for (int16_t t = 0; t<n; t++) {
+			temperature_data(&temp);
+			sum_of_t += temp;
+		}
+		int16_t avg_temp = sum_of_t / n;
+
+        Command accel_cmd(DATA_COMMAND, ACCELEROMETER);
+        bool res = evtQ->Send(accel_cmd);
+        CUBE_PRINT("ACCELERATION X Data: %i\n", avg_accel_x);
+        CUBE_PRINT("ACCELERATION Y Data: %i\n", avg_accel_y);
+        CUBE_PRINT("ACCELERATION Z Data: %i\n", avg_accel_z);
+
+        osDelay(500);
+
+        Command gyro_cmd(DATA_COMMAND, GYROSCOPE);
+        bool res1 = evtQ->Send(gyro_cmd);
+
+        CUBE_PRINT("GYROSCOPE X Data: %i\n", avg_gyro_x);
+        CUBE_PRINT("GYROSCOPE Y Data: %i\n", avg_gyro_y);
+        CUBE_PRINT("GYROSCOPE Z Data: %i\n", avg_gyro_z);
+
+        osDelay(500);
+
+        Command temp_cmd(DATA_COMMAND, TEMPERATURE);
+        bool res2 = evtQ->Send(temp_cmd);
+
+        CUBE_PRINT("TEMPERATURE: %i\n", avg_temp);
+
+        osDelay(500);
+  }
 }
 
 //Extra stuff below

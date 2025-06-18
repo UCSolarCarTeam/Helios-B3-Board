@@ -25,6 +25,9 @@ enum CAN_TX_COMMANDS
     ANALOG_INPUTS,     // Command for driver data
     LIGHTS_STATUS_BASE, // Command for lights status
     HEARTBEAT,
+	ACCELEROMETER,
+	GYROSCOPE,
+	TEMPERATURE
 };
 
 /* Macros ------------------------------------------------------------------*/

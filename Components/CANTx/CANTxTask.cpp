@@ -141,6 +141,27 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("Sent Heartbeat \n");
         break;
 
+    case ACCELEROMETER:
+    	msg.extendedID = 0x633;
+    	msg.DLC = 1;
+    	msg.data[0] = 0x83;
+    	CUBE_PRINT("Sent Accelerometer Data \n");
+    	break;
+
+    case GYROSCOPE:
+    	msg.extendedID = 0x634;
+    	msg.DLC = 1;
+    	msg.data[0] = 0x84;
+    	CUBE_PRINT("Sent Gyroscope Data \n");
+    	break;
+
+    case TEMPERATURE:
+    	msg.extendedID = 0x635;
+    	msg.DLC = 1;
+    	msg.data[0] = 0x85;
+    	CUBE_PRINT("Sent Temperature \n");
+    	break;
+
     default:
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
         break;

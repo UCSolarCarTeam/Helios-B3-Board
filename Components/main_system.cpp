@@ -37,7 +37,7 @@ void run_main() {
     // GPIOTask::Inst().InitTask();
     //CANRxTask::Inst().InitTask();
     //GPIOTask::Inst().InitTask();
-    //CANTxTask::Inst().InitTask();
+    CANTxTask::Inst().InitTask();
     I2CTask::Inst().InitTask();
 
 
