@@ -11,6 +11,8 @@
 #include "SystemDefines.hpp"
 #include "CANTx/CANTxTask.hpp"
 #include "Timer.hpp"
+#include "IOExpander.hpp"
+
 
 /*---------------------------------- Macros/Enums ----------------------------------*/
 enum GPIO_COMMANDS
@@ -31,10 +33,11 @@ public:
 
     void InitTask();
 
-    /**Getters for CAN formatting */
+    /** Getters for CAN formatting */
     uint8_t LightsInputs();
     uint16_t DigitalInputs();
     uint8_t LightStatus();
+    uint8_t getMotorControl();
 
 protected:
     static void RunTask(void *pvParams) { GPIOTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();

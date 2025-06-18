@@ -16,6 +16,7 @@
 
 #include "GPIO/GPIOTask.hpp"
 #include "SPI/SPI_Task.hpp"
+#include "MotorControl/MotorControlTask.hpp"
 
 CANPeripheral peripheral1 = {
     .CS_PORT = CS_CAN_N_GPIO_Port,
@@ -84,6 +85,7 @@ void CANTxTask::HandleCommand(Command &cm)
     uint16_t u16_acceleration = 0;
     uint16_t u16_braking = 0;
     uint32_t u32_data = 0;
+    CANMsg motor_msg;
 
     // Handle command based on address/type
     switch (static_cast<CAN_TX_COMMANDS>(cm.GetTaskCommand()))
@@ -161,6 +163,44 @@ void CANTxTask::HandleCommand(Command &cm)
     	msg.data[0] = 0x85;
     	CUBE_PRINT("Sent Temperature \n");
     	break;
+
+    case MOTOR_DRIVE_INPUT:
+        CUBE_PRINT("MotorControlTask - Motor Drive Input command\n");
+        // Get the drive command from MotorControlTask
+        motor_msg = MotorControlTask::Inst().getMotorDrive();
+        
+        // Parse the drive command into the CAN message
+        msg.extendedID = motor_msg.extendedID;
+        msg.DLC = motor_msg.DLC;
+        msg.data[0] = motor_msg.data[0];
+        msg.data[1] = motor_msg.data[1];
+
+        CUBE_PRINT("Sent Motor Drive Input command\n");
+        break;
+
+    case MOTOR_POWER_INPUT:
+        CUBE_PRINT("MotorControlTask - Motor Power Input command\n");
+        // Get the power command from MotorControlTask
+        motor_msg = MotorControlTask::Inst().getMotorPower();
+
+        // Parse the power command into the CAN message
+        msg.extendedID = motor_msg.extendedID;
+        msg.DLC = motor_msg.DLC;
+        msg.data[0] = motor_msg.data[0];
+        msg.data[1] = motor_msg.data[1];
+
+        CUBE_PRINT("Sent Motor Power Input command\n");
+        break;
+
+    case MOTOR_RESET_INPUT:
+        CUBE_PRINT("MotorControlTask - Motor Reset\n");
+        // Parse the reset command into the CAN message
+        // msg.extendedID = IDK WHAT IT IS WE ARE GONNA HAVE TO ASK ELECTRICAL;
+
+        
+
+        CUBE_PRINT("Sent Motor Reset Input command\n");
+        break;
 
     default:
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());

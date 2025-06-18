@@ -20,14 +20,17 @@
 /* Enums ------------------------------------------------------------------*/
 enum CAN_TX_COMMANDS
 {
-    LIGHTS_INPUT, // Command for lights input
+    LIGHTS_INPUT,       // Command for lights input
     DIGITAL_INPUTS,
-    ANALOG_INPUTS,     // Command for driver data
+    ANALOG_INPUTS,      // Command for driver data
     LIGHTS_STATUS_BASE, // Command for lights status
     HEARTBEAT,
 	ACCELEROMETER,
 	GYROSCOPE,
 	TEMPERATURE
+    MOTOR_DRIVE_INPUT,        // Command for motor drive input
+	MOTOR_POWER_INPUT,        // Command for motor power input
+	MOTOR_RESET_INPUT,
 };
 
 /* Macros ------------------------------------------------------------------*/

@@ -9,6 +9,9 @@
 #include "GPIO.hpp"
 #include "SystemDefines.hpp"
 
+volatile float accelerationPedalPercent;
+volatile float brakingPedalPercent;
+
 /**
  * @brief Constructor for SPI Task
  */
@@ -229,11 +232,11 @@ void SPI_Task::Run(void *pvParams)
    */
   while (1)
   {
-    float accelerationPedalPercent = getAccelerationPedalPercent();
+    accelerationPedalPercent = getAccelerationPedalPercent();
     CUBE_PRINT("Acceleration Pedal Position: %.2f%%\n",
                accelerationPedalPercent);
 
-    float brakingPedalPercent = getBrakePedalPercent();
+    brakingPedalPercent = getBrakePedalPercent();
     CUBE_PRINT("Braking Pedal Position: %.2f%%\n", brakingPedalPercent);
     osDelay(SPI_TASK_DELAY); // Delay to reach 100 readings/s
   }
