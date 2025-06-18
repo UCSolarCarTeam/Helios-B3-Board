@@ -5,12 +5,6 @@
 #include "cmsis_os.h"
 #include "stm32l1xx_hal.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifndef INC_M8N_H_
-#define INC_M8N_H_
 
 /*-------------- Private Macros --------------*/
 #define GPS_DEVICE_ADDRESS (0x42 << 1)	// GPS device address is 0x42, left-shifted for STM32 uses 7-bit address
@@ -19,6 +13,84 @@ extern "C" {
 // In case for "random access" read from i2c (refer to page 38 of data sheet)
 #define GPS_DATA_LENGTH_HIGH 0xFD	// register address for GPS data length (high byte)
 #define GPS_DATA_LENGTH_LOW 0xFE	// register address for GPS data length (low byte)
+
+uint8_t UBX_CFG_PRT[] = {
+    0xB5, 0x62,     // Sync Chars
+    0x06, 0x00,     // Class and Message ID for Port Configuration
+    0x14, 0x00,     // Length (20 bytes)
+    0x00, 0x00,     // Port Identifier (0 = I2C)
+    0x00, 0x00,     // txReady settings
+    0x00, 0x00, 0x00, 0x00,  // I2C mode flags (cleared)
+    0x00, 0x00, 0x00, 0x00,  // reserved
+    0x03, 0x00,     // inProtoMask (NMEA + UBX)
+    0x03, 0x00,     // outProtoMask (NMEA + UBX)
+    0x00, 0x00,     // extended TX timeout
+    0x00, 0x00,     // reserved
+    // Checksum will be calculated
+	0x8D, 0x7A
+};
+
+uint8_t UBX_CFG_MSG[] = {
+    0xB5, 0x62,     // Sync Chars
+    0x06, 0x01,     // Class and Message ID for Message Configuration
+    0x02, 0x00,     // Length (8 bytes)
+    0x01, 0x02,     // Class and Message ID to configure (NAV-POSLLH)
+    0x01, 0x00,     // Rate (1 = every navigation solution)
+    0x00, 0x00, 0x00, 0x00,  // Reserved
+    // Checksum will be calculated
+	0x32, 0x32
+};
+
+uint8_t UBX_CFG_RATE[] = {
+    0xB5, 0x62,     // Sync Chars
+    0x06, 0x08,     // Class and Message ID for Rate Configuration
+    0x06, 0x00,     // Length (6 bytes)
+    0xE8, 0x03,     // Measurement Rate (1000 ms = 1 Hz)
+    0x01, 0x00,     // Navigation Rate (1 cycle)
+    0x01, 0x00,     // Time Reference (GPS time)
+    // Checksum will be calculated
+	0x0D, 0x3D
+};
+
+uint8_t UBX_CFG_RESET[] = {
+	0xB5, 0x62, 0x06, 0x04, 0x04, 0x00,	// header and class/id bytes and length
+	0xFF, 0xFF,							// navBbrMask
+	0x00, 0x00,							// resetMode
+	// checksum
+	0x0C, 0x5D
+};
+
+// might be used...
+uint8_t UBX_CFG_CFG[] = {
+	0xB5, 0x62, 0x06, 0x09,	0x0D, 0x00,	// header and class/id bytes and length
+	// payload
+	0xFF, 0xFF, 0x00, 0x00, 			// clearMask
+	0x00, 0x00, 0x00, 0x00,				// saveMask
+	0xFF, 0xFF, 0x00, 0x00,				// loadMask
+	0x17,								// deviceMask
+	// Checksum bytes (to-be-added)
+	0x2F, 0xAE
+};
+
+uint8_t UBX_ACK_ACK[] = {
+	0xB5, 0x62, 0x05, 0x01, 0x02, 0x00,	// header and class/id bytes and length
+	0x00,								// classID of the acknowledged message	(to-be-added)
+	0x00,								// messageID of the acknowledged message (to-be-added)
+	// Checksum bytes (to-be-added)
+	0x00, 0x00
+};
+
+// Position, Velocity and Time configuration
+uint8_t UBX_CFG_NAV_PVT[] = {
+    0xB5, 0x62,     // Sync Chars
+    0x06, 0x01,     // Class and Message ID for Message Configuration
+    0x08, 0x00,     // Length (8 bytes)
+    0x01, 0x07,     // Class and Message ID (NAV-PVT)
+    0x01, 0x00,     // Rate (1 = every navigation solution)
+    0x00, 0x00, 0x00, 0x00,
+    // Checksum will be calculated
+	0x37, 0x37
+};
 
 /*
  * This struct consists of the values parsed from the message rectrieved from the receiver.
@@ -106,8 +178,4 @@ void UBX_Transmit(uint8_t *buffer, uint16_t buflen);
 
 void UBX_Receive(uint8_t *buffer, uint16_t buflen);
 
-#endif /* INC_M8N_H_ */
 
-#ifdef __cplusplus
-}
-#endif

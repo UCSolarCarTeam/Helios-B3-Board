@@ -20,6 +20,10 @@ constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 int16_t testArray[3];
 int16_t gyro_data[3];
 
+uint8_t GPS_BUFFER[36];
+#define BUFFER_SIZE 36
+NavData data;
+
 /**
  * @brief Constructor for I2CTask
  */

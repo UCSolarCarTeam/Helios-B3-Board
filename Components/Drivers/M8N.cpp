@@ -5,11 +5,10 @@
  *      Author: jazebzafar
  */
 
-#include "M8N.h"
+#include <M8N.hpp>
 #include "main.h"
-#include <stdio.h>
 #include <string.h>
-#include <stdint.h>
+#include "CubeDefines.hpp"
 
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
@@ -17,102 +16,24 @@ extern UART_HandleTypeDef huart1;
 
 /*------------------------------- GPS Functions -------------------------------*/
 
-uint8_t UBX_CFG_PRT[] = {
-    0xB5, 0x62,     // Sync Chars
-    0x06, 0x00,     // Class and Message ID for Port Configuration
-    0x14, 0x00,     // Length (20 bytes)
-    0x00, 0x00,     // Port Identifier (0 = I2C)
-    0x00, 0x00,     // txReady settings
-    0x00, 0x00, 0x00, 0x00,  // I2C mode flags (cleared)
-    0x00, 0x00, 0x00, 0x00,  // reserved
-    0x03, 0x00,     // inProtoMask (NMEA + UBX)
-    0x03, 0x00,     // outProtoMask (NMEA + UBX)
-    0x00, 0x00,     // extended TX timeout
-    0x00, 0x00,     // reserved
-    // Checksum will be calculated
-	0x8D, 0x7A
-};
-
-uint8_t UBX_CFG_MSG[] = {
-    0xB5, 0x62,     // Sync Chars
-    0x06, 0x01,     // Class and Message ID for Message Configuration
-    0x08, 0x00,     // Length (8 bytes)
-    0x01, 0x02,     // Class and Message ID to configure (NAV-POSLLH)
-    0x01, 0x00,     // Rate (1 = every navigation solution)
-    0x00, 0x00, 0x00, 0x00,  // Reserved
-    // Checksum will be calculated
-	0x32, 0x32
-};
-
-uint8_t UBX_CFG_RATE[] = {
-    0xB5, 0x62,     // Sync Chars
-    0x06, 0x08,     // Class and Message ID for Rate Configuration
-    0x06, 0x00,     // Length (6 bytes)
-    0xE8, 0x03,     // Measurement Rate (1000 ms = 1 Hz)
-    0x01, 0x00,     // Navigation Rate (1 cycle)
-    0x01, 0x00,     // Time Reference (GPS time)
-    // Checksum will be calculated
-	0x0D, 0x3D
-};
-
-uint8_t UBX_CFG_RESET[] = {
-	0xB5, 0x62, 0x06, 0x04, 0x04, 0x00,	// header and class/id bytes and length
-	0xFF, 0xFF,							// navBbrMask
-	0x00, 0x00,							// resetMode
-	// checksum
-	0x0C, 0x5D
-};
-
-// might be used...
-uint8_t UBX_CFG_CFG[] = {
-	0xB5, 0x62, 0x06, 0x09,	0x0D, 0x00,	// header and class/id bytes and length
-	// payload
-	0xFF, 0xFF, 0x00, 0x00, 			// clearMask
-	0x00, 0x00, 0x00, 0x00,				// saveMask
-	0xFF, 0xFF, 0x00, 0x00,				// loadMask
-	0x17,								// deviceMask
-	// Checksum bytes (to-be-added)
-	0x2F, 0xAE
-};
-
-uint8_t UBX_ACK_ACK[] = {
-	0xB5, 0x62, 0x05, 0x01, 0x02, 0x00,	// header and class/id bytes and length
-	0x00,								// classID of the acknowledged message	(to-be-added)
-	0x00,								// messageID of the acknowledged message (to-be-added)
-	// Checksum bytes (to-be-added)
-	0x00, 0x00
-};
-
-// Position, Velocity and Time configuration
-uint8_t UBX_CFG_NAV_PVT[] = {
-    0xB5, 0x62,     // Sync Chars
-    0x06, 0x01,     // Class and Message ID for Message Configuration
-    0x08, 0x00,     // Length (8 bytes)
-    0x01, 0x07,     // Class and Message ID (NAV-PVT)
-    0x01, 0x00,     // Rate (1 = every navigation solution)
-    0x00, 0x00, 0x00, 0x00,
-    // Checksum will be calculated
-	0x37, 0x37
-};
-
 /*------------------------------- GPS Functions -------------------------------*/
 
 
 void UBX_Transmit(uint8_t *buffer, uint16_t buflen) {
 	HAL_StatusTypeDef hal = HAL_I2C_Mem_Write(&hi2c1, GPS_DEVICE_ADDRESS, GPS_DATA_REGISTER, 1, buffer, buflen, 100);
 	if (hal != HAL_OK) {
-		//printf("HAL Status: %d | I2C Error: %d | Class and ID: %#X %#X\r\n", hal, hi2c1.ErrorCode, buffer[2], buffer[3]);
+		//CUBE_PRINT("HAL Status: %d | I2C Error: %d | Class and ID: %#X %#X\r\n", hal, hi2c1.ErrorCode, buffer[2], buffer[3]);
 	}else{
-		printf("[ ^ ]UBX Transmit Successful");
+		CUBE_PRINT("[ ^ ]UBX Transmit Successful\n");
 	}
 }
 
 void UBX_Receive(uint8_t *buffer, uint16_t buflen) {
 	HAL_StatusTypeDef hal = HAL_I2C_Mem_Read(&hi2c1, GPS_DEVICE_ADDRESS, GPS_DATA_REGISTER, 1, buffer, buflen, 100);
 		if (hal != HAL_OK) {
-			//printf("HAL Status: %d | I2C Error: %\r\n", hal, hi2c1.ErrorCode);
+			//CUBE_PRINT("HAL Status: %d | I2C Error: %\r\n", hal, hi2c1.ErrorCode);
 	}else{
-		printf("[ ^ ]UBX Receive Successful");
+		CUBE_PRINT("[ ^ ]UBX Receive Successful\n");
 	}
 }
 
@@ -147,7 +68,7 @@ uint16_t UBX_M8N_CHECKSUM(uint8_t* buffer, uint8_t buflen) {
 	// return ((CK_A == buffer[buflen - 2]) && (CK_B == buffer[buflen - 1]));
 
 	// return 2 byte checksum
-	return ((CK_A<<8) | CK_B);
+	return ((CK_A << 8) | CK_B);
 }
 
 /* This function parses the payload from a NAV_POSLLH message
@@ -177,12 +98,12 @@ void CONFIG_Transmit(uint8_t* buffer, uint16_t buflen) {
 
 
 	if (hal != HAL_OK) {
-		printf("CONFIG transmit went wrong\r\n");
-		printf("	[i]0x%x\r\n", hal);
+		CUBE_PRINT("CONFIG transmit went wrong\r\n");
+		CUBE_PRINT("	[i]0x%x\r\n", hal);
 	}
 	// get the length of the CONFIG message response
 	uint16_t message_length = UBX_GET_LENGTH();
-	printf("Message Length: %d\r\n", message_length);
+	CUBE_PRINT("Message Length: %d\r\n", message_length);
 
 	if (message_length != 0) {
 		// create a buffer of
@@ -192,10 +113,10 @@ void CONFIG_Transmit(uint8_t* buffer, uint16_t buflen) {
 		// Recieve the CONFIG response
 		hal = HAL_I2C_Master_Receive(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, config_response, message_length, HAL_MAX_DELAY);
 		if (hal != HAL_OK) {
-			printf("CONFIG response went wrong!\r\n");
-			printf("Error code: %08lX\r\n", hi2c1.ErrorCode);
+			CUBE_PRINT("CONFIG response went wrong!\r\n");
+			CUBE_PRINT("Error code: %08lX\r\n", hi2c1.ErrorCode);
 		} else {
-			printf("Length: %d | Headers: %X %X |Class: %X | ID: %X | rest: %X %X %X %X %X %X\r\n", message_length, config_response[0], config_response[1], config_response[2], config_response[3], config_response[4], config_response[5], config_response[6], config_response[7], config_response[8], config_response[9]);
+			CUBE_PRINT("Length: %d | Headers: %X %X |Class: %X | ID: %X | rest: %X %X %X %X %X %X\r\n", message_length, config_response[0], config_response[1], config_response[2], config_response[3], config_response[4], config_response[5], config_response[6], config_response[7], config_response[8], config_response[9]);
 			// see if response was a ACK message
 		}
 	}
@@ -205,10 +126,10 @@ uint16_t UBX_GET_LENGTH() {
 	uint8_t ubx_length[2];
 	HAL_StatusTypeDef hal = HAL_I2C_Mem_Read(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, GPS_DATA_LENGTH_HIGH, 1, ubx_length, sizeof(ubx_length), 100);
 	if (hal != HAL_OK) {
-		printf("Read for length went wrong");
+		CUBE_PRINT("Read for length went wrong");
 	}
 
-	printf("High: %X | Low: %X\r\n",ubx_length[0], ubx_length[1]);
+	CUBE_PRINT("High: %X | Low: %X\r\n",ubx_length[0], ubx_length[1]);
 	// return length as uint16_t
 	return ((ubx_length[0] << 8) | (ubx_length[1]));
 }
@@ -217,32 +138,19 @@ void GPS_Initialization(void) {
 	HAL_StatusTypeDef hal;
 
 	// Poll till hal is no longer busy
-	do {
-	    // Repeat without any code in here
-	} while (hal == HAL_BUSY);
 
-	printf("Starting MSG\r\n");
+	CUBE_PRINT("Starting MSG\r\n");
 	CONFIG_Transmit(UBX_CFG_MSG, sizeof(UBX_CFG_MSG)/sizeof(UBX_CFG_MSG[0]));
-	HAL_Delay(1000);
-
-	printf("Starting PRT\r\n");
+	CUBE_PRINT("Starting PRT\r\n");
 	CONFIG_Transmit(UBX_CFG_PRT, sizeof(UBX_CFG_PRT)/sizeof(UBX_CFG_PRT[0]));
-	HAL_Delay(1000);
-
-	printf("Starting RATE\r\n");
+	CUBE_PRINT("Starting RATE\r\n");
 	CONFIG_Transmit(UBX_CFG_RATE, sizeof(UBX_CFG_RATE)/sizeof(UBX_CFG_RATE[0]));
-	HAL_Delay(1000);
-
-	printf("Starting NAV\r\n");
+	CUBE_PRINT("Starting NAV\r\n");
 	CONFIG_Transmit(UBX_CFG_NAV_PVT, sizeof(UBX_CFG_NAV_PVT)/sizeof(UBX_CFG_NAV_PVT[0]));
-	HAL_Delay(1000);
 
 	//hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, UBX_CFG_CFG, sizeof(UBX_CFG_CFG), HAL_MAX_DELAY);
-	if (hal != HAL_OK) {
-		// something went wrong with transmit (exit)
-		printf("UBX-CFG-CFG went wrong!\r\n");
-	}
-	HAL_Delay(2000);
+
+	osDelay(500);
 }
 
 /*------------------------------- Extra Functions for testing purposes -------------------------------*/
