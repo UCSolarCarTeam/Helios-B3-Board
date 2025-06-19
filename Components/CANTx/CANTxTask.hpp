@@ -27,7 +27,7 @@ enum CAN_TX_COMMANDS
     HEARTBEAT,
 	ACCELEROMETER,
 	GYROSCOPE,
-	TEMPERATURE
+	TEMPERATURE,
     MOTOR_DRIVE_INPUT,        // Command for motor drive input
 	MOTOR_POWER_INPUT,        // Command for motor power input
 	MOTOR_RESET_INPUT,

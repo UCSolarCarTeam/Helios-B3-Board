@@ -138,33 +138,33 @@ void CANRxTask::HandleCommand(Command &cm)
 }
 
 //// Handle CAN_INT Callback here ?
-//#if 0
+#if 0
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-//{
-//   // NOTE: Can Implement Call back on RXBUF0 and RXBUF1 and decode the message accordingly.
-//   if (GPIO_Pin == CAN_INT_Pin)
-//   {
-//       // Handle or Event Flag into CPP Task
-//       Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_INTERRUPT_HAPPENED);
-//       CANRxTask::Inst()
-//           .GetCAN_RX_QUEUE()
-//           ->SendFromISR(canInterruptHappenedCommandFlag);
-//   }
-//   else if (GPIO_Pin == CAN_RX0BF_Pin)
-//   {
-//       Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_RX0_INTERRUPT_HAPPENED);
-//       CANRxTask::Inst()
-//           .GetCAN_RX_QUEUE()
-//           ->SendFromISR(canInterruptHappenedCommandFlag);
-//   }
-//   else if (GPIO_Pin == CAN_RX1BF_Pin)
-//   {
-//       Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_RX1_INTERRUPT_HAPPENED);
-//       CANRxTask::Inst()
-//           .GetCAN_RX_QUEUE()
-//           ->SendFromISR(canInterruptHappenedCommandFlag);
-//   }
-//}
+{
+   // NOTE: Can Implement Call back on RXBUF0 and RXBUF1 and decode the message accordingly.
+   if (GPIO_Pin == CAN_INT_Pin)
+   {
+       // Handle or Event Flag into CPP Task
+       Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_INTERRUPT_HAPPENED);
+       CANRxTask::Inst()
+           .GetCAN_RX_QUEUE()
+           ->SendFromISR(canInterruptHappenedCommandFlag);
+   }
+   else if (GPIO_Pin == CAN_RX0BF_Pin)
+   {
+       Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_RX0_INTERRUPT_HAPPENED);
+       CANRxTask::Inst()
+           .GetCAN_RX_QUEUE()
+           ->SendFromISR(canInterruptHappenedCommandFlag);
+   }
+   else if (GPIO_Pin == CAN_RX1BF_Pin)
+   {
+       Command canInterruptHappenedCommandFlag = Command(TASK_SPECIFIC_COMMAND, CAN_RX1_INTERRUPT_HAPPENED);
+       CANRxTask::Inst()
+           .GetCAN_RX_QUEUE()
+           ->SendFromISR(canInterruptHappenedCommandFlag);
+   }
+}
 #endif
 
 void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data){

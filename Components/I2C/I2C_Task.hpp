@@ -7,7 +7,7 @@
 #ifndef HELIOS_I2C_HPP_
 #define HELIOS_I2C_HPP_
 
-#include "M8N.hpp"
+//#include "M8N.hpp"
 #include "Task.hpp"
 #include "SystemDefines.hpp"
 //#include "Timer.hpp"

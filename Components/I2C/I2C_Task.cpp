@@ -22,7 +22,7 @@ int16_t gyro_data[3];
 
 uint8_t GPS_BUFFER[36];
 #define BUFFER_SIZE 36
-NavData data;
+//NavData data;
 
 /**
  * @brief Constructor for I2CTask
@@ -65,7 +65,7 @@ uint8_t* I2CTask::PollData()
 void I2CTask::Run(void *pvParams)
 {
 	CUBE_PRINT("Starting configurations\r\n");
-	GPS_Initialization();
+//	GPS_Initialization();
 	CUBE_PRINT("Configurations complete\r\n");
 
 	int16_t x, y, z;
