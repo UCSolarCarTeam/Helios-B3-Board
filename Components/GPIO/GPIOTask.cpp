@@ -199,7 +199,7 @@ void GPIOTask::Run(void *pvParams)
             switch (static_cast<IOPin>(i)){
 #if 1
            case DriverControls::FNR_STATE_HIGH:
-               CUBE_PRINT("    - P00 (FNR_STATE_HIGH): %d\n", driverControlState[i]);
+               CUBE_PRINT("    - P00 (FNR_STATE_HIGH):       %d\n", driverControlState[i]);
                if (driverControlState[i] == IOState::HIGH)
                {
                    fnr_state &= 0b11111101;
@@ -213,7 +213,7 @@ void GPIOTask::Run(void *pvParams)
                }
                break;
            case DriverControls::FNR_STATE_LOW:
-               CUBE_PRINT("    - P01 (FNR_STATE_LOW): %d\n", driverControlState[i]);
+               CUBE_PRINT("    - P01 (FNR_STATE_LOW):        %d\n", driverControlState[i]);
                if (driverControlState[i] == IOState::HIGH)
                {
                     fnr_state &= 0xFE;
@@ -227,7 +227,7 @@ void GPIOTask::Run(void *pvParams)
                }
                break;
            case DriverControls::LAP_BUTTON:
-               CUBE_PRINT("    - P02 (Lap Button): %d\n", driverControlState[i]);
+               CUBE_PRINT("    - P02 (Lap Button):           %d\n", driverControlState[i]);
                if (driverControlState[i] == IOState::HIGH)
                {
                     lap_toggle = 0;
@@ -244,7 +244,7 @@ void GPIOTask::Run(void *pvParams)
                }
                break;
            case DriverControls::SPARE_CC:
-               CUBE_PRINT("    - P03 (Spare CC): %d\n", driverControlState[i]);
+               CUBE_PRINT("    - P03 (Spare CC):             %d\n", driverControlState[i]);
                if (driverControlState[i] == IOState::HIGH)
                {
                }
@@ -258,7 +258,7 @@ void GPIOTask::Run(void *pvParams)
 #endif
 
             case DriverControls::HEADLIGHTS_ENABLE:
-                CUBE_PRINT("    - P04 (Headlights Enable): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P04 (Headlights Enable):   %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
                     // powerBoardExpander.SetPin(PowerBoard::HEADLIGHT_SIGNAL, IOState::LOW);
@@ -275,7 +275,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::HAZARD_LIGHT_ENABLE:
-                CUBE_PRINT("    - P05 (Hazard Light Enable): %d\n", driverControlState[i]);
+            	CUBE_PRINT("    - P05 (Hazard Light Enable): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
                     hazard_toggle = 0;
@@ -289,7 +289,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::RACE_MODE_ENABLE:
-                CUBE_PRINT("    - P06 (Race Mode Enable): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P06 (Race Mode Enable):    %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
                 }
@@ -302,7 +302,7 @@ void GPIOTask::Run(void *pvParams)
                 break;
 #if 0
             case DriverControls::P07:
-                CUBE_PRINT("    - P07 (Unused): %d\n", driverControlState[i]);
+                CUBE_PRINT("    - P07 (Unused):              %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
                 {
                 }
@@ -325,7 +325,7 @@ void GPIOTask::Run(void *pvParams)
             switch (static_cast<IOPin>(i))
             {
             case DriverControls::HORN_ENABLE:
-                CUBE_PRINT("    - P10 (Horn Enable): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P10 (Horn Enable):         %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                     powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::LOW);
@@ -341,7 +341,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::RIGHT_SIGNAL_ENABLE:
-                CUBE_PRINT("    - P12 (Right Signal): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P12 (Right Signal):        %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                     powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
@@ -355,7 +355,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::LEFT_SIGNAL_ENABLE:
-                CUBE_PRINT("    - P11 (Left Signal): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P11 (Left Signal):         %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                     powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
@@ -369,7 +369,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::MOTOR_RESET:
-                CUBE_PRINT("    - P13 (Motor Reset): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P13 (Motor Reset):         %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                     // powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::LOW);
@@ -383,7 +383,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::MECHANICAL_BRAKE:
-                CUBE_PRINT("    - P16 (Mech Brake): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P16 (Mech Brake):          %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                     powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::LOW);
@@ -398,7 +398,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::P15:
-                CUBE_PRINT("    - P15 (Unused): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P15 (Unused):              %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                 }
@@ -410,7 +410,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::P14:
-                CUBE_PRINT("    - P14 (Unused): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P14 (Unused):              %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                 }
@@ -422,7 +422,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::P17:
-                CUBE_PRINT("    - P17 (Unused): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P17 (Unused):              %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                 }
