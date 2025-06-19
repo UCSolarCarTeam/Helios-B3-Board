@@ -14,6 +14,7 @@ extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart1;
 
 //:
+/*
 uint8_t UBX_CFG_PRT[] = {
     0xB5, 0x62,     // Sync Chars
     0x06, 0x00,     // Class and Message ID for Port Configuration
@@ -88,7 +89,7 @@ uint8_t UBX_CFG_NAV_PVT[] = {
     // Checksum will be calculated
     0x37, 0x37
 };
-
+*/
 
 // UBXMessage
 UBXMessage::UBXMessage(uint8_t class_id, uint8_t msg_id, uint8_t length)
@@ -193,6 +194,8 @@ void GPSDevice::GPS_Initialization() {
     CONFIG_Transmit(UBX_CFG_NAV_PVT, sizeof(UBX_CFG_NAV_PVT)/sizeof(UBX_CFG_NAV_PVT[0]));
     osDelay(500);
 }
+
+
 
 
 
