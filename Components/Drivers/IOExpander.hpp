@@ -83,16 +83,16 @@ namespace DriverControls {
     constexpr IOPin P07                     = IOPin::P07;   // Unused
 
     // P6
-    constexpr IOPin HORN_ENABLE             = IOPin::P10;
-    constexpr IOPin RIGHT_SIGNAL_ENABLE     = IOPin::P11;
-    constexpr IOPin LEFT_SIGNAL_ENABLE      = IOPin::P12;
-    constexpr IOPin MOTOR_RESET             = IOPin::P13;
+    constexpr IOPin MECHANICAL_BRAKE        = IOPin::P10;
+    constexpr IOPin P11                     = IOPin::P11;   // Unused
+    constexpr IOPin P12                     = IOPin::P12;   // Unused
+    constexpr IOPin P13                     = IOPin::P13;   // Unused
 
     // P7
-    constexpr IOPin MECHANICAL_BRAKE        = IOPin::P14;
-    constexpr IOPin P15                     = IOPin::P15;   // Unused
-    constexpr IOPin P16                     = IOPin::P16;   // Unused
-    constexpr IOPin P17                     = IOPin::P17;   // Unused
+    constexpr IOPin HORN_ENABLE             = IOPin::P14;
+    constexpr IOPin RIGHT_SIGNAL_ENABLE     = IOPin::P15;
+    constexpr IOPin LEFT_SIGNAL_ENABLE      = IOPin::P16;
+    constexpr IOPin MOTOR_RESET             = IOPin::P17;
 }
 
 namespace PowerBoard {
