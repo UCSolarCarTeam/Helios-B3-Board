@@ -84,14 +84,14 @@ namespace DriverControls {
 
     // P6
     constexpr IOPin HORN_ENABLE             = IOPin::P10;
-    constexpr IOPin RIGHT_SIGNAL_ENABLE     = IOPin::P11;
-    constexpr IOPin LEFT_SIGNAL_ENABLE      = IOPin::P12;
+    constexpr IOPin LEFT_SIGNAL_ENABLE      = IOPin::P11;
+    constexpr IOPin RIGHT_SIGNAL_ENABLE     = IOPin::P12;
     constexpr IOPin MOTOR_RESET             = IOPin::P13;
 
     // P
-    constexpr IOPin MECHANICAL_BRAKE        = IOPin::P14;
+    constexpr IOPin P14				        = IOPin::P14;	// Unused
     constexpr IOPin P15                     = IOPin::P15;   // Unused
-    constexpr IOPin P16                     = IOPin::P16;   // Unused
+    constexpr IOPin MECHANICAL_BRAKE		= IOPin::P16;
     constexpr IOPin P17                     = IOPin::P17;   // Unused
 
 
