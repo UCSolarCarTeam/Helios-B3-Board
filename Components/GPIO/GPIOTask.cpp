@@ -322,80 +322,24 @@ void GPIOTask::Run(void *pvParams)
         {
             switch (static_cast<IOPin>(i))
             {
-            case DriverControls::MECHANICAL_BRAKE:
-                CUBE_PRINT("    - P10 (Mechanincal Brake): %d\n", driverControlState[i-2]);
+            case DriverControls::HORN_ENABLE:
+                CUBE_PRINT("    - P10 (Horn Enable): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
-                    
+                    powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::LOW);
+
                 }
                 else if (driverControlState[i - 2] == IOState::LOW)
                 {
+                    powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::HIGH);
                 
                 }
                 else if (driverControlState[i - 2] == IOState::ERROR)
                 {
                 }
                 break;
-#if 0
-            case DriverControls::P11:
-                CUBE_PRINT("    - P11 (Unused): %d\n", driverControlState[i-2]);
-                if (driverControlState[i - 2] == IOState::HIGH)
-                {
-                    powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-                }
-                else if (driverControlState[i - 2] == IOState::LOW)
-                {
-                    powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
-                }
-                else if (driverControlState[i - 2] == IOState::ERROR)
-                {
-                }
-                break;
-            case DriverControls::P12:
-                CUBE_PRINT("    - P12 (Unused): %d\n", driverControlState[i-2]);
-                if (driverControlState[i - 2] == IOState::HIGH)
-                {
-                    powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-                }
-                else if (driverControlState[i - 2] == IOState::LOW)
-                {
-                    powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-                }
-                else if (driverControlState[i - 2] == IOState::ERROR)
-                {
-                }
-                break;
-            case DriverControls::P13:
-                CUBE_PRINT("    - P13 (Unused): %d\n", driverControlState[i-2]);
-                if (driverControlState[i - 2] == IOState::HIGH)
-                {
-                    powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::HIGH);
-                }
-                else if (driverControlState[i - 2] == IOState::LOW)
-                {
-                    powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::LOW);
-                }
-                else if (driverControlState[i - 2] == IOState::ERROR)
-                {
-                }
-                break;
-#endif
-            case DriverControls::HORN_ENABLE:
-                CUBE_PRINT("    - P14 (Horn Enable): %d\n", driverControlState[i-2]);
-                if (driverControlState[i - 2] == IOState::HIGH)
-                {
-                    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::LOW);
-                }
-                else if (driverControlState[i - 2] == IOState::LOW)
-                {
-                    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::HIGH);
-                }
-                else if (driverControlState[i - 2] == IOState::ERROR)
-                {
-                }
-                break;
             case DriverControls::RIGHT_SIGNAL_ENABLE:
-                CUBE_PRINT("    - P15 (Right Signal): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P11 (Right Signal): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                     powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
@@ -409,7 +353,7 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::LEFT_SIGNAL_ENABLE:
-                CUBE_PRINT("    - P16 (Left Signal): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P12 (Left Signal): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                     powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
@@ -423,7 +367,59 @@ void GPIOTask::Run(void *pvParams)
                 }
                 break;
             case DriverControls::MOTOR_RESET:
-                CUBE_PRINT("    - P17 (Motor Reset): %d\n", driverControlState[i-2]);
+                CUBE_PRINT("    - P13 (Motor Reset): %d\n", driverControlState[i-2]);
+                if (driverControlState[i - 2] == IOState::HIGH)
+                {
+                    powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::LOW);
+                }
+                else if (driverControlState[i - 2] == IOState::LOW)
+                {
+                    powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::HIGH);
+                }
+                else if (driverControlState[i - 2] == IOState::ERROR)
+                {
+                }
+                break;
+            case DriverControls::MECHANICAL_BRAKE:
+                CUBE_PRINT("    - P14 (Mech Brake): %d\n", driverControlState[i-2]);
+                if (driverControlState[i - 2] == IOState::HIGH)
+                {
+                    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::LOW);
+                }
+                else if (driverControlState[i - 2] == IOState::LOW)
+                {
+                    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::HIGH);
+                }
+                else if (driverControlState[i - 2] == IOState::ERROR)
+                {
+                }
+                break;
+            case DriverControls::P15:
+                CUBE_PRINT("    - P15 (Unused): %d\n", driverControlState[i-2]);
+                if (driverControlState[i - 2] == IOState::HIGH)
+                {
+                }
+                else if (driverControlState[i - 2] == IOState::LOW)
+                {
+                }
+                else if (driverControlState[i - 2] == IOState::ERROR)
+                {
+                }
+                break;
+            case DriverControls::P16:
+                CUBE_PRINT("    - P16 (Unused): %d\n", driverControlState[i-2]);
+                if (driverControlState[i - 2] == IOState::HIGH)
+                {
+                }
+                else if (driverControlState[i - 2] == IOState::LOW)
+                {
+                }
+                else if (driverControlState[i - 2] == IOState::ERROR)
+                {
+                }
+                break;
+            case DriverControls::P17:
+                CUBE_PRINT("    - P17 (Unused): %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
                 }
