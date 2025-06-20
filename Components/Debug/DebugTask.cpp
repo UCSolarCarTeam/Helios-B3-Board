@@ -387,6 +387,92 @@ void DebugTask::HandleDebugMessage(const char* msg)
            CUBE_PRINT("Sent soft min temp Command");
         }
     }
+
+    /*close contactors */
+    else if (strncmp(msg, "close_common ", strlen("close_common ")) == 0) {
+        Command cmd(DATA_COMMAND, CLOSE_COMMON);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent closed common Command");
+        }
+    }
+    else if (strncmp(msg, "close_motor ", strlen("close_motor ")) == 0) {
+        Command cmd(DATA_COMMAND, CLOSE_MOTOR);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent closed motor Command");
+        }
+    }
+    else if (strncmp(msg, "close_array ", strlen("close_array ")) == 0) {
+        Command cmd(DATA_COMMAND, CLOSE_ARRAY);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent closed array Command");
+        }
+    }
+    else if (strncmp(msg, "close_lv ", strlen("close_lv ")) == 0) {
+        Command cmd(DATA_COMMAND, CLOSE_LV);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent closed lv Command");
+        }
+    }
+    else if (strncmp(msg, "close_charge ", strlen("close_charge ")) == 0) {
+        Command cmd(DATA_COMMAND, CLOSE_CHARGE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent closed charge Command");
+        }
+    }
+
+    // open back up the contactors sigh
+    else if (strncmp(msg, "open_common ", strlen("open_common ")) == 0) {
+        Command cmd(DATA_COMMAND, OPEN_COMMON);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent open common Command");
+        }
+    }
+    else if (strncmp(msg, "open_motor ", strlen("open_motor ")) == 0) {
+        Command cmd(DATA_COMMAND, OPEN_MOTOR);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent open motor Command");
+        }
+    }
+    else if (strncmp(msg, "open_array ", strlen("open_array ")) == 0) {
+        Command cmd(DATA_COMMAND, OPEN_ARRAY);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent open array Command");
+        }
+    }
+    else if (strncmp(msg, "open_lv ", strlen("open_lv ")) == 0) {
+        Command cmd(DATA_COMMAND, OPEN_LV);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent open lv Command");
+        }
+    }
+    else if (strncmp(msg, "open_charge ", strlen("open_charge ")) == 0) {
+        Command cmd(DATA_COMMAND, OPEN_CHARGE);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent open charge Command");
+        }
+    }
+
+
     //-- SYSTEM / CHAR COMMANDS -- (Must be last)
     else if (strncmp(msg, "iox_upd", 7) == 0) {
         // Update IO Expander

@@ -35,6 +35,21 @@ uint8_t soft_high_array = 0;
 uint8_t soft_high_lv = 0;
 uint8_t soft_high_charge = 0;
 
+uint8_t close_common = 0;
+uint8_t close_motor = 0;
+uint8_t close_array = 0;
+uint8_t close_lv = 0;
+uint8_t close_charge = 0;
+
+uint8_t open_common = 0;
+uint8_t open_motor = 0;
+uint8_t open_array = 0;
+uint8_t open_lv = 0;
+uint8_t open_charge = 0;
+
+
+
+
 
 ts_contactor_state contactor_array[5] = {{0}, {0}, {0}, {0}, {0}};
 ts_orion_info orion_info = {0};
@@ -269,22 +284,32 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("Sent Charge Heartbeat \n");
         break;
     case COMMON_BOARD_STATUS:
+    	contactor_array[COMMON].contactor_closed = 0;
+    	close_common = 0;
         contactorStatusCANPopulate(&msg, COMMON);
         CUBE_PRINT("Sent Common Status \n");
         break;
     case MOTOR_BOARD_STATUS:
+    	contactor_array[MOTOR].contactor_closed = 0;
+    	close_motor = 0;
         contactorStatusCANPopulate(&msg, MOTOR);
         CUBE_PRINT("Sent Motor Status \n");
         break;
     case ARRAY_BOARD_STATUS:
+    	contactor_array[ARRAY].contactor_closed = 0;
+    	close_array = 0;
         contactorStatusCANPopulate(&msg, ARRAY);
         CUBE_PRINT("Sent Array Status \n");
         break;
     case LV_BOARD_STATUS:
+    	contactor_array[LV].contactor_closed = 0;
+    	close_lv = 0;
         contactorStatusCANPopulate(&msg, LV);
         CUBE_PRINT("Sent LV Status \n");
         break;
     case CHARGE_BOARD_STATUS:
+    	contactor_array[CHARGE].contactor_closed = 0;
+    	close_charge = 0;
         contactorStatusCANPopulate(&msg, CHARGE);
         CUBE_PRINT("Sent Charge Status \n");
         break;
@@ -478,6 +503,76 @@ void CANTxTask::HandleCommand(Command &cm)
         orion_info.internalTemperature = 30;
         orionTempInfoCANPopulate(&msg);
         CUBE_PRINT("Sent Soft Min Temp \n");
+        break;
+
+        /* CLOSE CONTACTORS */
+    case CLOSE_COMMON:
+    	close_common = 1;
+    	contactor_array[COMMON].contactor_closed = 1;
+        contactorStatusCANPopulate(&msg, COMMON);
+        CUBE_PRINT("Sent close common \n");
+        break;
+
+    case CLOSE_MOTOR:
+    	close_motor = 1;
+    	contactor_array[MOTOR].contactor_closed = 1;
+        contactorStatusCANPopulate(&msg, MOTOR);
+        CUBE_PRINT("Sent close motor \n");
+        break;
+    case CLOSE_ARRAY:
+    	close_array = 1;
+    	contactor_array[ARRAY].contactor_closed = 1;
+        contactorStatusCANPopulate(&msg, ARRAY);
+        CUBE_PRINT("Sent Close array \n");
+        break;
+    case CLOSE_LV:
+    	close_lv = 1;
+    	contactor_array[LV].contactor_closed = 1;
+        contactorStatusCANPopulate(&msg, LV);
+        CUBE_PRINT("Sent close LV \n");
+        break;
+    case CLOSE_CHARGE:
+    	close_charge = 1;
+    	contactor_array[CHARGE].contactor_closed = 1;
+        contactorStatusCANPopulate(&msg, CHARGE);
+        CUBE_PRINT("Sent close charge \n");
+        break;
+
+    case OPEN_COMMON:
+    	close_common = 0;
+    	open_common = 1;
+    	contactor_array[COMMON].contactor_closed = 0;
+        contactorStatusCANPopulate(&msg, COMMON);
+        CUBE_PRINT("Sent open common \n");
+        break;
+
+    case OPEN_MOTOR:
+    	close_motor = 0;
+    	open_motor = 1;
+    	contactor_array[MOTOR].contactor_closed = 0;
+        contactorStatusCANPopulate(&msg, MOTOR);
+        CUBE_PRINT("Sent open motor \n");
+        break;
+    case OPEN_ARRAY:
+    	close_array = 0;
+    	open_array = 1;
+    	contactor_array[ARRAY].contactor_closed = 0;
+        contactorStatusCANPopulate(&msg, ARRAY);
+        CUBE_PRINT("Sent open array \n");
+        break;
+    case OPEN_LV:
+    	close_lv = 0;
+    	open_lv = 1;
+    	contactor_array[LV].contactor_closed = 0;
+        contactorStatusCANPopulate(&msg, LV);
+        CUBE_PRINT("Sent open LV \n");
+        break;
+    case OPEN_CHARGE:
+    	close_charge = 0;
+    	open_charge = 1;
+    	contactor_array[CHARGE].contactor_closed = 0;
+        contactorStatusCANPopulate(&msg, CHARGE);
+        CUBE_PRINT("Sent open charge \n");
         break;
 
 

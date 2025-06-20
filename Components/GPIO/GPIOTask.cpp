@@ -31,6 +31,18 @@ extern uint8_t soft_high_array;
 extern uint8_t soft_high_lv;
 extern uint8_t soft_high_charge;
 
+extern uint8_t close_common;
+extern uint8_t close_motor;
+extern uint8_t close_array;
+extern uint8_t close_lv;
+extern uint8_t close_charge;
+
+extern uint8_t open_common;
+extern uint8_t open_motor;
+extern uint8_t open_array;
+extern uint8_t open_lv;
+extern uint8_t open_charge;
+
 /**
  * @brief Constructor for GPIOTask
  */
@@ -455,25 +467,101 @@ void GPIOTask::checkCounterTick() {
     
     if ((this->counterTick & 0x1) == 0) { // 100 ms passed send LIGHTS_INPUT
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
+
+    	//common
     	if(hard_high_common) {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, HARD_HIGH_COMMON));
     	}
     	else if(soft_high_common) {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, SOFT_HIGH_COMMON));
     	}
+
+
+    	if(close_common) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CLOSE_COMMON));
+    	}
+    	else if (open_common) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, OPEN_COMMON));
+    	}
     	else {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_STATUS));
     	}
 
+
+    	//motor
     	if(hard_high_motor) {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, HARD_HIGH_MOTOR));
     	}
     	else if(soft_high_motor) {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, SOFT_HIGH_MOTOR));
     	}
+
+    	if(close_motor) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CLOSE_MOTOR));
+    	}
+    	else if (open_motor) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, OPEN_MOTOR));
+    	}
     	else {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_STATUS));
     	}
+
+
+    	//array
+    	if(hard_high_array) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, HARD_HIGH_ARRAY));
+    	}
+    	else if(soft_high_array) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, SOFT_HIGH_ARRAY));
+    	}
+
+    	if(close_array) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CLOSE_ARRAY));
+    	}
+    	else if (open_array) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, OPEN_ARRAY));
+    	}
+    	else {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_STATUS));
+    	}
+
+
+    	//lv
+    	if(hard_high_lv) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, HARD_HIGH_LV));
+    	}
+    	else if(soft_high_lv) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, SOFT_HIGH_LV));
+    	}
+
+    	if(close_lv) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CLOSE_LV));
+    	}
+    	else if (open_lv) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, OPEN_LV));
+    	}
+    	else {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_STATUS));
+    	}
+
+    	//charge
+    	if(hard_high_charge) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, HARD_HIGH_CHARGE));
+    	}
+    	else if(soft_high_charge) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, SOFT_HIGH_CHARGE));
+    	}
+
+    	if(close_charge) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CLOSE_CHARGE));
+    	}
+    	else if (open_charge) {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, OPEN_CHARGE));
+    	}
+    	else {
+    		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_STATUS));
+    	}
+
 
 
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_STATUS));
