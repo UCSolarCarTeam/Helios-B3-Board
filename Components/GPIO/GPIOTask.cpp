@@ -564,9 +564,9 @@ void GPIOTask::checkCounterTick() {
 
 
 
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_STATUS));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_STATUS));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_STATUS));
+//        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ARRAY_BOARD_STATUS));
+//        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LV_BOARD_STATUS));
+//        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CHARGE_BOARD_STATUS));
     }
     if ((this->counterTick & 0x3) == 0) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
