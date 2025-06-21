@@ -43,6 +43,7 @@ extern uint8_t open_array;
 extern uint8_t open_lv;
 extern uint8_t open_charge;
 
+extern uint8_t stop_orion;
 /**
  * @brief Constructor for GPIOTask
  */
@@ -571,12 +572,20 @@ void GPIOTask::checkCounterTick() {
     if ((this->counterTick & 0x3) == 0) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,TEMPERATURE_INFO));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,CELL_VOLTAGES));
+
+    	if (!stop_orion) {
+            CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,TEMPERATURE_INFO));
+            CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,CELL_VOLTAGES));
+    	}
+
     }
     if(this->counterTick == 20){
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,HEARTBEAT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,PACK_INFO));
+
+    	if(!stop_orion) {
+    		 CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,PACK_INFO));
+    	}
+
         
         if(!dead_common_heartbeat) {
         	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_HEARTBEAT));

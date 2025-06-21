@@ -47,6 +47,8 @@ uint8_t open_array = 0;
 uint8_t open_lv = 0;
 uint8_t open_charge = 0;
 
+uint8_t stop_orion = 0;
+
 
 
 
@@ -579,6 +581,14 @@ void CANTxTask::HandleCommand(Command &cm)
     	contactor_array[CHARGE].contactor_closed = 0;
         contactorStatusCANPopulate(&msg, CHARGE);
         CUBE_PRINT("Sent open charge \n");
+        break;
+    case STOP_ORION:
+		stop_orion = 1;
+		CUBE_PRINT("Sent stop orion \n");
+		break;
+    case START_ORION:
+    	stop_orion = 0;
+        CUBE_PRINT("Sent start orion \n");
         break;
 
 

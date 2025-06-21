@@ -471,6 +471,22 @@ void DebugTask::HandleDebugMessage(const char* msg)
            CUBE_PRINT("Sent open charge Command");
         }
     }
+    else if (strncmp(msg, "stop_orion ", strlen("stop_orion ")) == 0) {
+        Command cmd(DATA_COMMAND, STOP_ORION);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent stop orion Command");
+        }
+    }
+    else if (strncmp(msg, "start_orion ", strlen("start_orion ")) == 0) {
+        Command cmd(DATA_COMMAND, START_ORION);
+        Queue* evtQ = CANTxTask::Inst().GetEventQueue();
+        bool res = evtQ->Send(cmd);
+        if(res){
+           CUBE_PRINT("Sent start orion Command");
+        }
+    }
 
 
     //-- SYSTEM / CHAR COMMANDS -- (Must be last)
