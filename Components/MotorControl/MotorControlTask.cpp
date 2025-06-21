@@ -34,8 +34,7 @@ void MotorControlTask::Run(void *pvParams)
 {
     uint32_t prevWakeTime = osKernelSysTick();
 
-    DriveCommandsInfo driveCommandsInfo =
-    {
+    DriveCommandsInfo driveCommandsInfo = {
         .motorCurrentOut = 0.0f,
         .motorState = Off,
         .prevResetInput = 1,
@@ -178,12 +177,17 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     float regenPercentage = (float)getAvgRegen() / 100.0f; // Get value between 0 and 1
     float accelPercentage = (float)getAvgAccel() / 100.0f;
 
-    // // Determine drive commands (ACTIVE LOW)
+    /*
+     * UNUSED	= 00
+     * Drive	= 10
+     * Neutral	= 01 Not doing anything right now
+     * Reverse	= 11
+     * */
     uint8_t motor_gpio_state = GPIOTask::Inst().getMotorControl();
     uint8_t forward = (motor_gpio_state & 0x03) == 0b10; // 0b10 ASSUMTION! MAY CHANGE
-    uint8_t reverse = (motor_gpio_state & 0x03) == 0b00; // 0b00 ASSUMTION! MAY CHANGE
-    uint8_t mech_brake = motor_gpio_state & 0x04; 	// active low
-    uint8_t reset = motor_gpio_state & 0x08;		// active low
+    uint8_t reverse = (motor_gpio_state & 0x03) == 0b11; // 0b00 ASSUMTION! MAY CHANGE
+    uint8_t mech_brake = motor_gpio_state & 0x04; 		 // active low
+    uint8_t reset = motor_gpio_state & 0x08;			 // active low
     
 //    // NOTE: Hard coding GPIO values for now
 //    uint8_t forward = 0;
@@ -345,7 +349,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // ADD EXTENDED ID HERE IF NEEDED
     motor_power_msg.extendedID = MOTOR_POWER_STDID;
     motor_power_msg.DLC = MOTOR_POWER_DLC;
-    dataToSendFloat[0] = 0.0f; // Reserved (defined by WaveSculptor datasheet)
+    dataToSendFloat[0] = 0.0f; // Reserved (WaveSculptor datasheet)
     dataToSendFloat[1] = BUS_CURRENT_OUT;
     memcpy(motor_power_msg.data, dataToSendFloat, sizeof(float) * 2);
 

@@ -44,9 +44,9 @@ enum ResetStatus {
 
 typedef struct DriveCommandsInfo {
     float motorCurrentOut;
-    enum MotorStates motorState;
+    MotorStates motorState;
     uint8_t prevResetInput;
-    enum ResetStatus resetStatus;
+    ResetStatus resetStatus;
     uint8_t regenQueueIndex;
     uint8_t accelQueueIndex;
 } DriveCommandsInfo;
