@@ -112,18 +112,24 @@ void CANTxTask::HandleCommand(Command &cm)
 
     case ANALOG_INPUTS:
         msg.extendedID = 0x612;
-        msg.DLC = 3;
+        msg.DLC = 2;
 
-        u16_acceleration = SPI_Task::Inst().getAccelerationReading_P() & 0x0FFF; // Mask to ensure 12 bits
-        u16_braking = SPI_Task::Inst().getBrakingReading_P() & 0x0FFF;           // Mask to ensure 12 bits
+        // u16_acceleration = SPI_Task::Inst().getAccelerationReading_P() & 0x0FFF; // Mask to ensure 12 bits
+        // u16_braking = SPI_Task::Inst().getBrakingReading_P() & 0x0FFF;           // Mask to ensure 12 bits
 
-        // Pack the 12-bit acceleration and 12-bit braking into a 24-bit structure
-        u32_data = (u16_acceleration & 0x0FFF) | ((u16_braking & 0x0FFF) << 12);
+        // // Pack the 12-bit acceleration and 12-bit braking into a 24-bit structure
+        // u32_data = (u16_acceleration & 0x0FFF) | ((u16_braking & 0x0FFF) << 12);
 
-        // Split u32_data into bytes and assign to msg.data[]
-        msg.data[0] = static_cast<uint8_t>(u32_data & 0xFF);         // Extract the first 8 bits (bits 0-7)
-        msg.data[1] = static_cast<uint8_t>((u32_data >> 8) & 0xFF);  // Extract the next 8 bits (bits 8-15)
-        msg.data[2] = static_cast<uint8_t>((u32_data >> 16) & 0xFF); // Extract the next 8 bits (bits 16-23)
+        // // Split u32_data into bytes and assign to msg.data[]
+        // msg.data[0] = static_cast<uint8_t>(u32_data & 0xFF);         // Extract the first 8 bits (bits 0-7)
+        // msg.data[1] = static_cast<uint8_t>((u32_data >> 8) & 0xFF);  // Extract the next 8 bits (bits 8-15)
+        // msg.data[2] = static_cast<uint8_t>((u32_data >> 16) & 0xFF); // Extract the next 8 bits (bits 16-23)
+
+        // float accelPercentage = SPI_Task::Inst().getAccelerationPedalPercent();
+        // float brakePercentage = SPI_Task::Inst().getBrakePedalPercent();
+        
+        msg.data[0] = SPI_Task::Inst().getAccelerationIntPercent();
+        msg.data[1] = SPI_Task::Inst().getBrakeIntPercent();
 
         CUBE_PRINT("Sent Analog Inputs command\n");
         break;

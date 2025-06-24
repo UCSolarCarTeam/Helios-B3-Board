@@ -13,7 +13,6 @@
 #include "Timer.hpp"
 #include "IOExpander.hpp"
 
-
 /*---------------------------------- Macros/Enums ----------------------------------*/
 enum GPIO_COMMANDS
 {
@@ -39,6 +38,9 @@ public:
     uint8_t LightStatus();
     uint8_t getMotorControl();
 
+    IOExpander driverControlExpander = IOExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
+    IOExpander powerBoardExpander = IOExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(0, 0, 1));
+
 protected:
     static void RunTask(void *pvParams) { GPIOTask::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
     void Run(void *pvParams);                                               // Main run code
@@ -51,8 +53,9 @@ private:
 
     void checkCounterTick();
     uint8_t counterTick = 0;
+
     //** Potential private variable for refactoring code
-    // IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0)); */
+    // IOExpander driverControlExpander(SystemHandles::I2C_EExpanderxpander, IOExpander::CalculateAddress(1, 0, 0)); */
 };
 
 #endif

@@ -5,12 +5,8 @@
 ******************************************************************************
 */
 #include "SPI_Task.hpp"
-
 #include "GPIO.hpp"
 #include "SystemDefines.hpp"
-
-volatile float accelerationPedalPercent;
-volatile float brakingPedalPercent;
 
 /**
  * @brief Constructor for SPI Task
@@ -22,7 +18,8 @@ SPI_Task::SPI_Task() : Task(SPI_TAK_QUEUE_DEPTH_OBJS)
 
 /**
  * @brief Initialize the SPI Task
- */
+ */volatile float accelerationPedalPercent;
+// volatile float brakingPedalPercent;
 void SPI_Task::InitTask()
 {
   CUBE_ASSERT(rtTaskHandle == nullptr, "Cannot initialize SPI task twice");
@@ -168,10 +165,6 @@ uint16_t SPI_Task::getBrakingReading_N() { return g_brakeReading_N; }
 
 uint16_t SPI_Task::getBrakingReading_P() { return g_brakeReading_P; }
 
-uint32_t SPI_Task::DriverBase(){
-  
-}
-
 float SPI_Task::calculatePedalPosition(uint16_t pedalReading)
 {
   // Ensure pedalReading is within the valid ADC range
@@ -188,7 +181,12 @@ float SPI_Task::calculatePedalPosition(uint16_t pedalReading)
   return ((float)(pedalReading - ADC_MIN) / (ADC_MAX - ADC_MIN)) * 100.0f;
 }
 
-float SPI_Task::getAccelerationPedalPercent()
+/*------------------ Calculates and updates pedal values ------------------*/
+
+/**
+ * @brief Calculates and updates acceleration pedal percentage private value
+ */
+void SPI_Task::calculateAccelerationPedalPercent()
 {
   uint16_t accelPedalReadingP = readAccelerationPedal_P();
   uint16_t accelPedalReadingN = readAccelerationPedal_N();
@@ -196,10 +194,13 @@ float SPI_Task::getAccelerationPedalPercent()
   // Optional check  accelPedalReadingP + accelPedalReadingN != ADC_MAX +
   // ADC_MIN roughly equal
 
-  return calculatePedalPosition(accelPedalReadingP);
+  this->accelerationPedalPercent = calculatePedalPosition(accelPedalReadingP);
 }
 
-float SPI_Task::getBrakePedalPercent()
+/**
+ * @brief Calculates and updates brake pedal percentage value
+ */
+void SPI_Task::calculateBrakePedalPercent()
 {
   uint16_t brakePedalReadingP = readBrakingPedal_P();
   uint16_t brakePedalReadingN = readBrakingPedal_N();
@@ -207,8 +208,29 @@ float SPI_Task::getBrakePedalPercent()
   // Optional check: if (brakePedalReadingP + brakePedalReadingN != ADC_MAX +
   // ADC_MIN) {
 
-  return calculatePedalPosition(brakePedalReadingP);
+  this->brakingPedalPercent = calculatePedalPosition(brakePedalReadingP);
 }
+
+/*------------------- Getters for CAN Data -------------------*/
+
+float SPI_Task::getAccelerationPedalPercent()
+{
+  return this->accelerationPedalPercent;
+}
+
+float SPI_Task::getBrakePedalPercent()
+{
+  return this->brakingPedalPercent;
+}
+
+uint8_t SPI_Task::getAccelerationIntPercent() {
+  return static_cast<uint8_t>(this->accelerationPedalPercent);
+}
+
+uint8_t SPI_Task::getBrakeIntPercent() {
+  return static_cast<uint8_t>(this->brakingPedalPercent);
+}
+
 
 /**
  * @brief Instance Run loop for the SPI Task, runs on scheduler start as long as
@@ -232,12 +254,12 @@ void SPI_Task::Run(void *pvParams)
    */
   while (1)
   {
-    accelerationPedalPercent = getAccelerationPedalPercent();
-    CUBE_PRINT("Acceleration Pedal Position: %.2f%%\n",
-               accelerationPedalPercent);
+    calculateAccelerationPedalPercent();
+    // CUBE_PRINT("Acceleration Pedal Position: %.2f%%\n", this.accelerationPedalPercent);
 
-    brakingPedalPercent = getBrakePedalPercent();
-    CUBE_PRINT("Braking Pedal Position: %.2f%%\n", brakingPedalPercent);
+    calculateBrakePedalPercent();
+    // CUBE_PRINT("Braking Pedal Position: %.2f%%\n", this.brakingPedalPercent);
+
     osDelay(SPI_TASK_DELAY); // Delay to reach 100 readings/s
   }
 }

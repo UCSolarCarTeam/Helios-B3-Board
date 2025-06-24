@@ -166,8 +166,8 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     2. calculate average pedal percentages from the buffer
     */
 
-    regenValuesQueue[driveCommandsInfo->regenQueueIndex++] = brakingPedalPercent;
-    accelValuesQueue[driveCommandsInfo->accelQueueIndex++] = accelerationPedalPercent;
+    regenValuesQueue[driveCommandsInfo->regenQueueIndex++] = SPI_Task::Inst().getBrakePedalPercent();
+    accelValuesQueue[driveCommandsInfo->accelQueueIndex++] = SPI_Task::Inst().getAccelerationPedalPercent();
 
     // Update Queue Indices
     driveCommandsInfo->accelQueueIndex %= REGEN_QUEUE_SIZE;

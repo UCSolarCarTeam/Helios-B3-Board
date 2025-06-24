@@ -53,8 +53,10 @@ public:
     uint16_t getBrakingReading_P();
     uint16_t getBrakingReading_N();
 
-    /** Data Formatter for CAN Task */
-    uint32_t DriverBase();
+    float getAccelerationPedalPercent();
+    float getBrakePedalPercent();
+    uint8_t getAccelerationIntPercent();
+    uint8_t getBrakeIntPercent();
 
 protected:
     static void RunTask(void *pvParams) { SPI_Task::Inst().Run(pvParams); } // Static Task Interface, passes control to the instance Run();
@@ -76,14 +78,18 @@ private:
     uint16_t readData(void);                             // Reads serial data output of the conversion result
     bool SPI_Read(uint16_t sizeInBytes);                 // Reads SPI with HAL command onto protected last_read_
     float calculatePedalPosition(uint16_t pedalReading); // calculate the pedal position as a percentage
-    float getAccelerationPedalPercent();
-    float getBrakePedalPercent();
+    
+    void calculateAccelerationPedalPercent();
+    void calculateBrakePedalPercent();
 
     // Getter Variables for CAN Task Communication
     uint16_t g_accelerationReading_P;
     uint16_t g_accelerationReading_N;
     uint16_t g_brakeReading_N;
     uint16_t g_brakeReading_P;
+
+    float accelerationPedalPercent;
+    float brakingPedalPercent;
 };
 
 #endif // HELIOS_SPITASK_HPP_

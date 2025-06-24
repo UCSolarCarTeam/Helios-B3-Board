@@ -17,11 +17,9 @@
 #include "CubeDefines.hpp"
 #include "CANTxTask.hpp"
 #include "CanRxTask.hpp"
+#include "SPI/SPI_Task.hpp"
 #include "CAN.h"
 #include "GPIOTask.hpp"
-
-extern volatile float accelerationPedalPercent;
-extern volatile float brakingPedalPercent;
 
 /* Enums ------------------------------------------------------------------*/
 
