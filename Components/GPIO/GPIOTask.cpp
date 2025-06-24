@@ -469,6 +469,7 @@ void GPIOTask::checkCounterTick() {
     if ((this->counterTick & 0x1) == 0) { // 100 ms passed send LIGHTS_INPUT
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
 
+
     	//common
     	if(hard_high_common) {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, HARD_HIGH_COMMON));
@@ -476,8 +477,7 @@ void GPIOTask::checkCounterTick() {
     	else if(soft_high_common) {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, SOFT_HIGH_COMMON));
     	}
-
-
+#if 0
     	if(close_common) {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, CLOSE_COMMON));
     	}
@@ -488,7 +488,7 @@ void GPIOTask::checkCounterTick() {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_STATUS));
     	}
 
-
+#endif
     	//motor
     	if(hard_high_motor) {
     		CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, HARD_HIGH_MOTOR));
@@ -573,10 +573,10 @@ void GPIOTask::checkCounterTick() {
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
         //CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
 
-    	if (!stop_orion) {
+    	//if (!stop_orion) {
             CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,TEMPERATURE_INFO));
             CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,CELL_VOLTAGES));
-    	}
+    	//}
 
     }
     if(this->counterTick == 20){
@@ -586,13 +586,15 @@ void GPIOTask::checkCounterTick() {
     		 CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,PACK_INFO));
     	}
 
-        
+#if 0
         if(!dead_common_heartbeat) {
         	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, COMMON_BOARD_HEARTBEAT));
         }
         else {
         	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, DEAD_COMMON_HEARTBEAT));
         }
+#endif
+
         if(!dead_motor_heartbeat) {
         	CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, MOTOR_BOARD_HEARTBEAT));
         }
