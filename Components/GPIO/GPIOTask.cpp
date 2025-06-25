@@ -502,7 +502,7 @@ void GPIOTask::Run(void *pvParams)
         this->counterTick++;
 
         // Operate task at specified TASK_FREQUENCY
-        osDelay(10000);
+        osDelay(TASK_DELAY);
     }
 }
 
