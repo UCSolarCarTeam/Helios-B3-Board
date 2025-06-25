@@ -285,13 +285,13 @@ float CANRxTask::getMotorVelocityInput()
 uint8_t CANRxTask::getAllowCharge()
 {
     // This function should return the allow charge status
-    return allowCharge; // Placeholder for actual allow charge status
+    return this->allowCharge; // Placeholder for actual allow charge status
 }
 
 uint8_t CANRxTask::getAllowDischarge()
 {
     // This function should return the allow discharge status
-    return allowDischarge; // Placeholder for actual allow discharge status
+    return this->allowDischarge; // Placeholder for actual allow discharge status
 }
 
 //Helper function to print CAN message
