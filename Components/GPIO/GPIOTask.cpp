@@ -456,7 +456,7 @@ void GPIOTask::Run(void *pvParams)
 			);
 
             powerBoardExpander.SetPin(
-            		PowerBoard::LEFT_TURN_LIGHT_SIGNAL,
+            		PowerBoard::RIGHT_TURN_LIGHT_SIGNAL,
 					((hazard_toggle || right_signal_toggle) && blink) ? IOState::HIGH : IOState::LOW
 			);
 
