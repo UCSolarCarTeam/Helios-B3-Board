@@ -10,10 +10,10 @@
 
 /*----------------------- Macros -----------------------*/
 #define UNUSED_PINS 0
-#define TASK_FREQUENCY_HZ 1//10
+#define TASK_FREQUENCY_HZ 10
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
-#define BLINK_COUNT_MAX 5
+#define BLINK_COUNT_MAX 500
 
 /**
  * @brief Constructor for GPIOTask
@@ -465,21 +465,23 @@ void GPIOTask::Run(void *pvParams)
             	if(left_signal_toggle) {
             		if(!blink){
             			powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
-            			blink = 1;
             		} else {
             			powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-            			blink = 0;
             		}
             	}
 
             	if(right_signal_toggle) {
             		if(!blink){
             			powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
-            			blink = 1;
             		} else {
             			powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-            			blink = 0;
             		}
+            	}
+
+            	if(!blink){
+            		blink = 1;
+            	} else {
+            		blink = 0;
             	}
             }
 
@@ -500,7 +502,7 @@ void GPIOTask::Run(void *pvParams)
         this->counterTick++;
 
         // Operate task at specified TASK_FREQUENCY
-        osDelay(TASK_DELAY);
+        osDelay(10000);
     }
 }
 
