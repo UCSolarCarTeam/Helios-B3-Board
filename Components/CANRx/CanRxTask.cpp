@@ -131,10 +131,12 @@ void CANRxTask::HandleCommand(Command &cm)
         CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
         break;
     }
+
+    HandleCANMessage(id, dlc, data);
 }
 
 //// Handle CAN_INT Callback here ?
-#if 0
+#if 1
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
    // NOTE: Can Implement Call back on RXBUF0 and RXBUF1 and decode the message accordingly.
@@ -163,8 +165,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }
 #endif
 
-void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data){
-    switch(id){
+void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data) {
+
+	uint32_t motorRaw = 0;
+	uint32_t vehicleRaw = 0;
+
+    switch(id) {
         case MBMS_MESSAGE: // MBMS Status ID: CHANGE THIS TO THE ACTUAL DEFINE LATER
             // Bit 6 = nChargeEnable
             // Bit 8 = nDischargeEnable
@@ -172,86 +178,19 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data){
             this->allowCharge = (data[1] & 0x1) ? 0 : 1;      // Byte 1, Bit 0
             CUBE_PRINT("MBMS Status: allowCharge = %d, allowDischarge = %d\n", this->allowCharge, this->allowDischarge);
             break;
-#if 0
-        // TODO: add case motor feedback ID 0x402
-        // extract the vehicle velocity input from the data
-        case MOTOR_CONTROLLER_BASE:
-            // IDinfo ID: 0x420
-            // Name         | Bytes |   Bits
-            // ProhelionID	    4	    31-0
-            // SerialNumber		4	    63-32
-
-            // extract the Tritium ID
-            uint32_t prohelionID = 0;
-            for (uint8_t i = 0; i < 4; ++i) {
-                prohelionID |= (data[i] << (i * 8));
-            }
-
-            uint32_t serialNumber = 0;
-            for (uint8_t i = 4; i < 8; ++i) {
-                serialNumber |= (data[i] << ((i - 4) * 8));
-            }
-
-            break;
-
-        case MOTOR_STATUS:
-            // Status ID: 0x421
-            // Name         | Bytes |   Bits
-            // LimitFlags	    2	    15-0
-            // ErrorFlags	    2	    31-16
-            // ActiveMotor	    2	    47-32
-            // TxErrorCount	    1	    55-48
-            // RxErrorCount	    1       63-56
-
-            uint16_t limitFlags = 0;
-            for (uint8_t i = 0; i < 4; ++i) {
-                limitFlags |= (data[i] << (i * 8));
-            }
-
-            uint16_t errorFlags = 0;
-            for (uint8_t i = 2; i < 4; ++i) {
-                errorFlags |= (data[i] << ((i - 2) * 8));
-            }
-
-            uint16_t activeMotor = 0;
-            for (uint8_t i = 4; i < 6; ++i) {
-                activeMotor |= (data[i] << ((i - 4) * 8));
-            }
-            uint8_t txErrorCount = data[6];
-
-            uint8_t rxErrorCount = data[7];
-
-            break;
-
-        case MOTOR_BUS_MEASUREMENT:
-            // Name         | Bytes |   Bits
-            // BusVoltage	    4	    31-0
-            // BusCurrent	    4	    63-32
-
-            uint32_t busVoltage = 0.0f;
-            for(uint8_t i = 0; i < 4; ++i) {
-                busVoltage |= (data[i] << (i * 8));
-            }
-            uint32_t busCurrent = 0.0f;
-            for(uint8_t i = 4; i < 8; ++i) {
-                busCurrent |= (data[i] << ((i - 4) * 8));
-            }
-
-            break;
-#endif
         case MOTOR_VELOCITY:
             // Name         | Bytes |   Bits
             // MotorVelocity	4	    31-0
             // VehicleVelocity	4	    63-32
 
             // Extract motor velocity
-            uint32_t motorRaw = 0;
+
             for (uint8_t i = 0; i < 4; ++i) {
                 motorRaw |= static_cast<uint32_t>(data[i]) << (i * 8);
             }
 
             // Extract vehicle velocity
-            uint32_t vehicleRaw = 0;
+
             for (uint8_t i = 0; i < 4; ++i) {
                 vehicleRaw |= static_cast<uint32_t>(data[i + 4]) << (i * 8);
             }
@@ -259,11 +198,7 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data){
             // Store as float if needed
             this->motorVelocity = static_cast<float>(motorRaw);
             this->vehicleVelocity = static_cast<float>(vehicleRaw);
-            
             break;
-
-            break;
-
         default:
             CUBE_PRINT("CANRxTask - Received unsupported CAN message with ID: 0x%08X\n", id);
             break;        

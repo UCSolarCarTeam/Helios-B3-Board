@@ -96,7 +96,7 @@ private:
 
 #define BUS_CURRENT_OUT 1.0f // Percentage 0 to 1 (always 100%)
 
-#define DRIVE_COMMANDS_FREQ 10
+#define DRIVE_COMMANDS_FREQ 10  // This needs to be at most 1 command every 250ms
 
 #define MOTOR_DRIVE_STDID 0x501U
 #define MOTOR_DRIVE_DLC 8

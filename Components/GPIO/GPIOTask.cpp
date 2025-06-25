@@ -10,7 +10,7 @@
 
 /*----------------------- Macros -----------------------*/
 #define UNUSED_PINS 0
-#define TASK_FREQUENCY_HZ 5
+#define TASK_FREQUENCY_HZ 10
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
 /**
@@ -172,7 +172,7 @@ void GPIOTask::Run(void *pvParams)
     // Hazard Toggle
     uint8_t hazard_toggle = 0;
     uint8_t blink_toggle = 0;
-    uint8_t blink_counter = 5;
+    uint16_t blink_counter = 5000;
 
     // Boolean for Lap button toggle and counter
     uint8_t lap_counter = 0;
@@ -439,22 +439,23 @@ void GPIOTask::Run(void *pvParams)
         // TODO: sync it properly
         if (hazard_toggle) {
 
-            blink_counter--;
-
             if (blink_counter == 0) {
-                blink_counter = 5;
-                if (!blink_toggle) {
-                    powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-                    powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-                    // powerBoardExpander.SetPin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL, IOState::HIGH);
-                    blink_toggle = 1;
-                } else {
-                    powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
-                    powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
-                    // powerBoardExpander.SetPin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL, IOState::HIGH);
-                    blink_toggle = 0;   
-                }
+            	blink_counter = 5000;
             }
+
+            if (!blink_toggle) {
+            	powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+                powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+                // powerBoardExpander.SetPin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL, IOState::HIGH);
+                blink_toggle = 1;
+
+            } else {
+            	powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
+                powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
+                // powerBoardExpander.SetPin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL, IOState::HIGH);
+                blink_toggle = 0;
+            }
+                blink_counter--;
             
         } else {
             blink_counter = 0;

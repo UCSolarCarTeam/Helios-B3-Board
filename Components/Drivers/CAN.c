@@ -150,7 +150,7 @@ void ConfigureCANSPI(CANPeripheral *peripheral)
 
 	// Reset CAN IC
 	CAN_IC_RESET(peripheral);
-	// HAL_Delay(100);
+	osDelay(100);
 
 	// CANSTAT.OPMOD must read as config mode to be able to write to the registers (0x80)
 	uint8_t CANSTAT_STATUS = 0;
@@ -159,8 +159,11 @@ void ConfigureCANSPI(CANPeripheral *peripheral)
 	// Ensure IC is in configuration mode
 	if ((CANSTAT_STATUS & 0xE0) != 0x80) {
 		CAN_IC_WRITE_REGISTER_BITWISE(CANCTRL, 0xE0, 0x80, peripheral);
-		// HAL_Delay(100);
+		osDelay(100);
 	}
+
+	// CAN Filters
+	CAN_Filter(peripheral);
 
 	// Base IC Configuration Registers
 	CAN_IC_WRITE_REGISTER_BITWISE(CNF1, 0xFF, CONFIG_CNF1, peripheral); //configure CNF1
@@ -183,7 +186,7 @@ void ConfigureCANSPI(CANPeripheral *peripheral)
 		CAN_IC_READ_REGISTER(CANSTAT, &CANSTAT_STATUS, peripheral); // 0x44
 	#else
 		CAN_IC_WRITE_REGISTER_BITWISE(CANCTRL, 0xE7, 0x04, peripheral); //Put IC in normal operation mode with CLKOUT pin enable and 1:1 prescaler
-		// HAL_Delay(100);
+		osDelay(100);
 		CAN_IC_READ_REGISTER(CANSTAT, &CANSTAT_STATUS, peripheral);
 	#endif
 
@@ -199,23 +202,27 @@ void ConfigureCANSPI(CANPeripheral *peripheral)
  */
 void CAN_Filter(CANPeripheral *peripheral)
 {
-	// Filter 0x102 for MBMS Status
 	// Filter 0x423/0x403 for motor velocity
-    uint32_t filterID = (0x102 << 0);
-    uint32_t filterMask = 0x1FFFFFFF;
+	CAN_IC_WRITE_REGISTER(RXM1SIDH, 0XFB, peripheral);
+	CAN_IC_WRITE_REGISTER(RXM1SIDL, 0XFF, peripheral);
+	CAN_IC_WRITE_REGISTER(RXM1EID8, 0XFF, peripheral);
+	CAN_IC_WRITE_REGISTER(RXM1EID0, 0XFF, peripheral);
 
-    // Filter Registers
-    CAN_IC_WRITE_REGISTER(0x00, filterID >> 21, peripheral); // SIDH
-    CAN_IC_WRITE_REGISTER(0x01, ((filterID >> 13) & 0xE0) | (1 << 3), peripheral); // SIDL + EXIDE
-    CAN_IC_WRITE_REGISTER(0x02, (filterID >> 5) & 0xFF, peripheral); // EID8
-    CAN_IC_WRITE_REGISTER(0x03, (filterID << 3) & 0xFF, peripheral); // EID0
+	CAN_IC_WRITE_REGISTER(RXF2SIDH, 0X80, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF2SIDL, 0X68, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF2EID8, 0X00, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF2EID0, 0X00, peripheral);
 
+	// Filter 0x102 for MBMS Status
+	CAN_IC_WRITE_REGISTER(RXM0SIDH, 0XFF, peripheral);
+	CAN_IC_WRITE_REGISTER(RXM0SIDL, 0XFF, peripheral);
+	CAN_IC_WRITE_REGISTER(RXM0EID8, 0XFF, peripheral);
+	CAN_IC_WRITE_REGISTER(RXM0EID0, 0XFF, peripheral);
 
-    // Mask Registers
-    CAN_IC_WRITE_REGISTER(0x20, filterMask >> 21, peripheral); // MASK SIDH
-    CAN_IC_WRITE_REGISTER(0x21, ((filterMask >> 13) & 0xE0) | (1 << 3), peripheral); // MASK SIDL + EXIDE
-    CAN_IC_WRITE_REGISTER(0x22, (filterMask >> 5) & 0xFF, peripheral); // MASK EID8
-    CAN_IC_WRITE_REGISTER(0x23, (filterMask << 3) & 0xFF, peripheral); // MASK EID0
+	CAN_IC_WRITE_REGISTER(RXF0SIDH, 0X20, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF0SIDL, 0X48, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF0EID8, 0X00, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF0EID0, 0X00, peripheral);
 }
 
 /*-------------------------------------------------------------------------------------------*/

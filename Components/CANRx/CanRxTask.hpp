@@ -24,8 +24,8 @@ public:
     void InitTask();
     Queue* GetCAN_RX_QUEUE() const { return qEvtQueue; }
     
-    uint32_t getMotorVehicleVelocityInput();
-    uint32_t getMotorVelocityInput();
+    float getMotorVehicleVelocityInput();
+    float getMotorVelocityInput();
     uint8_t getAllowCharge();
     uint8_t getAllowDischarge();
 

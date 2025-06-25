@@ -143,11 +143,11 @@ uint8_t MotorControlTask::isNewDirectionSafe(uint8_t forward, uint8_t reverse)
     if (forward && reverse) {
         // Forward and reverse pressed at the same time, not safe
         return 0;
-        
+
     } else if ((forward && vehicleVelocitySafeToGoForward()) || (reverse && vehicleVelocitySafeToGoReverse())){
         // Forward or reverse pressed and vehicle velocity is safe to go in that direction
         return 1;
-        
+
     } else {
         // default case, not safe
         return 0;
@@ -158,7 +158,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                        DriveCommandsInfo* driveCommandsInfo,
                        uint32_t* switching)
 {
-    // osDelayUntil(prevWakeTimePtr, DRIVE_COMMANDS_FREQ);
+    osDelay(100);
 
     /*
     ---------- ADC Pedal Sampling ----------
@@ -188,7 +188,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     uint8_t reverse = (motor_gpio_state & 0x03) == 0b11; // 0b00 ASSUMTION! MAY CHANGE
     uint8_t mech_brake = motor_gpio_state & 0x04; 		 // active low
     uint8_t reset = motor_gpio_state & 0x08;			 // active low
-    
+
 //    // NOTE: Hard coding GPIO values for now
 //    uint8_t forward = 0;
 //    uint8_t reverse = 1;
@@ -202,7 +202,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     /*--------------- Determine Data to Send ---------------*/
     float motorVelocityOut; // RPM
-    if (!isNewDirectionSafe(forward, reverse)) {                    
+    if (!isNewDirectionSafe(forward, reverse)) {
         motorVelocityOut = 0;
         driveCommandsInfo->motorCurrentOut = 0;
 
@@ -236,13 +236,13 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                 *switching = 0;
                 driveCommandsInfo->motorCurrentOut = 0;
             }
-            
+
         } else {
             motorVelocityOut = 0;
             // Allow regen braking based on input from AuxBMS
             if (allowCharge) {
                 driveCommandsInfo->motorCurrentOut = calculateRegenMotorCurrent(
-                                                        regenPercentage, 
+                                                        regenPercentage,
                                                         driveCommandsInfo->motorCurrentOut
                                                     );
 
@@ -275,7 +275,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                 *switching = 0;
                 driveCommandsInfo->motorCurrentOut = 0;
             }
-        
+
         } else {
             if (forward && allowDischarge) {
                 // Forward and Discharge is allowed
@@ -283,7 +283,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                 motorVelocityOut = MAX_FORWARD_RPM; // FAR FUTURE TODO: Based on ADC LOL (needs math, Omar's curve fitting) - Dom
 
                 driveCommandsInfo->motorCurrentOut = calculateAccelMotorCurrent(
-                                                        accelPercentage, 
+                                                        accelPercentage,
                                                         driveCommandsInfo->motorCurrentOut
                                                     );
 
@@ -294,7 +294,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                 motorVelocityOut = MAX_REVERSE_RPM; // FAR FUTURE TODO: Based on ADC - Dom
 
                 driveCommandsInfo->motorCurrentOut = calculateAccelMotorCurrent(
-                                                        accelPercentage, 
+                                                        accelPercentage,
                                                         driveCommandsInfo->motorCurrentOut
                                                     );
             } else {
@@ -321,7 +321,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                 *switching = 0;
                 driveCommandsInfo->motorCurrentOut = 0;
             }
-            
+
         } else {
         driveCommandsInfo->motorState = Off;
         motorVelocityOut = 0;
@@ -342,7 +342,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     dataToSendFloat[0] = motorVelocityOut;
     dataToSendFloat[1] = driveCommandsInfo->motorCurrentOut;
     memcpy(motor_drive_msg.data, dataToSendFloat, sizeof(float) * 2);
-    
+
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_DRIVE_INPUT));
 
     // Transmit Motor Power command
@@ -359,7 +359,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // `!` for active low
 
     // reset = GPIOTask::Inst().getResetGPIO();
-    if (driveCommandsInfo->prevResetInput && !reset) 
+    if (driveCommandsInfo->prevResetInput && !reset)
     {
         driveCommandsInfo->resetStatus = SettingReset;
     }

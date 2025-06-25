@@ -14,7 +14,7 @@
 
 /* Macros/Enums ------------------------------------------------------------*/
 #define SPI1_TIMEOUT_MS 1000
-#define SPI_TASK_FREQUENCY 1 //Every second 
+#define SPI_TASK_FREQUENCY 20 //Every second
 #define ADC_MIN 102 // Corresponds to 10% of V_in
 #define ADC_MAX 921 // Corresponds to 90% of V_in
 #define SPI_TASK_DELAY 1000 / SPI_TASK_FREQUENCY

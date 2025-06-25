@@ -153,7 +153,7 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("MotorControlTask - Motor Drive Input command\n");
         // Get the drive command from MotorControlTask
         motor_msg = MotorControlTask::Inst().getMotorDrive();
-        
+
         // Parse the drive command into the CAN message
         msg.extendedID = motor_msg.extendedID;
         msg.DLC = motor_msg.DLC;
