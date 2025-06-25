@@ -128,7 +128,7 @@ void CANRxTask::HandleCommand(Command &cm)
         CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
         break;
     default:
-//        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
+        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
         break;
     }
 
@@ -200,7 +200,7 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data) {
             this->vehicleVelocity = static_cast<float>(vehicleRaw);
             break;
         default:
-//            CUBE_PRINT("CANRxTask - Received unsupported CAN message with ID: 0x%08X\n", id);
+            CUBE_PRINT("CANRxTask - Received unsupported CAN message with ID: 0x%08X\n", id);
             break;        
     }
 }
