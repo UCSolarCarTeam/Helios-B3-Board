@@ -23,7 +23,7 @@ int16_t gyro_data[3];
 
 uint8_t GPS_BUFFER[36];
 #define BUFFER_SIZE 36
-//NavData data;
+NavData gpsData;
 
 /**
  * @brief Constructor for I2CTask
@@ -75,6 +75,7 @@ void I2CTask::Run(void *pvParams)
 
 	telemetry_sensor_Init();
 
+
 	GPSDevice::GPS_Initialization();
 	CUBE_PRINT("GPS Configurations complete\r\n");
 
@@ -85,6 +86,27 @@ void I2CTask::Run(void *pvParams)
 		int32_t sum_of_gx = 0, sum_of_gy = 0, sum_of_gz = 0;
 		int16_t sum_of_t = 0;
 		int16_t n = 10;
+
+		GPSDevice::UBX_Transmit(UBX_CFG_MSG, UBX_CFG_MSG_LEN);
+        GPSDevice::UBX_Receive(GPS_BUFFER, BUFFER_SIZE);
+
+        uint16_t ck  = UBXMessage::calculateChecksum(GPS_BUFFER, BUFFER_SIZE);
+        uint16_t exp = (GPS_BUFFER[BUFFER_SIZE - 2] << 8) |
+                       (GPS_BUFFER[BUFFER_SIZE - 1]     );
+        if (ck == exp) {
+            GPSDevice::UBX_M8N_NAV_POSLLH_Parsing(GPS_BUFFER, &gpsData);
+        }
+        CUBE_PRINT(
+            "Data, iTOW: %u\n lon: %ld\n lat: %ld\n height: %ld\n hMSL: %ld\n hAcc: %u\n vAcc: %u\n",
+            gpsData.iTOW,
+            gpsData.lon,
+            gpsData.lat,
+            gpsData.height,
+            gpsData.hMSL,
+            gpsData.hAcc,
+            gpsData.vAcc
+        );
+        osDelay(500);
 
 		//Calculating average accelerometer values
 		for (int16_t a = 0; a<n; a++) {
@@ -148,6 +170,11 @@ void I2CTask::Run(void *pvParams)
         CUBE_PRINT("TEMPERATURE: %i\n", avg_temp);
 
         osDelay(500);
+
+
+
+
+
   }
 }
 
@@ -190,3 +217,5 @@ void I2CTask::Run(void *pvParams)
 //    }
 //
 //}
+
+

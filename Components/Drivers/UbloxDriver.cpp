@@ -92,6 +92,15 @@ uint8_t UBX_CFG_NAV_PVT[] = {
 };
 
 
+uint16_t UBX_CFG_PRT_LEN   = sizeof(UBX_CFG_PRT);
+uint16_t UBX_CFG_MSG_LEN   = sizeof(UBX_CFG_MSG);
+uint16_t UBX_CFG_RATE_LEN  = sizeof(UBX_CFG_RATE);
+uint16_t UBX_CFG_RESET_LEN   = sizeof(UBX_CFG_RESET);
+uint16_t UBX_CFG_CFG_LEN   = sizeof(UBX_CFG_CFG);
+uint16_t UBX_ACK_ACK_LEN  = sizeof(UBX_ACK_ACK);
+uint16_t UBX_CFG_NAV_PVT_LEN  = sizeof(UBX_CFG_NAV_PVT);
+
+
 // UBXMessage
 UBXMessage::UBXMessage(uint8_t class_id, uint8_t msg_id, uint8_t length)
     : msg_class(class_id), msg_id(msg_id), length(length) {
