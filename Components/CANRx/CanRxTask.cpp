@@ -128,7 +128,7 @@ void CANRxTask::HandleCommand(Command &cm)
         CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
         break;
     default:
-        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
+//        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
         break;
     }
 
