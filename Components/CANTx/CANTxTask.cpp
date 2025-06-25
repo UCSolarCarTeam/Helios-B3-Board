@@ -188,7 +188,7 @@ void CANTxTask::HandleCommand(Command &cm)
         break;
 
     default:
-        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
+//        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
         break;
     }
 
