@@ -22,8 +22,12 @@ void Accelerometer_Read_Byte(uint8_t address, uint8_t* buffer) {
 	 * Use the following function to communicate with the peripheral
 	 */
 
-	address = address | 0xA0; //why do this? --figure out why
-	HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c1, (ACCELEROMETER_DEVICE_ADDR << 1), address, I2C_MEMADD_SIZE_8BIT, buffer, 1, 1000);
+	//Remove bottom two lines, logic is flawed greatly
+	//address = address | 0xA0; //why do this? --figure out why
+	//HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c1, (ACCELEROMETER_DEVICE_ADDR << 1), address, I2C_MEMADD_SIZE_8BIT, buffer, 1, 1000);
+
+	HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c1, (ACCELEROMETER_DEVICE_ADDR<<1), address, I2C_MEMADD_SIZE_8BIT, buffer, 1, 1000);  // no address |= 0xA0
+
 
 	// HAL_I2C_Mem_Read(hi2c, DevAddress, MemAddress, MemAddSize, pData, Size, Timeout);
 	/* uint16_t DevAddress: I2C address of the device.
@@ -43,8 +47,10 @@ void Accelerometer_Write_Byte(uint8_t address, uint8_t value) {
 	 * Use the following function to communicate with the peripheral
 	 */
 
-	address = address | 0xA0; //why do this?
-	HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&hi2c1, (ACCELEROMETER_DEVICE_ADDR << 1), address, I2C_MEMADD_SIZE_8BIT, &value, 1, 1000);
+	//Removed two rows below:
+	//address = address | 0xA0; //why do this?
+	//HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&hi2c1, (ACCELEROMETER_DEVICE_ADDR << 1), address, I2C_MEMADD_SIZE_8BIT, &value, 1, 1000);
+	HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&hi2c1, (ACCELEROMETER_DEVICE_ADDR<<1), address, I2C_MEMADD_SIZE_8BIT, &value, 1, 1000);
 
 	//HAL_I2C_Mem_Write(hi2c, DevAddress, MemAddress, MemAddSize, pData, Size, Timeout);
 	//HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&hi2c1, (ACCELEROMETER_DEVICE_ADDR << 1), address, I2C_MEMADD_SIZE_8BIT, &value, 1, 1000);
@@ -63,6 +69,12 @@ void Accelerometer_Write_Byte(uint8_t address, uint8_t value) {
  */
 
 void telemetry_sensor_Init() {
+
+	//Setup for sensor
+	uint8_t pm1 = 0x81;
+	HAL_I2C_Mem_Write(&hi2c1, ACCEL_ADDR, 0x6B, I2C_MEMADD_SIZE_8BIT, &pm1, 1, 1000);
+	HAL_Delay(45);
+
 	//Accel configuration
 	uint8_t id_buffer;
 	Accelerometer_Read_Byte(0x75, &id_buffer);

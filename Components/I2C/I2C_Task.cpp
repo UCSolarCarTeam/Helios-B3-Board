@@ -50,11 +50,20 @@ void I2CTask::InitTask()
                     (TaskHandle_t *)&rtTaskHandle);
 
     CUBE_ASSERT(rtValue == pdPASS, "I2CTask::InitTask() - xTaskCreate() failed");
+
+
+	GPSDevice::GPS_Initialization();
+	CUBE_PRINT("GPS Configurations complete\r\n");
 }
 
 uint8_t* I2CTask::PollData()
 {
+	return GPS_BUFFER;
+}
 
+uint16_t I2CTask::CheckSum()
+{
+    return UBXMessage::calculateChecksum(GPS_BUFFER, BUFFER_SIZE);
 }
 
 
@@ -75,10 +84,6 @@ void I2CTask::Run(void *pvParams)
 
 	telemetry_sensor_Init();
 
-
-	GPSDevice::GPS_Initialization();
-	CUBE_PRINT("GPS Configurations complete\r\n");
-
 	Queue* evtQ = CANTxTask::Inst().GetEventQueue();
 
 	while (1) {
@@ -87,8 +92,10 @@ void I2CTask::Run(void *pvParams)
 		int16_t sum_of_t = 0;
 		int16_t n = 10;
 
-		GPSDevice::UBX_Transmit(UBX_CFG_MSG, UBX_CFG_MSG_LEN);
-        GPSDevice::UBX_Receive(GPS_BUFFER, BUFFER_SIZE);
+
+		GPSDevice::UBX_Transmit(UBX_POLL_POSLLH, UBX_POLL_POSLLH_LEN);
+		osDelay(10);  // time to allow rest
+		GPSDevice::UBX_Receive(GPS_BUFFER, BUFFER_SIZE);
 
         uint16_t ck  = UBXMessage::calculateChecksum(GPS_BUFFER, BUFFER_SIZE);
         uint16_t exp = (GPS_BUFFER[BUFFER_SIZE - 2] << 8) |

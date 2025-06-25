@@ -31,6 +31,9 @@ extern uint16_t UBX_CFG_CFG_LEN;
 extern uint16_t UBX_ACK_ACK_LEN;
 extern uint16_t UBX_CFG_NAV_PVT_LEN;
 
+// UBX Class=0x01 (NAV), ID=0x02 (POSLLH), length=0 payload
+extern uint8_t UBX_POLL_POSLLH[8];
+extern const uint16_t UBX_POLL_POSLLH_LEN;
 
 //Structs
 typedef struct UBX_M8N_NAV_POSLLH {
