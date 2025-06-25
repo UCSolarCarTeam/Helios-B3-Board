@@ -179,10 +179,10 @@ void CANTxTask::HandleCommand(Command &cm)
 
     case MOTOR_RESET_INPUT:
         CUBE_PRINT("MotorControlTask - Motor Reset\n");
-        // Parse the reset command into the CAN message
-        // msg.extendedID = IDK WHAT IT IS WE ARE GONNA HAVE TO ASK ELECTRICAL;
 
-        
+        msg.extendedID = 0x503;
+        msg.DLC = 0;
+        // No data to send for reset command
 
         CUBE_PRINT("Sent Motor Reset Input command\n");
         break;

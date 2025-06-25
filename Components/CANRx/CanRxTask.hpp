@@ -39,6 +39,11 @@ private:
     CANRxTask();        // Private constructor
     CANRxTask(const CANRxTask&);                        // Prevent copy-construction
     CANRxTask& operator=(const CANRxTask&);            // Prevent assignment
+
+    float vehicleVelocity = 0;
+    float motorVelocity = 0;
+    uint8_t allowCharge = 0;
+    uint8_t allowDischarge = 0;
 };
 
 //Helper function to print CAN message

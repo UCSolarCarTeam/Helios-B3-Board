@@ -194,6 +194,30 @@ void ConfigureCANSPI(CANPeripheral *peripheral)
 	Setup_CANRx_Interrupt_Buffer(peripheral);
 }
 
+/**
+ * @brief set CAN filters for CAN IC
+ */
+void CAN_Filter(CANPeripheral *peripheral)
+{
+	// Filter 0x102 for MBMS Status
+	// Filter 0x423/0x403 for motor velocity
+    uint32_t filterID = (0x102 << 0);
+    uint32_t filterMask = 0x1FFFFFFF;
+
+    // Filter Registers
+    CAN_IC_WRITE_REGISTER(0x00, filterID >> 21, peripheral); // SIDH
+    CAN_IC_WRITE_REGISTER(0x01, ((filterID >> 13) & 0xE0) | (1 << 3), peripheral); // SIDL + EXIDE
+    CAN_IC_WRITE_REGISTER(0x02, (filterID >> 5) & 0xFF, peripheral); // EID8
+    CAN_IC_WRITE_REGISTER(0x03, (filterID << 3) & 0xFF, peripheral); // EID0
+
+
+    // Mask Registers
+    CAN_IC_WRITE_REGISTER(0x20, filterMask >> 21, peripheral); // MASK SIDH
+    CAN_IC_WRITE_REGISTER(0x21, ((filterMask >> 13) & 0xE0) | (1 << 3), peripheral); // MASK SIDL + EXIDE
+    CAN_IC_WRITE_REGISTER(0x22, (filterMask >> 5) & 0xFF, peripheral); // MASK EID8
+    CAN_IC_WRITE_REGISTER(0x23, (filterMask << 3) & 0xFF, peripheral); // MASK EID0
+}
+
 /*-------------------------------------------------------------------------------------------*/
 
 uint8_t checkAvailableTXChannel(CANPeripheral *peripheral)

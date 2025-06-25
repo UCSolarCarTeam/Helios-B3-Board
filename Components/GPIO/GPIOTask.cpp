@@ -368,11 +368,11 @@ void GPIOTask::Run(void *pvParams)
                 // TODO: toggle boolean (notify motor task)
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
-                    // powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::LOW);
+                    powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::LOW);
                 }
                 else if (driverControlState[i - 2] == IOState::LOW)
                 {
-                    // powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::HIGH);
+                    powerBoardExpander.SetPin(DriverControls::MOTOR_RESET, IOState::HIGH);
                 }
                 else if (driverControlState[i - 2] == IOState::ERROR)
                 {

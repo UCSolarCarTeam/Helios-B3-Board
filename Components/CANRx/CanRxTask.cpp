@@ -25,10 +25,11 @@ enum CAN_RX_ADDRESSES{
     MBMS_MESSAGE = 0x102,
 
     // Motor Controller Addresses
-    MOTOR_CONTROLLER_BASE = 0x420,
+    MOTOR_CONTROLLER_BASE = 0x420,  // 0x400 if Left Motor is Primary
+    MOTOR_VELOCITY = 0x423,         // 0x403 if the Left Motor is Primary
+#if 0
     MOTOR_STATUS = 0x421,
     MOTOR_BUS_MEASUREMENT= 0x422,
-    MOTOR_VELOCITY = 0x423,
     MOTOR_PHASE_CURRENT = 0x424,
     MOTOR_VOLTAGE_VECTOR = 0x425,
     MOTOR_CURRENT_VECTOR = 0x426,
@@ -39,13 +40,8 @@ enum CAN_RX_ADDRESSES{
     MOTOR_BOARD_DSP_TEMP = 0x42C,
     MOTOR_ODOMETER_BUS = 0x42E,
     MOTOR_SLIP_SPEED = 0x437,
+#endif
 };
-
-
-uint32_t vehicleVelocity = 0;
-uint32_t motorVelocity = 0;
-uint8_t allowCharge = 0;
-uint8_t allowDischarge = 0;
 
 /**
  * @brief Constructor for CANTxTask
@@ -104,7 +100,7 @@ void CANRxTask::Run(void *pvParams)
 
         // Process the command
         HandleCommand(cm);
-
+        // Handle the CAN message
 
         cm.Reset();
     }
@@ -172,9 +168,9 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data){
         case MBMS_MESSAGE: // MBMS Status ID: CHANGE THIS TO THE ACTUAL DEFINE LATER
             // Bit 6 = nChargeEnable
             // Bit 8 = nDischargeEnable
-            allowDischarge = (data[0] & 0x40) ? 0 : 1;  // Byte 0, Bit 6
-            allowCharge = (data[1] & 0x1) ? 0 : 1;      // Byte 1, Bit 0
-            CUBE_PRINT("MBMS Status: allowCharge = %d, allowDischarge = %d\n", allowCharge, allowDischarge);
+            this->allowDischarge = (data[0] & 0x40) ? 0 : 1;  // Byte 0, Bit 6
+            this->allowCharge = (data[1] & 0x1) ? 0 : 1;      // Byte 1, Bit 0
+            CUBE_PRINT("MBMS Status: allowCharge = %d, allowDischarge = %d\n", this->allowCharge, this->allowDischarge);
             break;
 #if 0
         // TODO: add case motor feedback ID 0x402
@@ -248,15 +244,23 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data){
             // MotorVelocity	4	    31-0
             // VehicleVelocity	4	    63-32
 
-            motorVelocity = 0.0f;
-            for(uint8_t i = 0; i < 4; ++i) {
-                motorVelocity |= (data[i] << (i * 8));
+            // Extract motor velocity
+            uint32_t motorRaw = 0;
+            for (uint8_t i = 0; i < 4; ++i) {
+                motorRaw |= static_cast<uint32_t>(data[i]) << (i * 8);
             }
 
-            vehicleVelocity = 0.0f;
-            for(uint8_t i = 4; i < 8; ++i) {
-                vehicleVelocity |= (data[i] << ((i - 4) * 8));
+            // Extract vehicle velocity
+            uint32_t vehicleRaw = 0;
+            for (uint8_t i = 0; i < 4; ++i) {
+                vehicleRaw |= static_cast<uint32_t>(data[i + 4]) << (i * 8);
             }
+
+            // Store as float if needed
+            this->motorVelocity = static_cast<float>(motorRaw);
+            this->vehicleVelocity = static_cast<float>(vehicleRaw);
+            
+            break;
 
             break;
 
@@ -266,16 +270,16 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data){
     }
 }
 
-uint32_t CANRxTask::getMotorVehicleVelocityInput()
+float CANRxTask::getMotorVehicleVelocityInput()
 {
     // This function should return the vehicle velocity input from the motor controller
-    return vehicleVelocity; // Placeholder for actual vehicle velocity input
+    return this->vehicleVelocity;
 }
 
-uint32_t CANRxTask::getMotorVelocityInput()
+float CANRxTask::getMotorVelocityInput()
 {
     // This function should return the motor velocity from the motor controller
-    return motorVelocity; // Placeholder for actual motor velocity
+    return this->motorVelocity;
 }
 
 uint8_t CANRxTask::getAllowCharge()
