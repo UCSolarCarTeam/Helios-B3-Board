@@ -10,7 +10,7 @@
 
 /*----------------------- Macros -----------------------*/
 #define UNUSED_PINS 0
-#define TASK_FREQUENCY_HZ 2000//10
+#define TASK_FREQUENCY_HZ 1//10
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
 #define BLINK_COUNT_MAX 5
