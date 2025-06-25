@@ -13,7 +13,7 @@
 #define TASK_FREQUENCY_HZ 10
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
-#define BLINK_COUNT_MAX 5000
+#define BLINK_COUNT_MAX 500
 
 /**
  * @brief Constructor for GPIOTask
@@ -178,7 +178,7 @@ void GPIOTask::Run(void *pvParams)
 
     // For Blinking Logic
     uint16_t blink_counter = BLINK_COUNT_MAX;
-    uint8_t blink = 0;
+    uint8_t blink = false;
 
     // Boolean for Lap button toggle and counter
     uint8_t lap_counter = 0;
@@ -446,28 +446,38 @@ void GPIOTask::Run(void *pvParams)
         if (hazard_toggle || left_signal_toggle || right_signal_toggle) {
 
             if (blink_counter == 0) {
-            	blink_counter = BLINK_COUNT_MAX;
-            	blink = !blink;
+                blink_counter = BLINK_COUNT_MAX;
+                blink = !blink;
             }
 
-            powerBoardExpander.SetPin(
-            		PowerBoard::LEFT_TURN_LIGHT_SIGNAL,
-					((hazard_toggle || left_signal_toggle) && blink) ? IOState::HIGH : IOState::LOW
-			);
+            if (hazard_toggle) {
+                // Hazards override turn signals: blink both sides together
+                IOState state = blink ? IOState::HIGH : IOState::LOW;
+                powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, state);
+                powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, state);
 
-            powerBoardExpander.SetPin(
-            		PowerBoard::RIGHT_TURN_LIGHT_SIGNAL,
-					((hazard_toggle || right_signal_toggle) && blink) ? IOState::HIGH : IOState::LOW
-			);
+            } else {
+                // Turn signals blink independently
+                powerBoardExpander.SetPin(
+                    PowerBoard::LEFT_TURN_LIGHT_SIGNAL,
+                    (left_signal_toggle && blink) ? IOState::HIGH : IOState::LOW
+                );
+
+                powerBoardExpander.SetPin(
+                    PowerBoard::RIGHT_TURN_LIGHT_SIGNAL,
+                    (right_signal_toggle && blink) ? IOState::HIGH : IOState::LOW
+                );
+            }
 
             blink_counter--;
-            
-        } else {
-        	powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
-        	powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
 
-        	blink_counter = 0;
+        } else {
+            // No signals active, ensure both lights are off
+            powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
+            powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
+            blink_counter = 0;
         }
+
 
         // Commit changes to Power board
         powerBoardExpander.Commit();
