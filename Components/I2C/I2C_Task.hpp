@@ -10,6 +10,7 @@
 //#include "M8N.hpp"
 #include "Task.hpp"
 #include "SystemDefines.hpp"
+#include "UbloxDriver.hpp"
 //#include "Timer.hpp"
 
 /*---------------------------------- Macros/Enums ----------------------------------*/
@@ -35,6 +36,8 @@ public:
     uint8_t GPSData();
     uint8_t* PollData();
     uint8_t CheckSum();
+
+    static constexpr uint8_t NAV_PVT_DATA =  0x07;  // same thing as the UBX class=0x01,msg=0x07
 
     //uint8_t LightsInputs();
     //uint16_t DigitalInputs();

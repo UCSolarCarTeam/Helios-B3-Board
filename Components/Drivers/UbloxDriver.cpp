@@ -6,7 +6,7 @@
  */
 
 #include "UbloxDriver.hpp"
-#include "CubeDefines.hpp"
+#include "SystemDefines.hpp"
 #include <cstring>
 
 extern I2C_HandleTypeDef hi2c1;
@@ -14,7 +14,8 @@ extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart1;
 
 //:
-/*
+
+// UBX  Buffers
 uint8_t UBX_CFG_PRT[] = {
     0xB5, 0x62,     // Sync Chars
     0x06, 0x00,     // Class and Message ID for Port Configuration
@@ -89,7 +90,7 @@ uint8_t UBX_CFG_NAV_PVT[] = {
     // Checksum will be calculated
     0x37, 0x37
 };
-*/
+
 
 // UBXMessage
 UBXMessage::UBXMessage(uint8_t class_id, uint8_t msg_id, uint8_t length)
@@ -125,6 +126,7 @@ void GPSDevice::UBX_Transmit(uint8_t* buffer, uint16_t buflen) {
     }
 }
 
+//Recieve function
 void GPSDevice::UBX_Receive(uint8_t* buffer, uint16_t buflen) {
     HAL_StatusTypeDef hal = HAL_I2C_Mem_Read(&hi2c1, GPS_DEVICE_ADDRESS, GPS_DATA_REGISTER, 1, buffer, buflen, 100);
     if (hal != HAL_OK) {
@@ -134,6 +136,7 @@ void GPSDevice::UBX_Receive(uint8_t* buffer, uint16_t buflen) {
     }
 }
 
+// POSLLH parsing function
 void GPSDevice::UBX_M8N_NAV_POSLLH_Parsing(uint8_t* buffer, NavData* data) {
     data->iTOW = buffer[9]<<24 | buffer[8]<<16 | buffer[7]<<8 | buffer[6];
     data->lon = buffer[13]<<24 | buffer[12]<<16 | buffer[11]<<8 | buffer[10];
@@ -144,6 +147,7 @@ void GPSDevice::UBX_M8N_NAV_POSLLH_Parsing(uint8_t* buffer, NavData* data) {
     data->vAcc = buffer[33]<<24 | buffer[32]<<16 | buffer[31]<<8 | buffer[30];
 }
 
+// Transmit function
 void GPSDevice::CONFIG_Transmit(uint8_t* buffer, uint16_t buflen) {
     HAL_StatusTypeDef hal = HAL_I2C_Master_Transmit(&hi2c1, GPS_DEVICE_ADDRESS, buffer, buflen, HAL_MAX_DELAY);
     if (hal != HAL_OK) {
@@ -171,6 +175,7 @@ void GPSDevice::CONFIG_Transmit(uint8_t* buffer, uint16_t buflen) {
     }
 }
 
+// Get length for UBX
 uint16_t GPSDevice::UBX_GET_LENGTH() {
     uint8_t ubx_length[2];
     HAL_StatusTypeDef hal = HAL_I2C_Mem_Read(&hi2c1, GPS_DEVICE_ADDRESS | 0x01, GPS_DATA_LENGTH_HIGH, 1, ubx_length, sizeof(ubx_length), 100);
@@ -182,6 +187,7 @@ uint16_t GPSDevice::UBX_GET_LENGTH() {
     return ((ubx_length[0] << 8) | (ubx_length[1]));
 }
 
+// Init func
 void GPSDevice::GPS_Initialization() {
 	//Size calulcataion based on previous implementation
     CUBE_PRINT("Starting MSG\r\n");

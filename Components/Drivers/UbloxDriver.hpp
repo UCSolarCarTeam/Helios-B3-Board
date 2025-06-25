@@ -1,9 +1,13 @@
 #pragma once
 
+#ifndef UbloxDriver
+#define UbloxDriver
+
 #include "main.h"
 #include <stdint.h>
 #include "cmsis_os.h"
 #include "stm32l1xx_hal.h"
+#include "SystemDefines.hpp"
 
 //Private Macros
 #define GPS_DEVICE_ADDRESS    (0x42 << 1)
@@ -11,17 +15,8 @@
 #define GPS_DATA_LENGTH_HIGH  0xFD
 #define GPS_DATA_LENGTH_LOW   0xFE
 
-// UBX  Buffers
 /*
-uint8_t UBX_CFG_PRT[];
-uint8_t UBX_CFG_MSG[];
-uint8_t UBX_CFG_RATE[];
-uint8_t UBX_CFG_RESET[];
-uint8_t UBX_CFG_CFG[];
-uint8_t UBX_ACK_ACK[];
-uint8_t UBX_CFG_NAV_PVT[];
-*/
-
+// UBX  Buffers
 uint8_t UBX_CFG_PRT[] = {
     0xB5, 0x62,     // Sync Chars
     0x06, 0x00,     // Class and Message ID for Port Configuration
@@ -97,7 +92,7 @@ uint8_t UBX_CFG_NAV_PVT[] = {
     0x37, 0x37
 };
 
-
+*/
 
 //Structs
 typedef struct UBX_M8N_NAV_POSLLH {
@@ -135,3 +130,6 @@ public:
     static void UBX_M8N_NAV_POSLLH_Parsing(uint8_t* buffer, NavData* data);
     static HAL_StatusTypeDef WaitUntilI2CReady(uint32_t timeout_ms);
 };
+
+
+#endif //UbloxDriver definition
