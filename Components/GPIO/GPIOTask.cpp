@@ -328,21 +328,18 @@ void GPIOTask::Run(void *pvParams)
             {
             case DriverControls::HORN_ENABLE:
                 CUBE_PRINT("    - P10 (Horn Enable):         %d\n", driverControlState[i-2]);
+                if (driverControlState[i - 2] == IOState::HIGH)
+                {
+                    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::LOW);
+                }
+                else if (driverControlState[i - 2] == IOState::LOW)
+                {
+                    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::HIGH);
 
-                powerBoardExpander.SetPinNow(PowerBoard::HORN_SIGNAL, IOState::LOW);
-
-//                if (driverControlState[i - 2] == IOState::HIGH)
-//                {
-//                    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::LOW);
-//                }
-//                else if (driverControlState[i - 2] == IOState::LOW)
-//                {
-//                    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::HIGH);
-//
-//                }
-//                else if (driverControlState[i - 2] == IOState::ERROR)
-//                {
-//                }
+                }
+                else if (driverControlState[i - 2] == IOState::ERROR)
+                {
+                }
                 break;
             case DriverControls::LEFT_SIGNAL_ENABLE:
                 CUBE_PRINT("    - P11 (Left Signal):         %d\n", driverControlState[i-2]);
