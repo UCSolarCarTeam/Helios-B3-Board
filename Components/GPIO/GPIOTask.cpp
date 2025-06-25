@@ -10,10 +10,10 @@
 
 /*----------------------- Macros -----------------------*/
 #define UNUSED_PINS 0
-#define TASK_FREQUENCY_HZ 20//10
+#define TASK_FREQUENCY_HZ 200//10
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
-#define BLINK_COUNT_MAX 50
+#define BLINK_COUNT_MAX 5
 
 /**
  * @brief Constructor for GPIOTask
