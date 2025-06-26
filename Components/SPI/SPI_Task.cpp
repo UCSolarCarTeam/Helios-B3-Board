@@ -254,11 +254,16 @@ void SPI_Task::Run(void *pvParams)
    */
   while (1)
   {
-    calculateAccelerationPedalPercent();
-    // CUBE_PRINT("Acceleration Pedal Position: %.2f%%\n", this.accelerationPedalPercent);
 
-    calculateBrakePedalPercent();
-    // CUBE_PRINT("Braking Pedal Position: %.2f%%\n", this.brakingPedalPercent);
+    calculateAccelerationPedalPercent();
+//	uint8_t testaccel = getAccelerationIntPercent();
+//    CUBE_PRINT("accel: %d   \r", testaccel);
+     // CUBE_PRINT("Acceleration Pedal Position: %.2f%%\n", &(this->accelerationPedalPercent));
+
+//    calculateBrakePedalPercent();
+//    uint8_t testbrake = getBrakeIntPercent();
+//    CUBE_PRINT("brake: %d   \r", testbrake);
+     // CUBE_PRINT("Braking Pedal Position: %.2f%%\n", &(this->brakingPedalPercent));
 
     osDelay(SPI_TASK_DELAY); // Delay to reach 100 readings/s
   }

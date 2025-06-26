@@ -13,7 +13,7 @@
 #define TASK_FREQUENCY_HZ 10
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
-#define BLINK_COUNT_MAX 500
+#define BLINK_COUNT_MAX 1000
 
 /**
  * @brief Constructor for GPIOTask
@@ -166,7 +166,7 @@ void GPIOTask::Run(void *pvParams)
 //    IOExpander driverControlExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(1, 0, 0));
 //    IOExpander powerBoardExpander(SystemHandles::I2C_Expander, IOExpander::CalculateAddress(0, 0, 1));
 
-    powerBoardExpander.SetPinNow(PowerBoard::HORN_SIGNAL, IOState::LOW);
+    // powerBoardExpander.SetPinNow(PowerBoard::HORN_SIGNAL, IOState::LOW);
 
     // FNR_State
     uint8_t fnr_state = 0;
@@ -189,6 +189,13 @@ void GPIOTask::Run(void *pvParams)
     uint16_t powerBoardStatus = 0;
     uint16_t driverControlStatus = 0;
 
+    powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
+    powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
+    powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::LOW);
+    powerBoardExpander.SetPin(PowerBoard::DAYTIME_RUNNING_LIGHT_SIGNAL, IOState::LOW);
+    powerBoardExpander.SetPin(PowerBoard::HORN_SIGNAL, IOState::LOW);
+    powerBoardExpander.Commit();
+
     while (1)
     {
         // Poll GPIO State of driver controls
@@ -210,7 +217,7 @@ void GPIOTask::Run(void *pvParams)
                }
                else if (driverControlState[i] == IOState::LOW)
                {
-                   fnr_state |= 0b10;  
+                   fnr_state |= 0b10;
                }
                else if (driverControlState[i] == IOState::ERROR)
                {
@@ -224,7 +231,7 @@ void GPIOTask::Run(void *pvParams)
                }
                else if (driverControlState[i] == IOState::LOW)
                {
-                    fnr_state |= 0x01;   
+                    fnr_state |= 0x01;
                }
                else if (driverControlState[i] == IOState::ERROR)
                {
@@ -468,6 +475,8 @@ void GPIOTask::Run(void *pvParams)
             		} else {
             			powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
             		}
+            	} else if(!hazard_toggle){
+            		powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
             	}
 
             	if(right_signal_toggle) {
@@ -476,6 +485,8 @@ void GPIOTask::Run(void *pvParams)
             		} else {
             			powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
             		}
+            	}else if(!hazard_toggle){
+            		powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
             	}
 
             	if(!blink){
@@ -493,7 +504,6 @@ void GPIOTask::Run(void *pvParams)
             powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
             blink_counter = 0;
         }
-
 
         // Commit changes to Power board
         powerBoardExpander.Commit();
@@ -531,14 +541,14 @@ void GPIOTask::checkCounterTick() {
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, DIGITAL_INPUTS));
     CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
 
-    if (this->counterTick == 2) { // 100 ms passed send LIGHTS_INPUT
+    if (this->counterTick == 1) { // 100 ms passed send LIGHTS_INPUT
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
     }
-    if (this->counterTick == 4) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
+    if (this->counterTick == 2) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
     }
-    if(this->counterTick == 20){
+    if(this->counterTick == 10){
         CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,HEARTBEAT));
         this->counterTick = 0; // Reset the counter for the next cycle
     }

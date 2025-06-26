@@ -166,7 +166,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     2. calculate average pedal percentages from the buffer
     */
 
-    regenValuesQueue[driveCommandsInfo->regenQueueIndex++] = SPI_Task::Inst().getBrakePedalPercent();
+    regenValuesQueue[driveCommandsInfo->regenQueueIndex++] = 0; //SPI_Task::Inst().getBrakePedalPercent();
     accelValuesQueue[driveCommandsInfo->accelQueueIndex++] = SPI_Task::Inst().getAccelerationPedalPercent();
 
     // Update Queue Indices
@@ -174,7 +174,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     driveCommandsInfo->regenQueueIndex %= ACCEL_QUEUE_SIZE;
 
     // Convert values back to floating percentages for motors
-    float regenPercentage = (float)getAvgRegen() / 100.0f; // Get value between 0 and 1
+    float regenPercentage = 0; //(float)getAvgRegen() / 100.0f; // Get value between 0 and 1
     float accelPercentage = (float)getAvgAccel() / 100.0f;
 
     /*
@@ -197,8 +197,10 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     /* TODO: Add switch case handle for CANRx Task to receive AuxBMS states */
     // Read AuxBMS messages
-    uint8_t allowCharge = CANRxTask::Inst().getAllowCharge();
+//    uint8_t allowCharge = CANRxTask::Inst().getAllowCharge();
     uint8_t allowDischarge = CANRxTask::Inst().getAllowDischarge();
+    uint8_t allowCharge = 0;
+
 
     /*--------------- Determine Data to Send ---------------*/
     float motorVelocityOut; // RPM

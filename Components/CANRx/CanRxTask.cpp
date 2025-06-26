@@ -25,8 +25,8 @@ enum CAN_RX_ADDRESSES{
     MBMS_MESSAGE = 0x102,
 
     // Motor Controller Addresses
-    MOTOR_CONTROLLER_BASE = 0x420,  // 0x400 if Left Motor is Primary
-    MOTOR_VELOCITY = 0x423,         // 0x403 if the Left Motor is Primary
+    MOTOR_CONTROLLER_BASE = 0x400, //0x420,  // 0x400 if Left Motor is Primary
+    MOTOR_VELOCITY = 0x403, //0x423,         // 0x403 if the Left Motor is Primary
 #if 0
     MOTOR_STATUS = 0x421,
     MOTOR_BUS_MEASUREMENT= 0x422,
@@ -115,20 +115,22 @@ void CANRxTask::HandleCommand(Command &cm)
     switch (static_cast<CAN_RX_COMMANDS>(cm.GetTaskCommand()))
     {
     case CAN_INTERRUPT_HAPPENED:
-        CUBE_PRINT("Received a CAN RX Message by interrupt\n");
+//        CUBE_PRINT("Received a CAN RX Message by interrupt\n");
+    	__NOP();
         break;
     case CAN_RX0_INTERRUPT_HAPPENED:
         receiveCANMessage(0, &id, &dlc, data, &peripheral2);
-        CUBE_PRINT("CAN RX0 Message:\n");
-        CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
+//        CUBE_PRINT("CAN RX0 Message:\n");
+//        CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
         break;
     case CAN_RX1_INTERRUPT_HAPPENED:
         receiveCANMessage(1, &id, &dlc, data, &peripheral2);
-        CUBE_PRINT("CAN RX1 Message:\n");
-        CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
+//        CUBE_PRINT("CAN RX1 Message:\n");
+//        CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
         break;
     default:
-        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
+//        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
+        __NOP();
         break;
     }
 
@@ -200,7 +202,8 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data) {
             this->vehicleVelocity = static_cast<float>(vehicleRaw);
             break;
         default:
-            CUBE_PRINT("CANRxTask - Received unsupported CAN message with ID: 0x%08X\n", id);
+//            CUBE_PRINT("CANRxTask - Received unsupported CAN message with ID: 0x%08X\n", id);
+        	__NOP();
             break;        
     }
 }
