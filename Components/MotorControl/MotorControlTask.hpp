@@ -87,7 +87,11 @@ protected:
 private:
     MotorControlTask();                                                          // Private constructor
     MotorControlTask(const MotorControlTask &);                                 // Prevent copy-construction
-    MotorControlTask &operator=(const MotorControlTask &);                     // Prevent assignmen
+    MotorControlTask &operator=(const MotorControlTask &);                     // Prevent assignment
+
+    CANMsg motor_drive_msg;
+    CANMsg motor_power_msg;
+
 };
 
 

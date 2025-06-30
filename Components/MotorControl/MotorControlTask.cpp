@@ -4,9 +4,6 @@
 
 #include "MotorControlTask.hpp"
 
-CANMsg motor_drive_msg;
-CANMsg motor_power_msg;
-
 float regenValuesQueue[REGEN_QUEUE_SIZE] = {0};
 float accelValuesQueue[ACCEL_QUEUE_SIZE] = {0};
 
@@ -45,6 +42,14 @@ void MotorControlTask::Run(void *pvParams)
 
     uint32_t switching = 0;
 
+    this->motor_drive_msg.ID - 0;
+    this->motor_drive_msg.extendedID = MOTOR_DRIVE_STDID;
+    this->motor_drive_msg.DLC = MOTOR_DRIVE_DLC;
+
+    this->motor_power_msg.ID = 0;
+	this->motor_power_msg.extendedID = MOTOR_POWER_STDID;
+    this->motor_power_msg.DLC = MOTOR_POWER_DLC;
+
     for (;;)
     {
         sendDriveCommands(&prevWakeTime, &driveCommandsInfo, &switching);
@@ -54,13 +59,11 @@ void MotorControlTask::Run(void *pvParams)
 // -----------------------------------------
 
 CANMsg MotorControlTask::getMotorDrive(){
-    motor_drive_msg.ID = 0;
-	return motor_drive_msg;
+	return this->motor_drive_msg;
 }
 
 CANMsg MotorControlTask::getMotorPower(){
-    motor_power_msg.ID = 0;
-	return motor_power_msg;
+	return this->motor_power_msg;
 }
 
 uint32_t MotorControlTask::getAvgRegen()
@@ -337,23 +340,19 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     motorVehicleVelocityInput = 0.0f;
 
     // Transmit Motor Drive command
-    float dataToSendFloat[2];
+    float dataToSendFloat[2] = {0};
     // ADD EXTENDED ID HERE IF NEEDED
-    motor_drive_msg.extendedID = MOTOR_DRIVE_STDID;
-    motor_drive_msg.DLC = MOTOR_DRIVE_DLC;
     dataToSendFloat[0] = motorVelocityOut;
     dataToSendFloat[1] = driveCommandsInfo->motorCurrentOut;
-    memcpy(motor_drive_msg.data, dataToSendFloat, sizeof(float) * 2);
+    memcpy(motor_drive_msg.data, &dataToSendFloat[0], sizeof(float) * 2);
 
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_DRIVE_INPUT));
 
     // Transmit Motor Power command
     // ADD EXTENDED ID HERE IF NEEDED
-    motor_power_msg.extendedID = MOTOR_POWER_STDID;
-    motor_power_msg.DLC = MOTOR_POWER_DLC;
     dataToSendFloat[0] = 0.0f; // Reserved (WaveSculptor datasheet)
     dataToSendFloat[1] = BUS_CURRENT_OUT;
-    memcpy(motor_power_msg.data, dataToSendFloat, sizeof(float) * 2);
+    memcpy(motor_power_msg.data, &dataToSendFloat[0], sizeof(float) * 2);
 
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_POWER_INPUT));
 

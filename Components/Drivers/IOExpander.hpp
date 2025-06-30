@@ -72,8 +72,8 @@ enum class IOState {
 namespace DriverControls {
     // P2
     constexpr IOPin FNR_STATE_HIGH          = IOPin::P00;
-    constexpr IOPin FNR_STATE_LOW           = IOPin::P01;
-    constexpr IOPin LAP_BUTTON              = IOPin::P02;
+    constexpr IOPin FNR_STATE_LOW           = IOPin::P02;
+    constexpr IOPin LAP_BUTTON           	= IOPin::P01;
     constexpr IOPin SPARE_CC                = IOPin::P03;
 
     // P5

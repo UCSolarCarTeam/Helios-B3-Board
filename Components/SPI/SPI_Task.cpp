@@ -260,7 +260,7 @@ void SPI_Task::Run(void *pvParams)
 //    CUBE_PRINT("accel: %d   \r", testaccel);
      // CUBE_PRINT("Acceleration Pedal Position: %.2f%%\n", &(this->accelerationPedalPercent));
 
-//    calculateBrakePedalPercent();
+    calculateBrakePedalPercent();
 //    uint8_t testbrake = getBrakeIntPercent();
 //    CUBE_PRINT("brake: %d   \r", testbrake);
      // CUBE_PRINT("Braking Pedal Position: %.2f%%\n", &(this->brakingPedalPercent));
