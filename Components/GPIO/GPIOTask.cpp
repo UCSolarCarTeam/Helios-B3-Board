@@ -256,16 +256,13 @@ void GPIOTask::Run(void *pvParams)
                break;
            case DriverControls::SPARE_CC:
                CUBE_PRINT("    - P03 (Spare CC):             %d\n", driverControlState[i]);
-               if (driverControlState[i] == IOState::HIGH)
-               {
-               }
-               else if (driverControlState[i] == IOState::LOW)
-               {
-               }
-               else if (driverControlState[i] == IOState::ERROR)
-               {
-               }
-               break;
+        	   if (driverControlState[i] == IOState::HIGH){
+        		   hazard_toggle = 0;
+        	   } else if (driverControlState[i] == IOState::LOW){
+        		   hazard_toggle = 1;
+        	   }
+        	   else if (driverControlState[i] == IOState::ERROR){}
+        	   break;
             case DriverControls::HEADLIGHTS_ENABLE:
                 CUBE_PRINT("    - P04 (Headlights Enable):   %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
@@ -283,6 +280,7 @@ void GPIOTask::Run(void *pvParams)
                 {
                 }
                 break;
+#if UNUSED
             case DriverControls::HAZARD_LIGHT_ENABLE:
             	CUBE_PRINT("    - P05 (Hazard Light Enable): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
@@ -297,6 +295,7 @@ void GPIOTask::Run(void *pvParams)
                 {
                 }
                 break;
+#endif
             case DriverControls::RACE_MODE_ENABLE:
                 CUBE_PRINT("    - P06 (Race Mode Enable):    %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
@@ -449,51 +448,48 @@ void GPIOTask::Run(void *pvParams)
             }
         }
 
-        // TODO: sync it properly
         if (hazard_toggle || left_signal_toggle || right_signal_toggle) {
-
             if (blink_counter == 0) {
                 blink_counter = BLINK_COUNT_MAX;
             }
 
+            // Toggle blink
+            if(!blink){
+            	blink = 1;
+            } else {
+            	blink = 0;
+            }
+
             if (hazard_toggle) {
                 // Hazards override turn signals: blink both sides together
-            	if(!blink){
-            		powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
-            		powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
-            		blink = 1;
+            	IOState state;
+            	if(blink == 0){
+            		state = IOState::LOW;
             	} else {
-            		powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-            		powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-            		blink = 0;
+            		state = IOState::HIGH;
             	}
 
+                powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, state);
+                powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, state);
+//            	powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, state);
             } else {
-            	if(left_signal_toggle) {
-            		if(!blink){
-            			powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
-            		} else {
-            			powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-            		}
-            	} else if(!hazard_toggle){
-            		powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
-            	}
+            	IOState left_state, right_state;
+                if(blink == 0){
+                	if(left_signal_toggle){
+                		left_state = IOState::HIGH;
+                	} else if(!left_signal_toggle){
+                		left_state = IOState::LOW;
+                	}
 
-            	if(right_signal_toggle) {
-            		if(!blink){
-            			powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
-            		} else {
-            			powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-            		}
-            	}else if(!hazard_toggle){
-            		powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
-            	}
+                	if (right_signal_toggle){
+                		right_state = IOState::HIGH;
+                	} else if(left_signal_toggle) {
+                		right_state = IOState::LOW;
+                	}
+                }
 
-            	if(!blink){
-            		blink = 1;
-            	} else {
-            		blink = 0;
-            	}
+                powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, left_state);
+                powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, right_state);
             }
 
             blink_counter--;
@@ -502,6 +498,7 @@ void GPIOTask::Run(void *pvParams)
             // No signals active, ensure both lights are off
             powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
             powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
+//            powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::LOW);
             blink_counter = 0;
         }
 
