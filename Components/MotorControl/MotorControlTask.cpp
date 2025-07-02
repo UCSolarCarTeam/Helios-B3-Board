@@ -92,14 +92,14 @@ float MotorControlTask::lowPassFilter(float presentMotorCurrent, float prevMotor
 
 float MotorControlTask::calculateAccelMotorCurrent(float accelPercentage, float prevMotorCurrent)
 {
-    return lowPassFilter(calculateMotorCurrent(accelPercentage), prevMotorCurrent);
+    return calculateMotorCurrent(accelPercentage);//lowPassFilter(calculateMotorCurrent(accelPercentage), prevMotorCurrent);
 }
 
 float MotorControlTask::calculateRegenMotorCurrent(float regenPercentage, float prevMotorCurrent)
 {
     // Scale presentMotorCurrent by REGEN_INPUT_SCALING because regen uses less current than normal acceleration. Motors will trip if current is greater.
-    float presentMotorCurrent = calculateMotorCurrent(regenPercentage) * REGEN_INPUT_SCALING ;
-    return lowPassFilter(presentMotorCurrent, prevMotorCurrent);
+    float presentMotorCurrent = calculateMotorCurrent(regenPercentage) * REGEN_INPUT_SCALING;
+    return presentMotorCurrent;//lowPassFilter(presentMotorCurrent, prevMotorCurrent);
 }
 
 uint8_t MotorControlTask::vehicleVelocitySafeToGoForward()
@@ -147,6 +147,8 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // Convert values back to floating percentages for motors
     float regenPercentage = 0; //(float)getAvgRegen() / 100.0f; // Get value between 0 and 1
     float accelPercentage = SPI_Task::Inst().getAccelerationPedalPercent();
+    CUBE_PRINT("ACCEL PERCENT %d\n", static_cast<int>(accelPercentage));
+
     /*
      * UNUSED	= 00
      * Drive	= 10
@@ -160,9 +162,9 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     uint8_t reset = (motor_gpio_state & 0x08) >> 3;			 // active low
 
 //    CUBE_PRINT("MOTOR GPIO STATE %d\n", motor_gpio_state);
-//    CUBE_PRINT("FORWARD %d\n", forward);
-//    CUBE_PRINT("REVERSE %d\n", reverse);
-    CUBE_PRINT("MECH_BR %d\n", mech_brake);
+    CUBE_PRINT("FORWARD %d\n", forward);
+    CUBE_PRINT("REVERSE %d\n", reverse);
+//    CUBE_PRINT("MECH_BR %d\n", mech_brake);
 //    CUBE_PRINT("RESET   %d\n", reset);
     CUBE_PRINT("MOTOR STATE: %d\n" , driveCommandsInfo->motorState);
 
@@ -201,7 +203,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
         // To stop without regen braking, zero both motorCurrentOut and motorVelocityOut
         // https://tritium.com.au/includes/TRI88.004v4-Users-Manual.pdf - Section 13
 
-        if (driveCommandsInfo->motorState == Accelerating) {
+        if (driveCommandsInfo->motorState != RegenBraking) {
             *switching = 1;
         }
 
@@ -240,9 +242,10 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     } else if (accelPercentage > NON_ZERO_THRESHOLD) {
         // Accel state (drive state)
 
-        if(driveCommandsInfo->motorState == RegenBraking) {
+        if(driveCommandsInfo->motorState != Accelerating) {
             *switching = 1;
         }
+
         driveCommandsInfo->motorState = Accelerating;
 
         if(*switching) {
@@ -256,6 +259,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
             }
 
         } else {
+
             if (forward && allowDischarge) {
                 // Forward and Discharge is allowed
                 driveCommandsInfo->motorState = Accelerating;
@@ -285,7 +289,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
         }
     } else {
         // Off state
-        if(driveCommandsInfo->motorState == Accelerating) {
+        if(driveCommandsInfo->motorState != Off) {
             *switching = 1;
         }
 
@@ -317,15 +321,19 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // ADD EXTENDED ID HERE IF NEEDED
     dataToSendFloat[0] = MAX_FORWARD_RPM;
     dataToSendFloat[1] = driveCommandsInfo->motorCurrentOut;
-    memcpy(motor_drive_msg.data, &dataToSendFloat[0], sizeof(float) * 2);
+
+    memcpy(&motor_drive_msg.data[0], &dataToSendFloat[0], sizeof(float) * 2);
+    CUBE_PRINT("SWITCHING %d\n", *switching);
+    for(int i =  0; i < 8; i++){
+    	CUBE_PRINT("MOTOR_DRIVE_MSG[%d] %d\n", i, motor_drive_msg.data[i]);
+    }
 
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_DRIVE_INPUT));
 
     // Transmit Motor Power command
     // ADD EXTENDED ID HERE IF NEEDED
-    dataToSendFloat[0] = 0.0f; // Reserved (WaveSculptor datasheet)
-    dataToSendFloat[1] = BUS_CURRENT_OUT;
-    memcpy(motor_power_msg.data, &dataToSendFloat[0], sizeof(float) * 2);
+    motor_power_msg.data[0] = 0.0f; // Reserved (WaveSculptor datasheet)
+    motor_power_msg.data[4] = BUS_CURRENT_OUT; // ??? From original Elysia Code
 
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_POWER_INPUT));
 
@@ -333,7 +341,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // `!` for active low
 
     // reset = GPIOTask::Inst().getResetGPIO();
-    if (driveCommandsInfo->prevResetInput && !reset)
+    if (driveCommandsInfo->prevResetInput && reset)
     {
         driveCommandsInfo->resetStatus = SettingReset;
     }
@@ -346,7 +354,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     }
 
     // Update previous state (save current for next frame)
-    driveCommandsInfo->prevResetInput = !reset;
+    driveCommandsInfo->prevResetInput = reset;
 
 }
 

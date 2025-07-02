@@ -159,9 +159,15 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.DLC = motor_msg.DLC;
         msg.data[0] = motor_msg.data[0];
         msg.data[1] = motor_msg.data[1];
+        msg.data[2] = motor_msg.data[2];
+        msg.data[3] = motor_msg.data[3];
+        msg.data[4] = motor_msg.data[4];
+        msg.data[5] = motor_msg.data[5];
+        msg.data[6] = motor_msg.data[6];
+        msg.data[7] = motor_msg.data[7];
 
 //        CUBE_PRINT("Sent Motor Drive Input command\n");
-        CUBE_PRINT_CAN_MESSAGE(motor_msg.extendedID, motor_msg.DLC, &motor_msg.data[0]);
+//        CUBE_PRINT_CAN_MESSAGE(motor_msg.extendedID, motor_msg.DLC, &motor_msg.data[0]);
         break;
 
     case MOTOR_POWER_INPUT:
