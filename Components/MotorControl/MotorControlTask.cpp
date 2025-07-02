@@ -222,7 +222,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
         if (*switching) {
             // If regen to accel, set regen percentage to 0
-            driveCommandsInfo->motorCurrentOut = 0;// SPI_Task::Inst().getBrakePedalPercent();
+            driveCommandsInfo->motorCurrentOut = SPI_Task::Inst().getBrakePedalPercent() / 100.f;
 
             if (driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
                 // reset switching flag after switching
