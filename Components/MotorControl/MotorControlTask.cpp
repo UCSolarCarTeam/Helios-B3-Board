@@ -1,8 +1,9 @@
 #include <string.h> // for memcpy
-
 #include "cmsis_os.h"
-
 #include "MotorControlTask.hpp"
+
+#define DISABLED 0
+#define DEBUG_PRINTS 0
 
 uint32_t motorVehicleVelocityInput;
 
@@ -39,7 +40,7 @@ void MotorControlTask::Run(void *pvParams)
 
     uint32_t switching = 0;
 
-    this->motor_drive_msg.ID - 0;
+    this->motor_drive_msg.ID = 0;
     this->motor_drive_msg.extendedID = MOTOR_DRIVE_STDID;
     this->motor_drive_msg.DLC = MOTOR_DRIVE_DLC;
 
@@ -81,6 +82,7 @@ float MotorControlTask::calculateMotorCurrent(float accelPercentage)
     }
 }
 
+#if DISABLED
 float MotorControlTask::lowPassFilter(float presentMotorCurrent, float prevMotorCurrent)
 {
     // Essentially a simple IIR low pass filter, which is a system that resists change.
@@ -89,6 +91,7 @@ float MotorControlTask::lowPassFilter(float presentMotorCurrent, float prevMotor
     //Disappointing
     return prevMotorCurrent + MOTOR_CURRENT_SMOOTHING_FACTOR * (presentMotorCurrent - prevMotorCurrent);
 }
+#endif
 
 float MotorControlTask::calculateAccelMotorCurrent(float accelPercentage, float prevMotorCurrent)
 {
@@ -127,7 +130,7 @@ uint8_t MotorControlTask::isNewDirectionSafe(uint8_t forward, uint8_t reverse)
         return 1;
 
     } else {
-        // default case, not safe
+        // default case, not safe, likely Neutral
         return 0;
     }
 }
@@ -144,29 +147,35 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     2. calculate average pedal percentages from the buffer
     */
 
-    // Convert values back to floating percentages for motors
-    float regenPercentage = 0; //(float)getAvgRegen() / 100.0f; // Get value between 0 and 1
+    // Get pedal percentages
+    float regenPercentage = SPI_Task::Inst().getBrakePedalPercent();
     float accelPercentage = SPI_Task::Inst().getAccelerationPedalPercent();
+
+#if DEBUG_PRINTS
     CUBE_PRINT("ACCEL PERCENT %d\n", static_cast<int>(accelPercentage));
+#endif
 
     /*
-     * UNUSED	= 00
-     * Drive	= 10
-     * Neutral	= 01 Not doing anything right now
-     * Reverse	= 11
+     * ACTIVE LOW !!!!!!!!!
+     * UNUSED	= 11
+     * Drive	= 01
+     * Neutral	= 10
+     * Reverse	= 00
      * */
     uint8_t motor_gpio_state = GPIOTask::Inst().getMotorControl();
-    uint8_t forward = (motor_gpio_state & 0x03) == 0b01; // 0b10 ASSUMTION! MAY CHANGE
-    uint8_t reverse = (motor_gpio_state & 0x03) == 0b00; // 0b00 ASSUMTION! MAY CHANGE
-    uint8_t mech_brake = (motor_gpio_state & 0x04) >> 2; 		 // active low
-    uint8_t reset = (motor_gpio_state & 0x08) >> 3;			 // active low
-
-//    CUBE_PRINT("MOTOR GPIO STATE %d\n", motor_gpio_state);
-    CUBE_PRINT("FORWARD %d\n", forward);
-    CUBE_PRINT("REVERSE %d\n", reverse);
-//    CUBE_PRINT("MECH_BR %d\n", mech_brake);
-//    CUBE_PRINT("RESET   %d\n", reset);
-    CUBE_PRINT("MOTOR STATE: %d\n" , driveCommandsInfo->motorState);
+    uint8_t forward = (motor_gpio_state & 0x03) == 0b01; 	// 0b10
+    uint8_t reverse = (motor_gpio_state & 0x03) == 0b00; 	// 0b00
+    uint8_t mech_brake = (motor_gpio_state & 0x04) >> 2;	// converted to 1 if low
+    uint8_t reset = (motor_gpio_state & 0x08) >> 3;			// converted to 1 if low
+    
+#if DEBUG_PRINTS
+   CUBE_PRINT("MOTOR GPIO STATE %d\n", motor_gpio_state);
+   CUBE_PRINT("FORWARD %d\n", forward);
+   CUBE_PRINT("REVERSE %d\n", reverse);
+   CUBE_PRINT("MECH_BR %d\n", mech_brake);
+   CUBE_PRINT("RESET   %d\n", reset);
+   CUBE_PRINT("MOTOR STATE: %d\n" , driveCommandsInfo->motorState);
+#endif
 
 //    // NOTE: Hard coding GPIO values for now
 //    uint8_t forward = 0;
@@ -176,17 +185,19 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     /* TODO: Add switch case handle for CANRx Task to receive AuxBMS states */
     // Read AuxBMS messages
-//    uint8_t allowCharge = CANRxTask::Inst().getAllowCharge();
-    uint8_t allowDischarge = 1; //CANRxTask::Inst().getAllowDischarge();
-    uint8_t allowCharge = 0;
+    uint8_t allowCharge = CANRxTask::Inst().getAllowCharge();
+    uint8_t allowDischarge = CANRxTask::Inst().getAllowDischarge();
 
     /*--------------- Determine Data to Send ---------------*/
     float motorVelocityOut; // RPM
     if (!isNewDirectionSafe(forward, reverse)) {
         motorVelocityOut = 0;
         driveCommandsInfo->motorCurrentOut = 0;
-        CUBE_PRINT("UNSAFE, APPARENTLY\n");
-        CUBE_PRINT("FWD %d, REV %d\n", forward, reverse);
+
+#if DEBUG_PRINTS
+       CUBE_PRINT("UNSAFE, APPARENTLY\n");
+       CUBE_PRINT("FWD %d, REV %d\n", forward, reverse);
+#endif
 
     } else if (driveCommandsInfo->resetStatus == SettingReset) {
         // If reset button is pressed, set motorState to Off and motorCurrentOut to 0
@@ -250,7 +261,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
         if(*switching) {
             // If accel to regen, set accel percentage to 0
-            driveCommandsInfo->motorCurrentOut = SPI_Task::Inst().getAccelerationPedalPercent();
+            driveCommandsInfo->motorCurrentOut = SPI_Task::Inst().getAccelerationPedalPercent() / 100.f;
 
             if(driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
                 // reset switching flag after switching
@@ -283,7 +294,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                 // If neither forward nor reverse
                 // If discharge is not allowed, set motorState to Off
                 driveCommandsInfo->motorState = Off;
-                motorVelocityOut = 0;
+                motorVelocityOut = 0.f;
                 driveCommandsInfo->motorCurrentOut = 0;
             }
         }
@@ -296,8 +307,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
         driveCommandsInfo->motorState = Off;
 
         if(*switching) {
-            driveCommandsInfo->motorCurrentOut =
-                    calculateRegenMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
+            driveCommandsInfo->motorCurrentOut = 0.f;
 
             if(driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
                 *switching = 0;
@@ -306,8 +316,8 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
         } else {
         driveCommandsInfo->motorState = Off;
-        motorVelocityOut = 0;
-        driveCommandsInfo->motorCurrentOut = 0;
+        motorVelocityOut = 0.f;
+        driveCommandsInfo->motorCurrentOut = 0.f;
         }
     }
 
@@ -319,28 +329,31 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // Transmit Motor Drive command
     float dataToSendFloat[2] = {0};
     // ADD EXTENDED ID HERE IF NEEDED
-    dataToSendFloat[0] = MAX_FORWARD_RPM;
+    dataToSendFloat[0] = motorVelocityOut;
     dataToSendFloat[1] = driveCommandsInfo->motorCurrentOut;
 
     memcpy(&motor_drive_msg.data[0], &dataToSendFloat[0], sizeof(float) * 2);
+#if DEBUG_PRINTS
     CUBE_PRINT("SWITCHING %d\n", *switching);
     for(int i =  0; i < 8; i++){
-    	CUBE_PRINT("MOTOR_DRIVE_MSG[%d] %d\n", i, motor_drive_msg.data[i]);
+        CUBE_PRINT("MOTOR_DRIVE_MSG[%d] %d\n", i, motor_drive_msg.data[i]);
     }
+#endif
 
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_DRIVE_INPUT));
 
     // Transmit Motor Power command
     // ADD EXTENDED ID HERE IF NEEDED
-    motor_power_msg.data[0] = 0.0f; // Reserved (WaveSculptor datasheet)
-    motor_power_msg.data[4] = BUS_CURRENT_OUT; // ??? From original Elysia Code
+    dataToSendFloat[0] = 0.0f; // Reserved (WaveSculptor datasheet)
+    dataToSendFloat[1] = BUS_CURRENT_OUT; // ??? From original Elysia Code
+
+    memcpy(&motor_power_msg.data[0], &dataToSendFloat[0], sizeof(float) * 2);
 
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_POWER_INPUT));
 
     // Transmit Motor Reset command if button switch went from off to on
     // `!` for active low
 
-    // reset = GPIOTask::Inst().getResetGPIO();
     if (driveCommandsInfo->prevResetInput && reset)
     {
         driveCommandsInfo->resetStatus = SettingReset;

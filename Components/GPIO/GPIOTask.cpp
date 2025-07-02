@@ -9,7 +9,7 @@
 #include "IOExpander.hpp"
 
 /*----------------------- Macros -----------------------*/
-#define UNUSED_PINS 0
+#define DISABLED_PINS 0
 #define TASK_FREQUENCY_HZ 10
 constexpr uint32_t TASK_DELAY = 1000 / TASK_FREQUENCY_HZ;
 
@@ -281,7 +281,7 @@ void GPIOTask::Run(void *pvParams)
                 {
                 }
                 break;
-#if UNUSED
+#if DISABLED_PINS // Using Spare CC for Hazard Lights
             case DriverControls::HAZARD_LIGHT_ENABLE:
             	CUBE_PRINT("    - P05 (Hazard Light Enable): %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
@@ -309,7 +309,7 @@ void GPIOTask::Run(void *pvParams)
                 {
                 }
                 break;
-#if UNUSED_PINS
+#if DISABLED_PINS
             case DriverControls::P07:
                 CUBE_PRINT("    - P07 (Unused):              %d\n", driverControlState[i]);
                 if (driverControlState[i] == IOState::HIGH)
@@ -393,7 +393,7 @@ void GPIOTask::Run(void *pvParams)
                 break;
             case DriverControls::MECHANICAL_BRAKE:
                 CUBE_PRINT("    - P16 (Mech Brake):          %d\n", driverControlState[i-2]);
-                if (driverControlState[i - 2] == IOState::HIGH || hazard_toggle)
+                if (driverControlState[i - 2] == IOState::HIGH)
                 {
                     if(!(left_signal_toggle || hazard_toggle)){
                         powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
@@ -409,11 +409,11 @@ void GPIOTask::Run(void *pvParams)
                 }
                 else if (driverControlState[i - 2] == IOState::LOW)
                 {
-                    if(!(left_signal_toggle)){
+                    if(!(left_signal_toggle || hazard_toggle)){ // If no need for blinking
                         powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
 
                     }
-					if (!(right_signal_toggle)){
+					if (!(right_signal_toggle || hazard_toggle)){ // If no need for blinking
                         powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
                     }
 
@@ -425,7 +425,7 @@ void GPIOTask::Run(void *pvParams)
                 {
                 }
                 break;
-#if UNUSED_PINS
+#if DISABLED_PINS
             case DriverControls::P15:
                 CUBE_PRINT("    - P15 (Unused):              %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
