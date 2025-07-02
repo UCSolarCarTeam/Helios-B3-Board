@@ -100,8 +100,6 @@ private:
 
 #define BUS_CURRENT_OUT 1.0f // Percentage 0 to 1 (always 100%)
 
-#define DRIVE_COMMANDS_FREQ 10  // This needs to be at most 1 command every 250ms
-
 #define MOTOR_DRIVE_STDID 0x501U
 #define MOTOR_DRIVE_DLC 8
 
@@ -115,7 +113,8 @@ private:
 
 #define MAX_FORWARD_RPM 20000
 #define MAX_REVERSE_RPM -20000
-#define NON_ZERO_THRESHOLD 0.17f
+//#define NON_ZERO_THRESHOLD 0.17f
+#define NON_ZERO_THRESHOLD 3.0f
 #define MAX_PEDAL_THRESHOLD 0.71f
 #define MAX_ANALOG 4095 // 12bit ADC (2^12)
 #define REGEN_INPUT_SCALING 0.175f

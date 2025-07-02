@@ -4,9 +4,6 @@
 
 #include "MotorControlTask.hpp"
 
-float regenValuesQueue[REGEN_QUEUE_SIZE] = {0};
-float accelValuesQueue[ACCEL_QUEUE_SIZE] = {0};
-
 uint32_t motorVehicleVelocityInput;
 
 MotorControlTask::MotorControlTask() : Task(MOTOR_CONTROL_TASK_QUEUE_DEPTH_OBJS){}
@@ -66,30 +63,6 @@ CANMsg MotorControlTask::getMotorPower(){
 	return this->motor_power_msg;
 }
 
-uint32_t MotorControlTask::getAvgRegen()
-{
-    float sum = 0;
-
-    for (int i = 0; i < REGEN_QUEUE_SIZE; i++)
-    {
-        sum += regenValuesQueue[i];
-    }
-
-    return (uint32_t)((sum / (float)REGEN_QUEUE_SIZE));
-}
-
-uint32_t MotorControlTask::getAvgAccel()
-{
-    float sum = 0;
-
-    for (int i = 0; i < ACCEL_QUEUE_SIZE; i++)
-    {
-        sum += accelValuesQueue[i];
-    }
-
-    return (uint32_t)((sum / (float)ACCEL_QUEUE_SIZE));
-}
-
 float MotorControlTask::calculateMotorCurrent(float accelPercentage)
 {
     // To avoid a software overcurrent, our motor config
@@ -132,13 +105,15 @@ float MotorControlTask::calculateRegenMotorCurrent(float regenPercentage, float 
 uint8_t MotorControlTask::vehicleVelocitySafeToGoForward()
 {
     // return (motor0VehicleVelocityInput >= SAFE_VEHICLE_VELOCITY_TO_GO_FORWARD && motor1VehicleVelocityInput >= SAFE_VEHICLE_VELOCITY_TO_GO_FORWARD);
-    return (CANRxTask::Inst().getMotorVehicleVelocityInput() >= SAFE_VEHICLE_VELOCITY_TO_GO_FORWARD);
+//    return (CANRxTask::Inst().getMotorVehicleVelocityInput() >= SAFE_VEHICLE_VELOCITY_TO_GO_FORWARD);
+	return 1;
 }
 
 uint8_t MotorControlTask::vehicleVelocitySafeToGoReverse()
 {
     // return (motor0VehicleVelocityInput <= SAFE_VEHICLE_VELOCITY_TO_GO_REVERSE && motor1VehicleVelocityInput <= SAFE_VEHICLE_VELOCITY_TO_GO_REVERSE);
-    return (CANRxTask::Inst().getMotorVehicleVelocityInput() <= SAFE_VEHICLE_VELOCITY_TO_GO_REVERSE);
+//    return (CANRxTask::Inst().getMotorVehicleVelocityInput() <= SAFE_VEHICLE_VELOCITY_TO_GO_REVERSE);
+	return 1;
 }
 
 uint8_t MotorControlTask::isNewDirectionSafe(uint8_t forward, uint8_t reverse)
@@ -169,17 +144,9 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     2. calculate average pedal percentages from the buffer
     */
 
-    regenValuesQueue[driveCommandsInfo->regenQueueIndex++] = 0; //SPI_Task::Inst().getBrakePedalPercent();
-    accelValuesQueue[driveCommandsInfo->accelQueueIndex++] = SPI_Task::Inst().getAccelerationPedalPercent();
-
-    // Update Queue Indices
-    driveCommandsInfo->accelQueueIndex %= REGEN_QUEUE_SIZE;
-    driveCommandsInfo->regenQueueIndex %= ACCEL_QUEUE_SIZE;
-
     // Convert values back to floating percentages for motors
     float regenPercentage = 0; //(float)getAvgRegen() / 100.0f; // Get value between 0 and 1
-    float accelPercentage = (float)getAvgAccel() / 100.0f;
-
+    float accelPercentage = SPI_Task::Inst().getAccelerationPedalPercent();
     /*
      * UNUSED	= 00
      * Drive	= 10
@@ -187,10 +154,17 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
      * Reverse	= 11
      * */
     uint8_t motor_gpio_state = GPIOTask::Inst().getMotorControl();
-    uint8_t forward = (motor_gpio_state & 0x03) == 0b10; // 0b10 ASSUMTION! MAY CHANGE
-    uint8_t reverse = (motor_gpio_state & 0x03) == 0b11; // 0b00 ASSUMTION! MAY CHANGE
-    uint8_t mech_brake = motor_gpio_state & 0x04; 		 // active low
-    uint8_t reset = motor_gpio_state & 0x08;			 // active low
+    uint8_t forward = (motor_gpio_state & 0x03) == 0b01; // 0b10 ASSUMTION! MAY CHANGE
+    uint8_t reverse = (motor_gpio_state & 0x03) == 0b00; // 0b00 ASSUMTION! MAY CHANGE
+    uint8_t mech_brake = (motor_gpio_state & 0x04) >> 2; 		 // active low
+    uint8_t reset = (motor_gpio_state & 0x08) >> 3;			 // active low
+
+//    CUBE_PRINT("MOTOR GPIO STATE %d\n", motor_gpio_state);
+//    CUBE_PRINT("FORWARD %d\n", forward);
+//    CUBE_PRINT("REVERSE %d\n", reverse);
+    CUBE_PRINT("MECH_BR %d\n", mech_brake);
+//    CUBE_PRINT("RESET   %d\n", reset);
+    CUBE_PRINT("MOTOR STATE: %d\n" , driveCommandsInfo->motorState);
 
 //    // NOTE: Hard coding GPIO values for now
 //    uint8_t forward = 0;
@@ -201,19 +175,20 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     /* TODO: Add switch case handle for CANRx Task to receive AuxBMS states */
     // Read AuxBMS messages
 //    uint8_t allowCharge = CANRxTask::Inst().getAllowCharge();
-    uint8_t allowDischarge = CANRxTask::Inst().getAllowDischarge();
+    uint8_t allowDischarge = 1; //CANRxTask::Inst().getAllowDischarge();
     uint8_t allowCharge = 0;
-
 
     /*--------------- Determine Data to Send ---------------*/
     float motorVelocityOut; // RPM
     if (!isNewDirectionSafe(forward, reverse)) {
         motorVelocityOut = 0;
         driveCommandsInfo->motorCurrentOut = 0;
+        CUBE_PRINT("UNSAFE, APPARENTLY\n");
+        CUBE_PRINT("FWD %d, REV %d\n", forward, reverse);
 
     } else if (driveCommandsInfo->resetStatus == SettingReset) {
         // If reset button is pressed, set motorState to Off and motorCurrentOut to 0
-        driveCommandsInfo->motorCurrentOut = calculateRegenMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
+        driveCommandsInfo->motorCurrentOut = 0;//calculateRegenMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
 
         if (driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
             driveCommandsInfo->resetStatus = Resetting;
@@ -234,7 +209,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
         if (*switching) {
             // If regen to accel, set regen percentage to 0
-            driveCommandsInfo->motorCurrentOut = calculateRegenMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
+            driveCommandsInfo->motorCurrentOut = 0;// SPI_Task::Inst().getBrakePedalPercent();
 
             if (driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
                 // reset switching flag after switching
@@ -256,7 +231,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
                 driveCommandsInfo->motorCurrentOut = 0;
             }
         }
-    } else if (!mech_brake) {
+    } else if (mech_brake) {
         // If mechanical is pressed, set motorState to MechanicalBreaking and motorCurrentOut to 0
         driveCommandsInfo->motorState = MechanicalBreaking;
         motorVelocityOut = 0;
@@ -268,12 +243,11 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
         if(driveCommandsInfo->motorState == RegenBraking) {
             *switching = 1;
         }
-
         driveCommandsInfo->motorState = Accelerating;
 
         if(*switching) {
             // If accel to regen, set accel percentage to 0
-            driveCommandsInfo->motorCurrentOut = calculateAccelMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
+            driveCommandsInfo->motorCurrentOut = SPI_Task::Inst().getAccelerationPedalPercent();
 
             if(driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
                 // reset switching flag after switching
@@ -295,7 +269,6 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
             } else if (reverse && allowDischarge) {
                 // Reverse and Discharge is allowed
                 driveCommandsInfo->motorState = Accelerating;
-                HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
                 motorVelocityOut = MAX_REVERSE_RPM; // FAR FUTURE TODO: Based on ADC - Dom
 
                 driveCommandsInfo->motorCurrentOut = calculateAccelMotorCurrent(
@@ -342,7 +315,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     // Transmit Motor Drive command
     float dataToSendFloat[2] = {0};
     // ADD EXTENDED ID HERE IF NEEDED
-    dataToSendFloat[0] = motorVelocityOut;
+    dataToSendFloat[0] = MAX_FORWARD_RPM;
     dataToSendFloat[1] = driveCommandsInfo->motorCurrentOut;
     memcpy(motor_drive_msg.data, &dataToSendFloat[0], sizeof(float) * 2);
 
@@ -367,6 +340,7 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     if (driveCommandsInfo->resetStatus == Resetting)
     {
+    	CUBE_PRINT("Resetting Motors\n");
         CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_RESET_INPUT));
         driveCommandsInfo->resetStatus = NotResetting;
     }
