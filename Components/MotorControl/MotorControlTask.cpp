@@ -185,8 +185,10 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
     /* TODO: Add switch case handle for CANRx Task to receive AuxBMS states */
     // Read AuxBMS messages
-    uint8_t allowCharge = CANRxTask::Inst().getAllowCharge();
-    uint8_t allowDischarge = CANRxTask::Inst().getAllowDischarge();
+    uint8_t allowCharge = 1; //CANRxTask::Inst().getAllowCharge();
+    uint8_t allowDischarge = 1; // CANRxTask::Inst().getAllowDischarge();
+
+    CUBE_PRINT("ALLOW CHARGE    %d\nALLLOW DISCHARGE %d\n", allowCharge, allowDischarge);
 
     /*--------------- Determine Data to Send ---------------*/
     float motorVelocityOut; // RPM
@@ -203,10 +205,10 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
         // If reset button is pressed, set motorState to Off and motorCurrentOut to 0
         driveCommandsInfo->motorCurrentOut = 0;//calculateRegenMotorCurrent(0, driveCommandsInfo->motorCurrentOut);
 
-        if (driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
+//        if (driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
             driveCommandsInfo->resetStatus = Resetting;
             driveCommandsInfo->motorCurrentOut = 0;
-        }
+//        }
 
     } else if (regenPercentage > NON_ZERO_THRESHOLD) {
         // Regen state
@@ -222,16 +224,16 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
 
         if (*switching) {
             // If regen to accel, set regen percentage to 0
-            driveCommandsInfo->motorCurrentOut = SPI_Task::Inst().getBrakePedalPercent() / 100.f;
+//            driveCommandsInfo->motorCurrentOut = SPI_Task::Inst().getBrakePedalPercent() / 100.f;
 
-            if (driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
+//            if (driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
                 // reset switching flag after switching
                 *switching = 0;
                 driveCommandsInfo->motorCurrentOut = 0;
-            }
+//            }
 
         } else {
-            motorVelocityOut = 0;
+            motorVelocityOut = 0.5f;
             // Allow regen braking based on input from AuxBMS
             if (allowCharge) {
                 driveCommandsInfo->motorCurrentOut = calculateRegenMotorCurrent(
@@ -263,11 +265,11 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
             // If accel to regen, set accel percentage to 0
             driveCommandsInfo->motorCurrentOut = SPI_Task::Inst().getAccelerationPedalPercent() / 100.f;
 
-            if(driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
+//            if(driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
                 // reset switching flag after switching
                 *switching = 0;
                 driveCommandsInfo->motorCurrentOut = 0;
-            }
+//            }
 
         } else {
 
@@ -309,15 +311,15 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
         if(*switching) {
             driveCommandsInfo->motorCurrentOut = 0.f;
 
-            if(driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
+//            if(driveCommandsInfo->motorCurrentOut < SWITCHING_CURRENT) {
                 *switching = 0;
                 driveCommandsInfo->motorCurrentOut = 0;
-            }
+//            }
 
         } else {
-        driveCommandsInfo->motorState = Off;
-        motorVelocityOut = 0.f;
-        driveCommandsInfo->motorCurrentOut = 0.f;
+        	driveCommandsInfo->motorState = Off;
+        	motorVelocityOut = 0.f;
+        	driveCommandsInfo->motorCurrentOut = 0.f;
         }
     }
 
@@ -333,12 +335,12 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     dataToSendFloat[1] = driveCommandsInfo->motorCurrentOut;
 
     memcpy(&motor_drive_msg.data[0], &dataToSendFloat[0], sizeof(float) * 2);
-#if DEBUG_PRINTS
+//#if DEBUG_PRINTS
     CUBE_PRINT("SWITCHING %d\n", *switching);
     for(int i =  0; i < 8; i++){
         CUBE_PRINT("MOTOR_DRIVE_MSG[%d] %d\n", i, motor_drive_msg.data[i]);
     }
-#endif
+//#endif
 
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, MOTOR_DRIVE_INPUT));
 

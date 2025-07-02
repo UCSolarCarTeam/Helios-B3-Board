@@ -7,6 +7,7 @@
 #include "SystemDefines.hpp"
 #include "GPIOTask.hpp"
 #include "IOExpander.hpp"
+#include "SPI/SPI_Task.hpp"
 
 /*----------------------- Macros -----------------------*/
 #define DISABLED_PINS 0
@@ -395,29 +396,11 @@ void GPIOTask::Run(void *pvParams)
                 CUBE_PRINT("    - P16 (Mech Brake):          %d\n", driverControlState[i-2]);
                 if (driverControlState[i - 2] == IOState::HIGH)
                 {
-                    if(!(left_signal_toggle || hazard_toggle)){
-                        powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
-
-                    }
-                    if(!(right_signal_toggle || hazard_toggle)){
-                        powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
-                    }
-
-                	powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::LOW);
                 	braking = 0;
 
                 }
                 else if (driverControlState[i - 2] == IOState::LOW)
                 {
-                    if(!(left_signal_toggle || hazard_toggle)){ // If no need for blinking
-                        powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-
-                    }
-					if (!(right_signal_toggle || hazard_toggle)){ // If no need for blinking
-                        powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
-                    }
-
-                    powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::HIGH);
                     braking = 1;
 
                 }
@@ -466,6 +449,16 @@ void GPIOTask::Run(void *pvParams)
             default:
                 break;
             }
+        }
+
+        uint8_t brake_percent = SPI_Task::Inst().getBrakeIntPercent();
+//        CUBE_PRINT("BRAKE PERCENT ");
+        if(brake_percent >= 3 || braking){
+//        	CUBE_PRINT("ON  %d\n", brake_percent);
+        	braking = 1;
+        } else if (brake_percent < 3 || !braking){
+//        	CUBE_PRINT("OFF %d\n", brake_percent);
+        	braking = 0;
         }
 
         if (hazard_toggle || left_signal_toggle || right_signal_toggle) {
@@ -532,6 +525,28 @@ void GPIOTask::Run(void *pvParams)
 //            powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::LOW);
             blink_counter = 0;
             blink = 0;
+        }
+
+        if(braking){
+            if(!(left_signal_toggle || hazard_toggle)){ // If no need for blinking
+                powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+
+            }
+			if (!(right_signal_toggle || hazard_toggle)){ // If no need for blinking
+                powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::HIGH);
+            }
+
+            powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::HIGH);
+        } else {
+            if(!(left_signal_toggle || hazard_toggle)){
+                powerBoardExpander.SetPin(PowerBoard::LEFT_TURN_LIGHT_SIGNAL, IOState::LOW);
+
+            }
+            if(!(right_signal_toggle || hazard_toggle)){
+                powerBoardExpander.SetPin(PowerBoard::RIGHT_TURN_LIGHT_SIGNAL, IOState::LOW);
+            }
+
+        	powerBoardExpander.SetPin(PowerBoard::BRAKE_LIGHT_SIGNAL, IOState::LOW);
         }
 
         // Commit changes to Power board

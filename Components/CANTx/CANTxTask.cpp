@@ -95,7 +95,7 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.DLC = 1;
         u8_data = GPIOTask::Inst().LightsInputs();
         msg.data[0] = u8_data;
-        CUBE_PRINT("Sent Lights Input command\n");
+//        CUBE_PRINT("Sent Lights Input command\n");
         break;
 
     case DIGITAL_INPUTS:
@@ -107,7 +107,7 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.data[1] = (u16_data >> 8) & 0x01; // High byte, only 9 bits
         msg.data[0] = u16_data & 0xFF;        // Low byte, 8 bits
 
-        CUBE_PRINT("Sent DIGITAL INPUTS command\n");
+//        CUBE_PRINT("Sent DIGITAL INPUTS command\n");
         break;
 
     case ANALOG_INPUTS:
@@ -131,7 +131,7 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.data[0] = SPI_Task::Inst().getAccelerationIntPercent();
         msg.data[1] = SPI_Task::Inst().getBrakeIntPercent();
 
-        CUBE_PRINT("Sent Analog Inputs command\n");
+//        CUBE_PRINT("Sent Analog Inputs command\n");
         break;
 
     case LIGHTS_STATUS_BASE:
@@ -139,18 +139,18 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.DLC = 1;
         u8_data = GPIOTask::Inst().LightStatus();
         msg.data[0] = u8_data;
-        CUBE_PRINT("Sent Lights Status command\n");
+//        CUBE_PRINT("Sent Lights Status command\n");
         break;
 
     case HEARTBEAT:
         msg.extendedID = 0x600;
         msg.DLC = 1;
         msg.data[0] = 1;
-        CUBE_PRINT("Sent Heartbeat \n");
+//        CUBE_PRINT("Sent Heartbeat \n");
         break;
 
     case MOTOR_DRIVE_INPUT:
-        CUBE_PRINT("MotorControlTask - Motor Drive Input command\n");
+//        CUBE_PRINT("MotorControlTask - Motor Drive Input command\n");
         // Get the drive command from MotorControlTask
         motor_msg = MotorControlTask::Inst().getMotorDrive();
 
@@ -167,11 +167,12 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.data[7] = motor_msg.data[7];
 
 //        CUBE_PRINT("Sent Motor Drive Input command\n");
-//        CUBE_PRINT_CAN_MESSAGE(motor_msg.extendedID, motor_msg.DLC, &motor_msg.data[0]);
+        CUBE_PRINT("MOTOR DRIVE CAN MESSAGE\n");
+        CUBE_PRINT_CAN_MESSAGE(motor_msg.extendedID, motor_msg.DLC, &motor_msg.data[0]);
         break;
 
     case MOTOR_POWER_INPUT:
-        CUBE_PRINT("MotorControlTask - Motor Power Input command\n");
+//        CUBE_PRINT("MotorControlTask - Motor Power Input command\n");
         // Get the power command from MotorControlTask
         motor_msg = MotorControlTask::Inst().getMotorPower();
 
@@ -180,12 +181,20 @@ void CANTxTask::HandleCommand(Command &cm)
         msg.DLC = motor_msg.DLC;
         msg.data[0] = motor_msg.data[0];
         msg.data[1] = motor_msg.data[1];
+        msg.data[2] = motor_msg.data[2];
+        msg.data[3] = motor_msg.data[3];
+        msg.data[4] = motor_msg.data[4];
+        msg.data[5] = motor_msg.data[5];
+        msg.data[6] = motor_msg.data[6];
+        msg.data[7] = motor_msg.data[7];
 
-        CUBE_PRINT("Sent Motor Power Input command\n");
+        CUBE_PRINT("MOTOR POWER CAN MESSAGE\n");
+        CUBE_PRINT_CAN_MESSAGE(msg.extendedID, msg.DLC, &msg.data[0]);
+//        CUBE_PRINT("Sent Motor Power Input command\n");
         break;
 
     case MOTOR_RESET_INPUT:
-        CUBE_PRINT("MotorControlTask - Motor Reset\n");
+//        CUBE_PRINT("MotorControlTask - Motor Reset\n");
 
         msg.extendedID = 0x503;
         msg.DLC = 0;

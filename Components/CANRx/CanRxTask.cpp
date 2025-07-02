@@ -242,4 +242,5 @@ void CUBE_PRINT_CAN_MESSAGE(uint32_t id, uint8_t dlc, uint8_t *data)
     {
         CUBE_PRINT("%02X ", data[i]);
     }
+    CUBE_PRINT("\n");
 }
