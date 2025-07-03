@@ -3,7 +3,7 @@
 #include "MotorControlTask.hpp"
 
 #define DISABLED 0
-#define DEBUG_PRINTS 0
+#define DEBUG_PRINTS 1
 
 uint32_t motorVehicleVelocityInput;
 
@@ -186,14 +186,14 @@ void MotorControlTask::sendDriveCommands(uint32_t* prevWakeTimePtr,
     /* TODO: Add switch case handle for CANRx Task to receive AuxBMS states */
     // Read AuxBMS messages
     uint8_t allowCharge =
-//    		1;
-    		CANRxTask::Inst().getAllowCharge();    // comment out to hardcode
+    		1;
+//    		CANRxTask::Inst().getAllowCharge();    // comment out to hardcode
 
     uint8_t allowDischarge =
     		1;
 //			CANRxTask::Inst().getAllowDischarge(); // comment out to hardcode
 
-    CUBE_PRINT("MOTOR CONTROL ALLOW CHARGE    %d\n", allowCharge);
+//    CUBE_PRINT("MOTOR CONTROL ALLOW CHARGE    %d\n", allowCharge);
 //    CUBE_PRINT("MOTOR CONTROL ALLOW DISCHARGE %d\n", allowDischarge);
 
     /*--------------- Determine Data to Send ---------------*/
