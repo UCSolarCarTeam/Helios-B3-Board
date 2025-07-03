@@ -173,12 +173,15 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data) {
 	uint32_t vehicleRaw = 0;
 
     switch(id) {
-        case MBMS_MESSAGE: // MBMS Status ID: CHANGE THIS TO THE ACTUAL DEFINE LATER
+        case MBMS_MESSAGE:
             // Bit 6 = nChargeEnable
             // Bit 8 = nDischargeEnable
             this->allowDischarge = (data[0] & 0x40) ? 0 : 1;  // Byte 0, Bit 6
             this->allowCharge = (data[1] & 0x1) ? 0 : 1;      // Byte 1, Bit 0
-            CUBE_PRINT("MBMS Status: allowCharge = %d, allowDischarge = %d\n", this->allowCharge, this->allowDischarge);
+
+//            CUBE_PRINT("CANRx allowDischarge = %d\n", this->allowDischarge);
+            CUBE_PRINT("CANRx allowCharge = %d\n", this->allowCharge);
+
             break;
         case MOTOR_VELOCITY:
             // Name         | Bytes |   Bits
