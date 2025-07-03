@@ -21,7 +21,10 @@
 CANPeripheral peripheral1 = {
     .CS_PORT = CS_CAN_N_GPIO_Port,
     .CS_PIN = CS_CAN_N_Pin,
-    .hspi = SystemHandles::CAN_SPI};
+    .hspi = SystemHandles::CAN_SPI
+};
+
+uint32_t testTxCounter = 0;
 
 /**
  * @brief Constructor for CANTxTask
@@ -55,7 +58,6 @@ void CANTxTask::InitTask()
  */
 void CANTxTask::Run(void *pvParams)
 {
-    ConfigureCANSPI(&peripheral1);
     while (1)
     {
 
@@ -203,8 +205,37 @@ void CANTxTask::HandleCommand(Command &cm)
         CUBE_PRINT("Sent Motor Reset Input command\n");
         break;
 
+    case TEST_102:
+        msg.extendedID = 0x102;
+        msg.DLC = 1;
+        msg.data[0] = 0xAA;
+        CUBE_PRINT("Sent 0x102\n");
+        break;
+        
+    case TEST_403:
+        msg.extendedID = 0x403;
+        msg.DLC = 1;
+        msg.data[0] = 0xBB;
+        CUBE_PRINT("Sent 0x403\n");
+        break;
+
+    case TEST_423:
+        msg.extendedID = 0x423;
+        msg.DLC = 1;
+        msg.data[0] = 0xCC;
+        CUBE_PRINT("Sent 0x423\n");
+        break;
+
+    case TEST_RANDOM:
+        msg.extendedID = testTxCounter;
+        msg.DLC = 1;
+        msg.data[0] = 0xFF;
+        CUBE_PRINT("Sent 0x%08X\n", testTxCounter);
+        testTxCounter++;
+        break;
+
     default:
-        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
+        CUBE_PRINT("CANTXTask - Received unsupported command: %d\n", cm.GetCommand());
         break;
     }
 

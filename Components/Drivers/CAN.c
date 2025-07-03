@@ -135,7 +135,7 @@ void ConfigureCANSPI(CANPeripheral *peripheral)
 	// TODO: ask violet of this settings
 
 	// Ensure IC is out of reset state (128 clock cycles)
-	// HAL_Delay(100);
+	// HAL_Delay(10);
 
 	// Tq = (2 x (BRP + 1)) / Fosc
 	uint8_t CONFIG_CNF1 = 0x01; //BRP = 1 to make tq = 250ns and a SJW of 1Tq
@@ -150,20 +150,19 @@ void ConfigureCANSPI(CANPeripheral *peripheral)
 
 	// Reset CAN IC
 	CAN_IC_RESET(peripheral);
-	osDelay(100);
+	osDelay(10);
 
 	// CANSTAT.OPMOD must read as config mode to be able to write to the registers (0x80)
 	uint8_t CANSTAT_STATUS = 0;
 	CAN_IC_READ_REGISTER(CANSTAT, &CANSTAT_STATUS, peripheral);
 
 	// Ensure IC is in configuration mode
-	if ((CANSTAT_STATUS & 0xE0) != 0x80) {
+	uint8_t setupCounter = 0;
+	while ( ((CANSTAT_STATUS & 0xE0) != 0x80) && (setupCounter < 10)) {
 		CAN_IC_WRITE_REGISTER_BITWISE(CANCTRL, 0xE0, 0x80, peripheral);
-		osDelay(100);
+		setupCounter++;
+		osDelay(10);
 	}
-
-	// CAN Filters
-	CAN_Filter(peripheral);
 
 	// Base IC Configuration Registers
 	CAN_IC_WRITE_REGISTER_BITWISE(CNF1, 0xFF, CONFIG_CNF1, peripheral); //configure CNF1
@@ -171,58 +170,77 @@ void ConfigureCANSPI(CANPeripheral *peripheral)
 	CAN_IC_WRITE_REGISTER_BITWISE(CNF3, 0x47, CONFIG_CNF3, peripheral); //configure CNF3
 
 	// Receive Buffer Configurations
-	// Recieve valid standard and extended message frames
-	// Enable rollover: RXBnCTRL.BUKT = 1
+	// Recieve valid extended message frames
+	// Disable rollover: RXBnCTRL.BUKT = 0
 	CAN_IC_WRITE_REGISTER_BITWISE(BFPCTRL, 0x0F, 0x0F, peripheral);
-	CAN_IC_WRITE_REGISTER_BITWISE(RXB0CTRL, 0x64, 0x64, peripheral);
-	CAN_IC_WRITE_REGISTER_BITWISE(RXB1CTRL, 0x60, 0x60, peripheral);
+
+
+	/* Conditional for toggling CAN filters -------------------------------------
+		0: No filters
+		1: Yes filters
+	*/
+	#if 1
+		CAN_IC_WRITE_REGISTER_BITWISE(RXB0CTRL, 0x64, 0x40, peripheral);
+		CAN_IC_WRITE_REGISTER_BITWISE(RXB1CTRL, 0x60, 0x40, peripheral);
+		CAN_Filter(peripheral);
+	#else
+		CAN_IC_WRITE_REGISTER_BITWISE(RXB0CTRL, 0x64, 0x60, peripheral);
+		CAN_IC_WRITE_REGISTER_BITWISE(RXB1CTRL, 0x60, 0x60, peripheral);
+	#endif
 
 	CANSTAT_STATUS = 0;
 
 	// Toggle CAN_TEST_SETUP to 1 for loopback mode, 0 for normal mode
 	#if 0
 		CAN_IC_WRITE_REGISTER_BITWISE(CANCTRL, 0xE7, 0x44, peripheral);	// Put IC in loop-back mode for testing as well as enable CLKOUT pin with 1:1 prescaler
-		// HAL_Delay(100);
+		osDelay(10);
 		CAN_IC_READ_REGISTER(CANSTAT, &CANSTAT_STATUS, peripheral); // 0x44
 	#else
 		CAN_IC_WRITE_REGISTER_BITWISE(CANCTRL, 0xE7, 0x04, peripheral); //Put IC in normal operation mode with CLKOUT pin enable and 1:1 prescaler
-		osDelay(100);
+		osDelay(10);
 		CAN_IC_READ_REGISTER(CANSTAT, &CANSTAT_STATUS, peripheral);
 	#endif
 
 	// Reset and configure interrupts
-	CAN_IC_WRITE_REGISTER(CANINTE, 0xA0, peripheral); 	//configure interrupts, currently enable ERRIF
+	CAN_IC_WRITE_REGISTER(CANINTE, 0x20, peripheral); 	//configure interrupts, currently enable ERRIF
 	CAN_IC_WRITE_REGISTER(CANINTF, 0x00, peripheral); 	//clear INTE flags
 	CAN_IC_WRITE_REGISTER(EFLG, 0x00, peripheral);
-	Setup_CANRx_Interrupt_Buffer(peripheral);
+	// Setup_CANRx_Interrupt_Buffer(peripheral);
 }
+
 
 /**
  * @brief set CAN filters for CAN IC
  */
 void CAN_Filter(CANPeripheral *peripheral)
 {
-	// Filter 0x423/0x403 for motor velocity
-	CAN_IC_WRITE_REGISTER(RXM1SIDH, 0XFB, peripheral);
-	CAN_IC_WRITE_REGISTER(RXM1SIDL, 0XFF, peripheral);
-	CAN_IC_WRITE_REGISTER(RXM1EID8, 0XFF, peripheral);
-	CAN_IC_WRITE_REGISTER(RXM1EID0, 0XFF, peripheral);
-
-	CAN_IC_WRITE_REGISTER(RXF2SIDH, 0X80, peripheral);
-	CAN_IC_WRITE_REGISTER(RXF2SIDL, 0X68, peripheral);
-	CAN_IC_WRITE_REGISTER(RXF2EID8, 0X00, peripheral);
-	CAN_IC_WRITE_REGISTER(RXF2EID0, 0X00, peripheral);
-
-	// Filter 0x102 for MBMS Status
+	// Set up masks
 	CAN_IC_WRITE_REGISTER(RXM0SIDH, 0XFF, peripheral);
 	CAN_IC_WRITE_REGISTER(RXM0SIDL, 0XFF, peripheral);
 	CAN_IC_WRITE_REGISTER(RXM0EID8, 0XFF, peripheral);
 	CAN_IC_WRITE_REGISTER(RXM0EID0, 0XFF, peripheral);
 
-	CAN_IC_WRITE_REGISTER(RXF0SIDH, 0X20, peripheral);
-	CAN_IC_WRITE_REGISTER(RXF0SIDL, 0X48, peripheral);
-	CAN_IC_WRITE_REGISTER(RXF0EID8, 0X00, peripheral);
-	CAN_IC_WRITE_REGISTER(RXF0EID0, 0X00, peripheral);
+	CAN_IC_WRITE_REGISTER(RXM1SIDH, 0XFF, peripheral);
+	CAN_IC_WRITE_REGISTER(RXM1SIDL, 0XFF, peripheral);
+	CAN_IC_WRITE_REGISTER(RXM1EID8, 0XFF, peripheral);
+	CAN_IC_WRITE_REGISTER(RXM1EID0, 0XFF, peripheral);
+
+	// Filter 0x102 for MBMS Status (RXB0)
+	CAN_IC_WRITE_REGISTER(RXF0SIDH, 0X00, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF0SIDL, 0X08, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF0EID8, 0X01, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF0EID0, 0X02, peripheral);
+
+	// Filter 0x423/0x403 for motor velocity (RXB1)
+	CAN_IC_WRITE_REGISTER(RXF5SIDH, 0X00, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF5SIDL, 0X08, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF5EID8, 0X04, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF5EID0, 0X23, peripheral);
+
+	CAN_IC_WRITE_REGISTER(RXF4SIDH, 0X00, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF4SIDL, 0X08, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF4EID8, 0X04, peripheral);
+	CAN_IC_WRITE_REGISTER(RXF4EID0, 0X03, peripheral);
 }
 
 /*-------------------------------------------------------------------------------------------*/
@@ -266,7 +284,7 @@ uint8_t checkAvailableTXChannel(CANPeripheral *peripheral)
             return 2;
         }
 
-		osDelay(50);
+		osDelay(20);
         // prevWakeTime += TX_CHANNEL_CHECK_DELAY;
         // osDelayUntil(prevWakeTime);
     }
@@ -408,3 +426,6 @@ void Setup_CANRx_Interrupt_Buffer(CANPeripheral *peripheral){
 	CAN_IC_WRITE_REGISTER_BITWISE(CANINTE,0x03,0x03,peripheral); //Enable interrupt PIN (CAN_INT)
 	//Active low interrupt pins
 }
+
+
+

@@ -8,6 +8,8 @@
 /* Includes -----------------------------------------------------------------*/
 #include "SystemDefines.hpp"
 #include "UARTDriver.hpp"
+#include "CAN.h"
+#include "main.h"
 
 // Tasks
 #include "WatchdogTask.hpp"
@@ -24,6 +26,13 @@ namespace Driver {
     UARTDriver uart2(USART2);
 }
 
+/* CAN peripheral struct object-----------------------------------------------*/
+CANPeripheral peripheral0 = {
+    .CS_PORT = CS_CAN_N_GPIO_Port,
+    .CS_PIN = CS_CAN_N_Pin,
+    .hspi = SystemHandles::CAN_SPI
+};
+
 /* Interface Functions ------------------------------------------------------------*/
 /**
  * @brief Main function interface, called inside main.cpp before os initialization takes place.
@@ -38,6 +47,9 @@ void run_main() {
     CANTxTask::Inst().InitTask();
     GPIOTask::Inst().InitTask();
     MotorControlTask::Inst().InitTask();
+
+    // Init Peripherals
+    ConfigureCANSPI(&peripheral0);
 
     // Print System Boot Info : Warning, don't queue more than 10 prints before scheduler starts
     CUBE_PRINT("\n-- CUBE SYSTEM --\n");

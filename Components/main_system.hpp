@@ -41,7 +41,6 @@ namespace UART {
     constexpr UARTDriver* Debug = &Driver::uart2;
 }
 
-
 /* System Handles ------------------------------------------------------------------*/
 extern CRC_HandleTypeDef hcrc;       // CRC - Hardware CRC System Handle
 

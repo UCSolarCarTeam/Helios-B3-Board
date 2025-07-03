@@ -7,6 +7,7 @@
 #include "GPIO.hpp"
 #include "SystemDefines.hpp"
 #include "WatchdogTask.hpp"
+#include "CANTx/CANTxTask.hpp"
 
 /* Macros/Enums ------------------------------------------------------------*/
 
@@ -62,7 +63,7 @@ void WatchdogTask::HandleCommand(Command& cm)
 void WatchdogTask::Run(void * pvParams)
 {
     uint32_t tempSecondCounter = 0;
-
+    uint8_t tempTxCounter = 0;
     while (1) {
         GPIO::LED_BLUE::On();
         osDelay(500);
@@ -74,6 +75,35 @@ void WatchdogTask::Run(void * pvParams)
         Command cm;
 
         CUBE_PRINT(">> Run [%d] s\n", tempSecondCounter++);
+
+// Temp CAN sender for loopback mode
+#if 0
+        switch (tempTxCounter)
+        {
+        case 0:
+            CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, TEST_102));  
+            break;
+
+        case 1:
+            CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, TEST_403));  
+            break;
+    
+        case 2:
+            CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, TEST_423));  
+            break;
+
+        default:
+            break;
+        }
+
+        tempTxCounter++;
+
+        if (tempTxCounter >= 3) {
+            tempTxCounter = 0;
+        }
+
+        CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, TEST_RANDOM));  
+#endif
 
         // Ingest the command queue, up to 5 commands
         uint8_t proced = 0;

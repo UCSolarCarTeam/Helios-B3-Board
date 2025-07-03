@@ -71,8 +71,6 @@ void CANRxTask::InitTask()
 
 void CANRxTask::Run(void *pvParams)
 {
-    ConfigureCANSPI(&peripheral2);
-    
     while (1)
     {
         /***
@@ -112,24 +110,31 @@ void CANRxTask::HandleCommand(Command &cm)
     uint8_t dlc = 0;
     uint8_t data[8] = {0};
 
+    uint8_t CANINTF_status = 0;
+    uint8_t EFLG_status = 0;
+
     switch (static_cast<CAN_RX_COMMANDS>(cm.GetTaskCommand()))
     {
     case CAN_INTERRUPT_HAPPENED:
-//        CUBE_PRINT("Received a CAN RX Message by interrupt\n");
+        // CUBE_PRINT("Received a CAN RX Message by interrupt\n");
+        CAN_IC_READ_REGISTER(CANINTF, &CANINTF_status, &peripheral2);
+        CAN_IC_READ_REGISTER(EFLG, &EFLG_status, &peripheral2);
     	__NOP();
+        // CAN_IC_WRITE_REGISTER_BITWISE(CANINTF, 0x20, 0x00, &peripheral2);
+        // CAN_IC_WRITE_REGISTER_BITWISE(EFLG, 0xC0, 0x00, &peripheral2);
         break;
     case CAN_RX0_INTERRUPT_HAPPENED:
         receiveCANMessage(0, &id, &dlc, data, &peripheral2);
-//        CUBE_PRINT("CAN RX0 Message:\n");
-//        CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
+        CUBE_PRINT("CAN RX0 Message:\n");
+        CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
         break;
     case CAN_RX1_INTERRUPT_HAPPENED:
         receiveCANMessage(1, &id, &dlc, data, &peripheral2);
-//        CUBE_PRINT("CAN RX1 Message:\n");
-//        CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
+        CUBE_PRINT("CAN RX1 Message:\n");
+        CUBE_PRINT_CAN_MESSAGE(id, dlc, data);
         break;
     default:
-//        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
+        CUBE_PRINT("CANRXTask - Received unsupported command: %d\n", cm.GetCommand());
         __NOP();
         break;
     }
@@ -137,8 +142,6 @@ void CANRxTask::HandleCommand(Command &cm)
     HandleCANMessage(id, dlc, data);
 }
 
-//// Handle CAN_INT Callback here ?
-#if 1
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
    // NOTE: Can Implement Call back on RXBUF0 and RXBUF1 and decode the message accordingly.
@@ -165,7 +168,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
            ->SendFromISR(canInterruptHappenedCommandFlag);
    }
 }
-#endif
 
 void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data) {
 
@@ -179,7 +181,7 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data) {
             this->allowDischarge = (data[0] & 0x40) ? 0 : 1;  // Byte 0, Bit 6
             this->allowCharge = (data[1] & 0x1) ? 0 : 1;      // Byte 1, Bit 0
 
-//            CUBE_PRINT("CANRx allowDischarge = %d\n", this->allowDischarge);
+            // CUBE_PRINT("CANRx allowDischarge = %d\n", this->allowDischarge);
             CUBE_PRINT("CANRx allowCharge = %d\n", this->allowCharge);
 
             break;
@@ -189,13 +191,11 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data) {
             // VehicleVelocity	4	    63-32
 
             // Extract motor velocity
-
             for (uint8_t i = 0; i < 4; ++i) {
                 motorRaw |= static_cast<uint32_t>(data[i]) << (i * 8);
             }
 
             // Extract vehicle velocity
-
             for (uint8_t i = 0; i < 4; ++i) {
                 vehicleRaw |= static_cast<uint32_t>(data[i + 4]) << (i * 8);
             }
@@ -205,12 +205,13 @@ void CANRxTask::HandleCANMessage(uint32_t id, uint8_t dlc, uint8_t *data) {
             this->vehicleVelocity = static_cast<float>(vehicleRaw);
             break;
         default:
-//            CUBE_PRINT("CANRxTask - Received unsupported CAN message with ID: 0x%08X\n", id);
+        //    CUBE_PRINT("CANRxTask - Received unsupported CAN message with ID: 0x%08X\n", id);
         	__NOP();
             break;        
     }
 }
 
+/* Getter Functions -----------------------------------------------------------------------------*/
 float CANRxTask::getMotorVehicleVelocityInput()
 {
     // This function should return the vehicle velocity input from the motor controller
@@ -235,7 +236,7 @@ uint8_t CANRxTask::getAllowDischarge()
     return this->allowDischarge; // Placeholder for actual allow discharge status
 }
 
-//Helper function to print CAN message
+/* Helper function to print CAN message -----------------------------------------------------------*/
 void CUBE_PRINT_CAN_MESSAGE(uint32_t id, uint8_t dlc, uint8_t *data)
 {
     CUBE_PRINT("  ID: 0x%08X\n", id);

@@ -28,6 +28,11 @@ enum CAN_TX_COMMANDS
     MOTOR_DRIVE_INPUT,        // Command for motor drive input
 	MOTOR_POWER_INPUT,        // Command for motor power input
 	MOTOR_RESET_INPUT,
+
+    TEST_102,
+    TEST_403,
+    TEST_423,
+    TEST_RANDOM
 };
 
 /* Macros ------------------------------------------------------------------*/

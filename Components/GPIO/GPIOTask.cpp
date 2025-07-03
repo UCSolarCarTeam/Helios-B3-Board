@@ -560,7 +560,6 @@ void GPIOTask::Run(void *pvParams)
     }
 }
 
-
 /**
  * @brief Handles periodic tasks based on the `counterTick`.
  *
@@ -583,18 +582,15 @@ void GPIOTask::checkCounterTick() {
     // Always send every 50 ms
     //NOTE: Currently not sending to queue 
     CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, DIGITAL_INPUTS));
-    CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, ANALOG_INPUTS));
+    CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, ANALOG_INPUTS));
 
-    if (this->counterTick == 1) { // 100 ms passed send LIGHTS_INPUT
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
+    if ((this->counterTick % 2) == 0) {
+        CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, LIGHTS_INPUT));
+        CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND, LIGHTS_STATUS_BASE));
     }
-    if (this->counterTick == 2) { // 200 ms passed send LIGHTS_INPUT and LIGHTS_STATUS_BASE
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_INPUT));
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND, LIGHTS_STATUS_BASE));
-    }
+
     if(this->counterTick == 10){
-        CANTxTask::Inst().SendCommand(Command(DATA_COMMAND,HEARTBEAT));
+        CANTxTask::Inst().SendCommand(Command(TASK_SPECIFIC_COMMAND,HEARTBEAT));
         this->counterTick = 0; // Reset the counter for the next cycle
     }
-
 }
